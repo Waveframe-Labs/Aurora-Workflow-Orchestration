@@ -111,7 +111,7 @@ Independent AI-assisted researcher
 
 - ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
 - Email: **shawnkardin@gmail.com**  
-- GitHub: [shawncwright](https://github.com/shawncwright)  
+- GitHub: [shawncwright](https://github.com/Wright-Shawn)  
 
 I develop and document structured workflows for AI-assisted research and applied analysis, with the **AI Orchestration Method (AOM)** as the flagship framework. My work spans both theoretical modeling (e.g., cosmology through Waveframe) and practical applications (e.g., customer review analysis).  
 
