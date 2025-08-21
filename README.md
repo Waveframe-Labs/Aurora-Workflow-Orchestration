@@ -81,7 +81,6 @@ docs/            # Extended methodology guide
 figures/         # Workflow diagrams & process charts
 citations/       # References & external sources
 WORKFLOW_LOG.md  # Factual timeline of project development
-DIALOGUE_LOG.md  # Curated transcript showing project emergence
 ```
 
 ---
