@@ -1,4 +1,4 @@
-# AI-Workflow-Orchestration (Epistemic Orchestration Method, EOM)
+# AI Orchestration Method (AOM)
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
@@ -8,38 +8,39 @@
 ---
 
 <p align="center">
-  <img src="figures/AI-Workflow-Orchestration-Banner.PNG" alt="AI Workflow Orchestration banner" width="100%">
+  <img src="figures/AI-Orchestration-Method-Banner.PNG" alt="AI Orchestration Method banner" width="100%">
 </p>
 
 ---
 
 ## What This Is (Plain Language)
 
-**AI-Workflow-Orchestration (AWO)** — also referred to as the **Epistemic Orchestration Method (EOM)** — is a methodology project that defines how to structure, critique, and validate AI-assisted research.  
+The **AI Orchestration Method (AOM)** is a framework for structuring, critiquing, and validating AI-assisted work.  
 
-The project includes reproducible workflow logs, documentation practices, and case studies. Its purpose is to make **AI–human orchestration** transparent and trustworthy, bridging the gap between *automation* and *explanation* in knowledge production.
+It provides reproducible workflow logs, documentation practices, and case studies. The goal is to make **AI–human collaboration** transparent, trustworthy, and scalable — bridging the gap between *automation* and *explanation* in both research and applied problem solving.
 
 ---
 
 ## Why It Matters
 
-AI is no longer just a tool — it’s part of the research pipeline. That raises critical questions:  
+AI is no longer just a tool — it’s part of the workflow itself. That creates new challenges:  
 
-- How do we know what we know when AI is in the loop?  
-- What standards make AI-assisted research trustworthy?  
-- What counts as “explanation” versus “automation”?  
-- How do we formalize **human-in-the-loop oversight** as part of the knowledge pipeline?  
+- How do we validate outputs without blind trust in AI?  
+- What standards make AI-assisted work reproducible across teams?  
+- How do we formalize **human-in-the-loop oversight**?  
+- How do we scale workflows from research questions to applied business domains?  
 
-AWO/EOM tackles these questions by turning abstract epistemology into a **concrete workflow method**.
+**AOM is the answer.** It turns abstract challenges of AI epistemology into a **concrete orchestration framework** for real projects.
 
 ---
 
 ## Skills Demonstrated
 
-- **Workflow design & quality gates** – checkpoints to ensure clarity and reproducibility.  
-- **Methodology development** – structuring epistemic standards for AI research.  
-- **Clear communication of complex processes** – bridging technical and non-technical audiences.  
+- **Workflow design & quality gates** – ensuring clarity and reproducibility at every step.  
+- **Methodology development** – formalizing a domain-agnostic orchestration process.  
+- **Human-in-the-loop oversight** – integrating validation and falsifiability checks.  
 - **Research reproducibility** – workflow logs, documentation templates, and case studies.  
+- **Applied analysis** – demonstrations on scientific and business problems.  
 
 ---
 
@@ -47,16 +48,34 @@ AWO/EOM tackles these questions by turning abstract epistemology into a **concre
 
 - **Workflow logs** – chronological records of project evolution.  
 - **Documentation templates** – reproducible structures for validation.  
-- **Case studies** – applied demonstrations (Waveframe as first).  
-- **Theory notes** – connecting workflows to epistemological framing.  
+- **Case studies** – applied demonstrations of AOM in action.  
+- **Theory notes** – methodological rationale and principles.  
+
+---
+
+## Core Workflow Cycle
+
+1. **Define Research Question** → Frame the inquiry clearly.  
+2. **AI Orchestration** → Deploy multiple AI models/agents to explore possible answers.  
+3. **Validation & Falsification** → Compare outputs against data, logic, or constraints.  
+4. **Documentation & Reproducibility** → Record decisions, failures, and results.  
+5. **Synthesis & Insights** → Distill findings into knowledge claims and caveats.  
+
+---
+
+## Roles in the Workflow
+
+- **Human (Orchestrator):** defines the problem, interprets AI outputs, and applies falsifiability standards.  
+- **AI Models:** generate hypotheses, run simulations, provide alternative formulations.  
+- **Orchestration Layer:** integrates outputs, ensures consistency, reproducibility, and logging.  
 
 ---
 
 ## Repository Structure
 
 ```
-theory/          # Core methodological notes & epistemology
-methods/         # Templates, workflow logs, documentation practices
+theory/          # Core methodological notes & rationale
+methods/         # Templates, workflow logs, reproducibility practices
 case_studies/    # Links & summaries of applied demonstrations
 docs/            # Extended methodology guide
 figures/         # Workflow diagrams & process charts
@@ -67,7 +86,26 @@ DIALOGUE_LOG.md  # Curated transcript showing project emergence
 
 ---
 
+## Case Studies
+
+The following projects demonstrate AOM in action:  
+
+- [Waveframe Cosmology](link) → AOM applied to theoretical physics.  
+- [Customer Review Analysis](link) → AOM applied to business insights.  
+- [Societal Progress Simulator](link) → AOM applied to social dynamics.  
+
+---
+
+## Principles
+
+- **Falsifiability First** – models are judged by how they can fail, not just succeed.  
+- **AI as Partner** – AI outputs are collaborators in inquiry, not black boxes.  
+- **Process Over Outcome** – the structure of inquiry is as important as the result.  
+
+---
+
 ## Citation
 
 If you use or reference this work, please cite via the [CITATION.cff](CITATION.cff) file or ORCID:  
-**ORCID:** [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
+
+**ORCID:** [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
