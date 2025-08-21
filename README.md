@@ -8,7 +8,7 @@
 ---
 
 <p align="center">
-  <img src="figures/AI-Orchestration-Method-Banner.PNG" alt="AI Orchestration Method banner" width="100%">
+  <img src="figures/AI-Workflow-Orchestration-Banner.PNG" alt="AI Orchestration Method banner" width="100%">
 </p>
 
 ---
