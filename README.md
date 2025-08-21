@@ -7,6 +7,12 @@
 
 ---
 
+<p align="center">
+  <img src="figures/AI-Workflow-Orchestration-Banner.png" alt="AI Workflow Orchestration banner" width="100%">
+</p>
+
+---
+
 ## What This Is (Plain Language)
 
 **AI-Workflow-Orchestration (AWO)** — also referred to as the **Epistemic Orchestration Method (EOM)** — is a methodology project that defines how to structure, critique, and validate AI-assisted research.  
