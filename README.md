@@ -71,20 +71,6 @@ AI is no longer just a tool — it’s part of the workflow itself. That creates
 
 ---
 
-## Repository Structure
-
-```
-theory/          # Core methodological notes & rationale
-methods/         # Templates, workflow logs, reproducibility practices
-case_studies/    # Links & summaries of applied demonstrations
-docs/            # Extended methodology guide
-figures/         # Workflow diagrams & process charts
-citations/       # References & external sources
-WORKFLOW_LOG.md  # Factual timeline of project development
-```
-
----
-
 ## Case Studies
 
 The following projects demonstrate AOM in action:  
