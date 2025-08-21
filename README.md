@@ -122,3 +122,18 @@ I develop and document structured workflows for AI-assisted research and applied
 If you use or reference this work, please cite via the [CITATION.cff](CITATION.cff) file or ORCID:  
 
 **ORCID:** [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
+
+---
+
+## License  
+
+This repository is dual-licensed to maximize both open knowledge sharing and structured attribution:  
+
+- **Apache 2.0 License** → Permissive use for code and workflows.  
+- **Creative Commons CC BY 4.0 License** → Attribution required for textual content and documentation.  
+
+By using this repository, you agree to comply with the terms of both licenses.  
+
+See:  
+- [LICENSE](LICENSE) (Apache 2.0)  
+- [LICENSE-CC-BY-4.0.md](LICENSE-CC-BY-4.0.md) (Creative Commons Attribution 4.0)  
