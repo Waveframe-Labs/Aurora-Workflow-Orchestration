@@ -104,6 +104,20 @@ The following projects demonstrate AOM in action:
 
 ---
 
+## Project Logs  
+
+All dialogue and workflow records are stored in the [`logs/`](logs) directory.  
+Each log file is timestamped for clarity and archival purposes.  
+
+- **Workflow Logs** → Factual timelines of project development.  
+- **Dialogue Logs** → Curated excerpts showing the emergence of ideas.  
+
+Example:  
+- [WORKFLOW_LOG_2025-08-21.md](logs/WORKFLOW_LOG_2025-08-21.md)  
+- [DIALOGUE_LOG_2025-08-21.md](logs/DIALOGUE_LOG_2025-08-21.md)  
+
+---
+
 ## Author  
 
 **Shawn C. Wright**  
