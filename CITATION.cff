@@ -2,6 +2,6 @@ cff-version: 1.2.0
 title: "AI Workflow Orchestration"
 authors:
   - family-names: "Wright"
-    given-names: "Shawn"
+    given-names: "Shawn C."
 license: Apache-2.0 OR CC-BY-4.0
 repository-code: "https://github.com/Wright-Shawn/AI-Workflow-Orchestration"
