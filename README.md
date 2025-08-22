@@ -2,7 +2,6 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
-[![ORCID](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-brightgreen.svg)](https://orcid.org/0009-0006-6043-9295)  
 [![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff)  
 
 ---
@@ -13,125 +12,106 @@
 
 ---
 
-## What This Is (Plain Language)
+## What This Is
 
-The **AI Orchestration Method (AOM)** is a framework for structuring, critiquing, and validating AI-assisted work.  
+AI is moving fast, but most teams don’t have reproducible workflows.  
+The **AI Orchestration Method (AOM)** makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
 
-It provides reproducible workflow logs, documentation practices, and case studies. The goal is to make **AI–human collaboration** transparent, trustworthy, and scalable — bridging the gap between *automation* and *explanation* in both research and applied problem solving.
+AOM is not a coding framework — it’s a **research and process framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains.  
 
 ---
 
 ## Why It Matters
 
-AI is no longer just a tool — it’s part of the workflow itself. That creates new challenges:  
+AI is now embedded in the workflow itself. That creates challenges:  
 
-- How do we validate outputs without blind trust in AI?  
-- What standards make AI-assisted work reproducible across teams?  
-- How do we formalize **human-in-the-loop oversight**?  
-- How do we scale workflows from research questions to applied business domains?  
+- How do we validate outputs without blind trust?  
+- How do we reproduce results across people and projects?  
+- How do we balance speed with rigor?  
 
-**AOM is the answer.** It turns abstract challenges of AI epistemology into a **concrete orchestration framework** for real projects.
+**AOM answers these problems** by turning ad-hoc AI use into a structured, repeatable orchestration method.  
+
+---
+
+## Core Principles
+
+- **Falsifiability First** → methods must be disprovable, not just impressive  
+- **AI as Partner** → models are collaborators in inquiry, not black boxes  
+- **Process Over Outcome** → the structure of inquiry matters as much as the result  
+
+---
+
+## Workflow Cycle
+
+1. **Define Question** → Frame the inquiry clearly  
+2. **AI Orchestration** → Deploy models to explore possibilities  
+3. **Validation** → Stress-test outputs with data, logic, or constraints  
+4. **Documentation** → Record decisions, failures, and results  
+5. **Synthesis** → Distill insights and caveats into usable knowledge  
+
+<p align="center">
+  <img src="figures/AOM-Workflow-Cycle.png" alt="AOM Workflow Cycle diagram" width="70%">
+</p>
 
 ---
 
 ## Skills Demonstrated
 
-- **Workflow design & quality gates** – ensuring clarity and reproducibility at every step.  
-- **Methodology development** – formalizing a domain-agnostic orchestration process.  
-- **Human-in-the-loop oversight** – integrating validation and falsifiability checks.  
-- **Research reproducibility** – workflow logs, documentation templates, and case studies.  
-- **Applied analysis** – demonstrations on scientific and business problems.  
+- **Workflow design & process engineering** → structuring projects for clarity and repeatability  
+- **Human-in-the-loop oversight** → embedding validation and falsifiability into AI use  
+- **Reproducibility practices** → workflow logs, documentation templates, and audit trails  
+- **Applied analysis** → translating orchestration methods into science, business, and social domains  
+- **Method development** → creating frameworks for scaling AI–human collaboration  
 
 ---
 
 ## Deliverables
 
-- **Workflow logs** – chronological records of project evolution.  
-- **Documentation templates** – reproducible structures for validation.  
-- **Case studies** – applied demonstrations of AOM in action.  
-- **Theory notes** – methodological rationale and principles.  
+- **Workflow Logs** → chronological records of project decisions  
+- **Documentation Templates** → reusable structures for validation  
+- **Case Studies** → applied demonstrations of AOM in practice  
+
+An applied demonstration (customer review analysis) is under development and will be linked here once published.  
 
 ---
 
-## Core Workflow Cycle
+## Roles
 
-1. **Define Research Question** → Frame the inquiry clearly.  
-2. **AI Orchestration** → Deploy multiple AI models/agents to explore possible answers.  
-3. **Validation & Falsification** → Compare outputs against data, logic, or constraints.  
-4. **Documentation & Reproducibility** → Record decisions, failures, and results.  
-5. **Synthesis & Insights** → Distill findings into knowledge claims and caveats.  
+- **Orchestrator (Human):** Guides direction, applies falsifiability, validates outputs  
+- **AI Models:** Generate alternatives, surface blind spots, accelerate iteration  
+- **Orchestration Layer:** Captures logs, integrates outputs, ensures reproducibility  
 
 ---
 
-## Roles in the Workflow
+## Logs
 
-- **Human (Orchestrator):** defines the problem, interprets AI outputs, and applies falsifiability standards.  
-- **AI Models:** generate hypotheses, run simulations, provide alternative formulations.  
-- **Orchestration Layer:** integrates outputs, ensures consistency, reproducibility, and logging.  
+Logs are stored in the [`logs/`](logs) directory.  
+Each file is timestamped for clarity and archival purposes.  
 
----
-
-## Case Studies
-
-The following projects demonstrate AOM in action:  
-
-- [Waveframe Cosmology](link) → AOM applied to theoretical physics.  
-- [Customer Review Analysis](link) → AOM applied to business insights.  
-- [Societal Progress Simulator](link) → AOM applied to social dynamics.  
+Logs demonstrate how AOM tracks **decisions, alternatives, and validations** across the project lifecycle.  
 
 ---
 
-## Principles
-
-- **Falsifiability First** – models are judged by how they can fail, not just succeed.  
-- **AI as Partner** – AI outputs are collaborators in inquiry, not black boxes.  
-- **Process Over Outcome** – the structure of inquiry is as important as the result.  
-
----
-
-## Project Logs  
-
-All dialogue and workflow records are stored in the [`logs/`](logs) directory.  
-Each log file is timestamped for clarity and archival purposes.  
-
-- **Workflow Logs** → Factual timelines of project development.  
-- **Dialogue Logs** → Curated excerpts showing the emergence of ideas.  
-
-Example:  
-- [WORKFLOW_LOG_2025-08-21.md](logs/WORKFLOW_LOG_2025-08-21.md)  
-- [DIALOGUE_LOG_2025-08-21.md](logs/DIALOGUE_LOG_2025-08-21.md)  
-
----
-
-## Author  
+## Author
 
 **Shawn C. Wright**  
-Independent AI-assisted researcher  
+Researcher developing reproducible workflows for AI–human collaboration.  
+Focused on orchestration methods, documentation, and applied analysis across science and business domains.  
 
 - ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
-- Email: **shawnkardin@gmail.com**  
-- GitHub: [shawncwright](https://github.com/Wright-Shawn)  
-
-I develop and document structured workflows for AI-assisted research and applied analysis, with the **AI Orchestration Method (AOM)** as the flagship framework. My work spans both theoretical modeling (e.g., cosmology through Waveframe) and practical applications (e.g., customer review analysis).  
+- Email: **shawnkardin [at] gmail [dot] com**  
+- GitHub: [Wright-Shawn](https://github.com/Wright-Shawn)  
 
 ---
 
-## Citation
+## License
 
-If you use or reference this work, please cite via the [CITATION.cff](CITATION.cff) file or ORCID:  
+This repository uses a dual license:
 
-**ORCID:** [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
+- **Apache 2.0** → applies to source code, scripts, and automation  
+- **CC BY 4.0** → applies to documentation, prose, logs, and workflow notes  
 
----
-
-## License  
-
-This repository is dual-licensed to maximize both open knowledge sharing and structured attribution:  
-
-- **Apache 2.0 License** → Permissive use for code and workflows.  
-- **Creative Commons CC BY 4.0 License** → Attribution required for textual content and documentation.  
-
-By using this repository, you agree to comply with the terms of both licenses.  
+By using this repository, you agree to comply with both.  
 
 See:  
 - [LICENSE](LICENSE) (Apache 2.0)  
