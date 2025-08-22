@@ -50,7 +50,7 @@ AI is now embedded in the workflow itself. That creates challenges:
 5. **Synthesis** → Distill insights and caveats into usable knowledge  
 
 <p align="center">
-  <img src="figures/AOM-Workflow-Cycle.png" alt="AOM Workflow Cycle diagram" width="70%">
+  <img src="figures/AOM-Workflow-Cycle.PNG" alt="AOM Workflow Cycle diagram" width="70%">
 </p>
 
 ---
