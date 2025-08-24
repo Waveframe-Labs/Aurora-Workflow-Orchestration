@@ -1,4 +1,4 @@
-# AI Orchestration Method (AOM)
+# AI Workflow Orchestration (AWO)
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
@@ -7,50 +7,50 @@
 ---
 
 <p align="center">
-  <img src="figures/AI-Workflow-Orchestration-Banner.PNG" alt="AI Orchestration Method banner" width="100%">
+  <img src="figures/AI-Workflow-Orchestration-Banner.PNG" alt="AI Workflow Orchestration banner" width="100%">
 </p>
 
 ---
 
 ## What This Is
 
-AI is moving fast, but most teams don’t have reproducible workflows.  
-The **AI Orchestration Method (AOM)** makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
+AI is moving fast, but most projects lack **reproducible workflows**.  
+The **AI Workflow Orchestration (AWO)** framework makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
 
-AOM is not a coding framework — it’s a **research and process framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains.  
+AWO is not a coding library — it’s a **methodological framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains.  
 
 ---
 
 ## Why It Matters
 
-AI is now embedded in the workflow itself. That creates challenges:  
+AI isn’t just a tool — it’s part of the workflow itself. That raises new challenges:  
 
 - How do we validate outputs without blind trust?  
-- How do we reproduce results across people and projects?  
+- How do we reproduce results across teams and contexts?  
 - How do we balance speed with rigor?  
 
-**AOM answers these problems** by turning ad-hoc AI use into a structured, repeatable orchestration method.  
+**AWO addresses these questions** by transforming ad-hoc AI use into a structured, repeatable orchestration method.  
 
 ---
 
 ## Core Principles
 
-- **Falsifiability First** → methods must be disprovable, not just impressive  
-- **AI as Partner** → models are collaborators in inquiry, not black boxes  
-- **Process Over Outcome** → the structure of inquiry matters as much as the result  
+- **Falsifiability First** → outputs must be disprovable, not just impressive  
+- **AI as Partner** → models act as collaborators, not opaque black boxes  
+- **Process Over Outcome** → the rigor of inquiry matters as much as results  
 
 ---
 
 ## Workflow Cycle
 
 1. **Define Question** → Frame the inquiry clearly  
-2. **AI Orchestration** → Deploy models to explore possibilities  
-3. **Validation** → Stress-test outputs with data, logic, or constraints  
-4. **Documentation** → Record decisions, failures, and results  
-5. **Synthesis** → Distill insights and caveats into usable knowledge  
+2. **Orchestrate AI** → Deploy models to explore possibilities  
+3. **Validate** → Stress-test outputs with logic, data, or constraints  
+4. **Document** → Capture decisions, failures, and results  
+5. **Synthesize** → Distill findings into usable knowledge  
 
 <p align="center">
-  <img src="figures/AOM-Workflow-Cycle.PNG" alt="AOM Workflow Cycle diagram" width="70%">
+  <img src="figures/AOM-Workflow-Cycle.PNG" alt="AWO Workflow Cycle diagram" width="70%">
 </p>
 
 ---
@@ -58,26 +58,26 @@ AI is now embedded in the workflow itself. That creates challenges:
 ## Skills Demonstrated
 
 - **Workflow design & process engineering** → structuring projects for clarity and repeatability  
-- **Human-in-the-loop oversight** → embedding validation and falsifiability into AI use  
-- **Reproducibility practices** → workflow logs, documentation templates, and audit trails  
-- **Applied analysis** → translating orchestration methods into science, business, and social domains  
-- **Method development** → creating frameworks for scaling AI–human collaboration  
+- **Human-in-the-loop oversight** → embedding falsifiability and validation in AI use  
+- **Reproducibility practices** → workflow logs, documentation templates, audit trails  
+- **Applied analysis** → translating orchestration into science, business, and social domains  
+- **Method development** → frameworks for scaling AI–human collaboration  
 
 ---
 
 ## Deliverables
 
-- **Workflow Logs** → chronological records of project decisions  
-- **Documentation Templates** → reusable structures for validation  
-- **Case Studies** → applied demonstrations of AOM in practice  
+- **Workflow Logs** → timestamped records of project decisions  
+- **Documentation Templates** → reusable structures for reproducible inquiry  
+- **Case Studies** → applied demonstrations of AWO in practice  
 
-An applied demonstration (customer review analysis) is under development and will be linked here once published.  
+A first applied demonstration (customer review analysis) is under development and will be linked here when published.  
 
 ---
 
-## Roles
+## Roles in AWO
 
-- **Orchestrator (Human):** Guides direction, applies falsifiability, validates outputs  
+- **Orchestrator (Human):** Frames direction, applies falsifiability, validates outputs  
 - **AI Models:** Generate alternatives, surface blind spots, accelerate iteration  
 - **Orchestration Layer:** Captures logs, integrates outputs, ensures reproducibility  
 
@@ -88,7 +88,7 @@ An applied demonstration (customer review analysis) is under development and wil
 Logs are stored in the [`logs/`](logs) directory.  
 Each file is timestamped for clarity and archival purposes.  
 
-Logs demonstrate how AOM tracks **decisions, alternatives, and validations** across the project lifecycle.  
+Logs demonstrate how AWO tracks **decisions, alternatives, and validations** across the project lifecycle.  
 
 ---
 
@@ -98,7 +98,7 @@ Logs demonstrate how AOM tracks **decisions, alternatives, and validations** acr
 Researcher developing reproducible workflows for AI–human collaboration.  
 Focused on orchestration methods, documentation, and applied analysis across science and business domains.  
 
-- ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
+- ORCID: [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-brightgreen.svg)](https://orcid.org/0009-0006-6043-9295)  
 - Email: **shawnkardin [at] gmail [dot] com**  
 - GitHub: [Wright-Shawn](https://github.com/Wright-Shawn)  
 
