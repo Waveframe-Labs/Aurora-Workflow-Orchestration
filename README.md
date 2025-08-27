@@ -33,54 +33,54 @@ AI isn’t just a tool — it’s part of the workflow itself. That raises new c
 
 ---
 
-# Roadmap
+## Roadmap
 
-**This repository is alive.** AWO (AI Workflow Orchestration) will continue to evolve across concrete, public case studies and method upgrades. Below is the near-term plan and how it ladders into a stable, citable method.
+**This repository is alive.** AWO will continue to evolve through applied case studies and method refinements. Instead of fixed timelines, progress is tracked in phases — each tagged release reflects the latest stable state of the method.  
 
-## Q3–Q4 2025 (Active)
-- **Cosmology case study (Waveframe v4.0):** Reproducible notebooks, logs, and artifacts demonstrating AWO in a hard-science domain. Focus: transparent derivations, baseline comparisons, and falsifiability workflows.
-- **Customer analytics case study:** End‑to‑end pipeline from raw reviews → topic modeling → sentiment and “why” themes → recommendations. Focus: data hygiene, annotation standards, and decision-grade reporting.
-- **Method whitepaper v1.0:** A stable, citable, 1‑page explanation in `docs/` covering principles, roles, artifacts, and governance.
+### Current Focus  
+- **Method Whitepaper v1.0** — citable, stable reference in `docs/`.  
+- **Case Study: Waveframe v4.0** — demonstration of AWO in a hard-science domain (cosmology).  
+- **Case Study: Customer Review Analytics** — end-to-end example of AWO applied to business data.  
 
-## 2026
-- **Domain expansion:**
-  - **Societal Progress Simulator:** Interactive model and evaluation framework; demonstrates AWO for simulation, UI, and narrative reporting.
-  - **Data/ML engineering patterns:** Lightweight templates for ETL, evaluation harnesses, and experiment tracking that fit phone‑only and low‑resource constraints.
-- **Method upgrades:**
-  - **Critique loops:** Formalize multi‑model roles (Implementer, Refiner, Critic) with checklists and failure modes.
-  - **Evidence registry:** Standardize how figures, CSVs, and logs are registered and linked to claims.
-  - **Reproducibility profiles:** Boilerplate `make reproduce` targets and Colab‑first runners; pinned environments.
+### Upcoming Priorities  
+- **Societal Progress Simulator** — interactive demonstration of AWO in applied social science.  
+- **Expanded case studies** — additional applications in diverse domains to stress-test and refine AWO.  
+- **Refined documentation standards** — tightening how logs, artifacts, and decisions are recorded.  
 
-## Long‑term
-- **Stable release cadence:** Semantic versioning for both method and case studies; each tag mapped to a DOI.
-- **Third‑party contributions:** Clear CONTRIBUTING, review rubric, and artifact requirements.
-- **Minimum Viable Paper (MVP) builder:** Script that assembles a citable brief from repo artifacts (figures, claims, and references).
+### Long-Term Vision  
+- **Stable release cadence** — semantic versioning with DOIs for each tagged release.  
+- **Citable briefs** — lightweight, structured outputs (“minimum viable papers”) built from repo artifacts.  
+- **Community use** — opening AWO for external case studies and reproducibility experiments.  
 
-## In‑repo Guarantees (what to expect now)
-- Colab‑ready quickstarts or `make reproduce` targets.
-- Pinned environments (lock files) and dataset provenance notes.
-- Logs and run manifests for every figure/table used in docs.
-- Clear labeling of **Runnable** vs **Archived** notebooks.
+---
 
-> If it can’t be reproduced, it doesn’t count. AWO optimizes for honest, inspectable work over theatrics.
+## In-repo Guarantees (what to expect now)
+
+- **Method whitepaper** in `/docs`: a citable, stable reference for AWO.  
+- **Roadmap** in the README: clear direction for evolution.  
+- **Citation files** (`CITATION.cff`, `citation.bib`): proper referencing support.  
+- **Logs** in `/logs`: records of orchestration choices, critique loops, and design evolution.  
+- **Versioning**: tagged releases, DOIs, and semantic versioning.  
+
+> If it can’t be audited, it doesn’t count. AWO optimizes for honest, inspectable workflows over theatrics.  
 
 ---
 
 ## Core Principles
 
-- **Falsifiability First** → outputs must be disprovable, not just impressive  
-- **AI as Partner** → models act as collaborators, not opaque black boxes  
-- **Process Over Outcome** → the rigor of inquiry matters as much as results  
+- **Falsifiability First** → outputs must be disprovable, not just impressive.  
+- **AI as Partner** → models act as collaborators, not opaque black boxes.  
+- **Process Over Outcome** → the rigor of inquiry matters as much as results.  
 
 ---
 
 ## Workflow Cycle
 
-1. **Define Question** → Frame the inquiry clearly  
-2. **Orchestrate AI** → Deploy models to explore possibilities  
-3. **Validate** → Stress-test outputs with logic, data, or constraints  
-4. **Document** → Capture decisions, failures, and results  
-5. **Synthesize** → Distill findings into usable knowledge  
+1. **Define Question** → Frame the inquiry clearly.  
+2. **Orchestrate AI** → Deploy models to explore possibilities.  
+3. **Validate** → Stress-test outputs with logic, data, or constraints.  
+4. **Document** → Capture decisions, failures, and results.  
+5. **Synthesize** → Distill findings into usable knowledge.  
 
 <p align="center">
   <img src="figures/AOM-Workflow-Cycle.PNG" alt="AWO Workflow Cycle diagram" width="70%">
@@ -90,29 +90,29 @@ AI isn’t just a tool — it’s part of the workflow itself. That raises new c
 
 ## Skills Demonstrated
 
-- **Workflow design & process engineering** → structuring projects for clarity and repeatability  
-- **Human-in-the-loop oversight** → embedding falsifiability and validation in AI use  
-- **Reproducibility practices** → workflow logs, documentation templates, audit trails  
-- **Applied analysis** → translating orchestration into science, business, and social domains  
-- **Method development** → frameworks for scaling AI–human collaboration  
+- **Workflow design & process engineering** → structuring projects for clarity and repeatability.  
+- **Human-in-the-loop oversight** → embedding falsifiability and validation in AI use.  
+- **Reproducibility practices** → logs, documentation templates, audit trails.  
+- **Applied analysis** → translating orchestration into science, business, and social domains.  
+- **Method development** → frameworks for scaling AI–human collaboration.  
 
 ---
 
 ## Deliverables
 
-- **Workflow Logs** → timestamped records of project decisions  
-- **Documentation Templates** → reusable structures for reproducible inquiry  
-- **Case Studies** → applied demonstrations of AWO in practice  
+- **Workflow Logs** → timestamped records of project decisions.  
+- **Documentation Templates** → reusable structures for reproducible inquiry.  
+- **Case Studies** → applied demonstrations of AWO in practice.  
 
-A first applied demonstration (customer review analysis) is under development and will be linked here when published.  
+The first applied demonstration (customer review analysis) is under development and will be linked here when published.  
 
 ---
 
 ## Roles in AWO
 
-- **Orchestrator (Human):** Frames direction, applies falsifiability, validates outputs  
-- **AI Models:** Generate alternatives, surface blind spots, accelerate iteration  
-- **Orchestration Layer:** Captures logs, integrates outputs, ensures reproducibility  
+- **Orchestrator (Human):** Frames direction, applies falsifiability, validates outputs.  
+- **AI Models:** Generate alternatives, surface blind spots, accelerate iteration.  
+- **Orchestration Layer:** Captures logs, integrates outputs, ensures reproducibility.  
 
 ---
 
@@ -141,8 +141,8 @@ Focused on orchestration methods, documentation, and applied analysis across sci
 
 This repository uses a dual license:
 
-- **Apache 2.0** → applies to source code, scripts, and automation  
-- **CC BY 4.0** → applies to documentation, prose, logs, and workflow notes  
+- **Apache 2.0** → applies to source code, scripts, and automation.  
+- **CC BY 4.0** → applies to documentation, prose, logs, and workflow notes.  
 
 By using this repository, you agree to comply with both.  
 
