@@ -12,7 +12,11 @@ keywords:
   - reproducibility
   - research workflow
   - human-in-the-loop
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013613.svg)](https://doi.org/10.5281/zenodo.17013613)
 license: Apache-2.0
 version: 1.0.2
 date-released: 2025-08-31
+doi: 10.5281/zenodo.17013613
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.17013612
+    description: Concept DOI for all versions
