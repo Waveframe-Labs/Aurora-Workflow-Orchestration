@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this, please cite it."
+title: AI Workflow Orchestration (AWO)
+type: software
+authors:
+  - family-names: Wright
+    given-names: Shawn C.
+repository-code: "https://github.com/Wright-Shawn/AI-Workflow-Orchestration"
+url: "https://github.com/Wright-Shawn/AI-Workflow-Orchestration"
+keywords:
+  - AI orchestration
+  - reproducibility
+  - research workflow
+  - human-in-the-loop
+license: Apache-2.0
+version: 1.0.2
+date-released: 2025-08-31
