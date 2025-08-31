@@ -1,0 +1,27 @@
+{
+  "title": "AI Workflow Orchestration (AWO)",
+  "upload_type": "software",
+  "description": "A reproducible, documented orchestration method for human\u2013AI research and build cycles. AWO defines roles (Primary Engine, Supporting Models, Human-in-the-Loop), critique loops, mock peer review, and workflow logging designed for transparency and independent verification.",
+  "creators": [
+    {
+      "name": "Wright, Shawn"
+    }
+  ],
+  "license": "Apache-2.0",
+  "keywords": [
+    "AI orchestration",
+    "reproducibility",
+    "workflow",
+    "research",
+    "human-in-the-loop"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Wright-Shawn/AI-Workflow-Orchestration",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "software"
+    }
+  ],
+  "notes": "This record is the citable archive for release v1.0.2 of AWO."
+}
