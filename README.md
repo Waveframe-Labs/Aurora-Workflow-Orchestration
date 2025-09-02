@@ -18,7 +18,10 @@
 AI is moving fast, but most projects lack **reproducible workflows**.  
 The **AI Workflow Orchestration (AWO)** framework makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
 
-AWO is not a coding library — it’s a **methodological framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains.  
+AWO is not a coding library — it’s a **methodological framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains. 
+This repository is intentionally built in public with AI assistance.  
+The aim isn’t to hide AI involvement — it’s to show how AI can be audited,  
+structured, and trusted in real workflows.
 
 ---
 
