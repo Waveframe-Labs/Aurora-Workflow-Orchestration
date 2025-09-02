@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.0 — Whitepaper + Audit Framework (2025-08-31)
+## v1.1.0 — Whitepaper + Audit Framework (2025-09-02)
 - Added **AWO Whitepaper v1.0** in `/docs/` (Markdown + PDF).
 - Introduced `/decisions/` folder with Architecture Decision Records (ADRs).
 - Expanded `/logs/` with timestamped workflow entries.
