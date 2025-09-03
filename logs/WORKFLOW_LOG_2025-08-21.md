@@ -1,63 +1,45 @@
-# Workflow Log – AI Orchestration Method (AOM)
+# Changelog — AI Workflow Orchestration (AWO)
 
-This log documents the factual sequence of steps taken to establish the **AI Orchestration Method (AOM)** as the flagship repository.  
-It tracks naming decisions, README development, file generation, and supporting artifacts.
-
----
-
-## Timeline of Events
-
-**1. Naming Clarification**  
-- Initial draft README included “Epistemic Orchestration Method (EOM)” alongside “AI-Workflow-Orchestration.”  
-- User decided to remove epistemic naming entirely.  
-- Official project name locked to **AI Orchestration Method (AOM)**.  
+This changelog tracks the evolution of the **AI Workflow Orchestration (AWO)** repository.  
+It documents naming decisions, README development, supporting artifacts, and tagged releases to ensure the project remains reproducible and auditable.
 
 ---
 
-**2. Flagship Positioning**  
-- External commentary (shared by user) suggested that Waveframe was only a testbed and the orchestration method itself was the true innovation.  
-- Assistant agreed, concluding:  
-  - AOM = flagship repository.  
-  - Waveframe = first case study.  
-  - Future case studies (e.g., customer review analysis) will validate generality.  
+## v0.1.0 — Initial Scaffold (August 2025)
+- Repository created with placeholder README.  
+- Early drafts still referenced “Epistemic Orchestration Method (EOM).”  
+- Decision made to remove epistemic framing entirely.  
+- Project name locked to **AI Workflow Orchestration (AWO)**.  
 
 ---
 
-**3. README Development**  
-- User provided strong draft README with badges, banner, plain-language intro, rationale, and repo structure.  
-- Assistant recommended recalibration:  
-  - Remove all references to EOM.  
-  - Emphasize reproducibility, human-in-the-loop oversight, and business applications.  
-  - Maintain academic credibility while adding recruiter-safe framing.  
-- Full README rewritten as **AOM-only**, positioning it as the crown jewel.  
+## v1.0.2 — Zenodo Integration & DOI Preparation (August 2025)
+- Added `.zenodo.json` with metadata (title, description, license, identifiers).  
+- Added `CITATION.cff` with version, author, and release date.  
+- Verified Zenodo concept DOI integration and generated DOI badge.  
+- README reframed to emphasize reproducibility, auditability, and human-in-the-loop oversight.  
+- Positioning clarified:  
+  - **AWO = flagship methodology**  
+  - **Waveframe v4.0 = first case study**  
+  - Future case studies (e.g., customer review analysis) will test generality.  
 
 ---
 
-**4. README Export**  
-- Assistant generated the revised README as a downloadable `README.md` file.  
-- File included complete structure with Overview, Why It Matters, Skills, Deliverables, Workflow Cycle, Roles, Repo Layout, Case Studies, Principles, and Citation.  
-
----
-
-**5. Supporting Sections**  
-- User requested dedicated **Author** and **License** sections.  
-- Assistant generated Markdown for both, ready to append to README.  
-
----
-
-**6. Dialogue and Workflow Logs**  
-- User requested a curated dialogue log from this thread.  
-- Initial attempt was summary-like; user clarified that actual excerpts belong in the dialogue log.  
-- Assistant revised `DIALOGUE_LOG.md` with curated excerpts.  
-- User confirmed the distinction and requested this file, `WORKFLOW_LOG.md`, as the factual counterpart.  
+## v1.1.0 — Whitepaper + Audit Framework (September 2025)
+- Added **AWO Whitepaper v1.0** in `/docs/` (Markdown + PDF).  
+- Introduced `/decisions/` folder with Architecture Decision Records (ADRs).  
+- Expanded `/logs/` with timestamped workflow entries.  
+- Updated README to link to decisions, case studies, and Concept DOI.  
+- Clarified dual-licensing: Apache 2.0 (code) + CC BY 4.0 (docs/logs).  
+- Established AWO as a **fully auditable, reproducible framework**, not just a method draft.  
 
 ---
 
 ## Current Status
+- **README.md** complete and recruiter-facing.  
+- **AWO Whitepaper v1.0** published in `/docs/`.  
+- **/decisions/** and **/logs/** provide audit trail of design choices and workflow evolution.  
+- Zenodo Concept DOI minted: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612).  
+- Waveframe v4.0.5 archived as the first major case study demonstrating AWO in practice.  
 
-- **README.md** complete and positioned as flagship.  
-- **Author** and **License** sections generated.  
-- **DIALOGUE_LOG.md** complete with curated excerpts.  
-- **WORKFLOW_LOG.md** (this file) complete with factual timeline.  
-
-AOM is formally established as the crown jewel repository, with Waveframe and other projects serving as case studies.
+AWO is formally established as the **flagship repository**, with case studies serving as proofs of generality across domains.
