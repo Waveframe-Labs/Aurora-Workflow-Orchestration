@@ -1,0 +1,22 @@
+# AWO Project Config (example)
+project: AI Workflow Orchestration (AWO)
+default_branch: main
+concept_doi: 10.5281/zenodo.17013612  # update when known
+artifacts:
+  logs_dir: logs
+  dialogue_dir: logs/dialogue
+  decisions_dir: decisions
+  figures_dir: figures
+  notebooks_dir: notebooks
+  data_dir: data
+process:
+  claim_id_prefix: CLM-
+  checklists:
+    audit: templates/audit-checklist.md
+    release: templates/release-checklist.md
+  templates:
+    adr: templates/adr.md
+    worklog: templates/worklog-entry.md
+    dialogue: templates/dialogue-log.md
+    manifest: templates/falsifiability-manifest.md
+  roster: templates/model-roster.yaml

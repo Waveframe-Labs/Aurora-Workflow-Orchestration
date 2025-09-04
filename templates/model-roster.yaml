@@ -1,0 +1,18 @@
+# Model Roster (example)
+main_model:
+  name: gpt-*-main
+  purpose: continuity + synthesis
+  memory_policy: summarize_at_end_of_iteration
+auditors:
+  logic:
+    name: gpt-*-logic
+    independence: true
+  data:
+    name: gpt-*-data
+    independence: true
+  peer:
+    name: gpt-*-peer
+    independence: true
+notes: >
+  Keep auditors independent of the main model to avoid leakage.
+  Record model family and version when possible.
