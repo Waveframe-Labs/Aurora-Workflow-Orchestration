@@ -60,6 +60,8 @@ AI isn’t just a tool — it’s part of the workflow itself. That raises new c
 
 ## In-repo Guarantees (what to expect now)
 
+See the AWO method spec in [/docs/AWO_Method_Spec_v1.1.md](docs/AWO_Method_Spec_v1.1.md). 
+Templates live in [/templates](templates), including the falsifiability manifest, dialogue logs, ADRs, and release/audit checklists.
 - **Method whitepaper** in `/docs`: a citable, stable reference for AWO.  
 - **Roadmap** in the README: clear direction for evolution.  
 - **Citation files** (`CITATION.cff`, `citation.bib`): proper referencing support.  
