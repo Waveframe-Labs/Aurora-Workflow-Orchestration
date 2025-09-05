@@ -1,7 +1,7 @@
 # ADR-0004 — Logging Schema & Locations
 
 ## Status
-Proposed — 2025-09-05
+Proposed — 2025-09
 
 ## Context
 AWO’s reproducibility depends on consistent logging. Dialogue Logs DL-001 through DL-005 have already demonstrated the need to distinguish between:
