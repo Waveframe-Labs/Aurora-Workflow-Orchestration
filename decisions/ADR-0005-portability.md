@@ -1,7 +1,7 @@
 # ADR-0005 — Portability Guarantees
 
 ## Status
-Proposed — 2025-09-05
+Proposed — 2025-09
 
 ## Context
 One of the five core requirements of AWO (DL-001) is **Portability**:  
