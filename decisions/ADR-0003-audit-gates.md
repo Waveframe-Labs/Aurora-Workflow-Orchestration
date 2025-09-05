@@ -1,7 +1,7 @@
 # ADR-0003 — Audit Gates & Rejection Loop
 
 ## Status
-Proposed — 2025-09-05
+Proposed — 2025-09
 
 ## Context
 One of AWO’s five core requirements (DL-001) is the **Rejection Loop**: failed audits must trigger revision, not defense without evidence.  
