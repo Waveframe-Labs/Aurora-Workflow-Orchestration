@@ -1,7 +1,7 @@
 # ADR-0002 — Evidence Registry & Citation Policy
 
 ## Status
-Proposed — 2025-09-05
+Proposed — 2025-08
 
 ## Context
 One of AWO’s non-negotiable requirements is **falsifiability backed by evidence**.  
