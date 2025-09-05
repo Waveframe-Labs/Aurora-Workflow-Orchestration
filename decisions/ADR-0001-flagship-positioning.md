@@ -1,7 +1,7 @@
 # ADR-0001 — Flagship Positioning & Case-Study Policy
 
 ## Status
-Accepted — 2025-09-04
+Accepted — 2025-08
 
 ## Context
 Early drafts of this repository used multiple names (“EOM,” “AOM,” “AWO”).  
