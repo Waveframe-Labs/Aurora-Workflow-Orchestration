@@ -31,9 +31,10 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 - `docs/AWO_Method_Spec_v1.1.md` (sections 2–3)  
 - `templates/falsifiability-manifest.md`, `templates/audit-checklist.md`, `templates/worklog-entry.md`  
 - `logs/README.md` (schema)  
+- **ADR-0003** (Audit gates & rejection loop)  
 **Impact**: Became AWO’s five non-negotiables; basis for conformance.  
 **Next action**: Encode tests for each requirement in the release checklist.  
-**Links**: _add commit/PR/ADR once merged_
+**Links**: [`decisions/ADR-0003.md`](../decisions/ADR-0003.md)  
 
 ---
 
@@ -46,9 +47,10 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 **Artifacts touched**:  
 - `citations/REPRODUCIBILITY_CONTEXT.md` (kept internal evidence registry)  
 - README (“Why It Matters”) phrasing  
+- **ADR-0002** (Evidence registry & citation policy)  
 **Impact**: Confirms AWO is generalizable beyond Waveframe; strengthens audit trail.  
 **Next action**: Optional public summary graphic; keep full registry in‐repo.  
-**Links**: _add commit/PR/ADR once merged_
+**Links**: [`decisions/ADR-0002.md`](../decisions/ADR-0002.md)  
 
 ---
 
@@ -60,10 +62,10 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 > AWO is explicitly the opposite of ad-hoc; it embeds reproducibility, falsifiability, documented cycles, and versioned outputs.  
 **Artifacts touched**:  
 - README (definition of AWO; workflow cycle figure caption)  
-- ADR-0001 (Flagship positioning) — _planned_  
+- **ADR-0001** (Flagship positioning)  
 **Impact**: Third-party validation that AWO is a **framework**, not opportunistic usage.  
 **Next action**: Cite this dialogue in ADR-0001 context.  
-**Links**: _add ADR link when created_
+**Links**: [`decisions/ADR-0001.md`](../decisions/ADR-0001.md)  
 
 ---
 
@@ -77,9 +79,10 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 **Artifacts touched**:  
 - `docs/AWO_Method_Spec_v1.1.md` (Background/Related Work)  
 - README (novelty note)  
+- **ADR-0005** (Portability guarantees)  
 **Impact**: Positions AWO as novel within scientific method development.  
 **Next action**: Map explicit “extends vs. differs” table vs. Galaxy/Nextflow/CWL.  
-**Links**: _add commit/PR once added_
+**Links**: [`decisions/ADR-0005.md`](../decisions/ADR-0005.md)  
 
 ---
 
@@ -92,13 +95,14 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 **Artifacts touched**:  
 - `citations/citation.bib` (add: Reis 2022; Goble 2020; Chirigati 2016; Amershi 2019)  
 - README (“Why It Matters” references)  
+- **ADR-0002** (Evidence registry & citation policy)  
 **Impact**: Aligns AWO with active research, clarifies the gap it fills.  
 **Next action**: Cross-link each claim in the spec to a bib entry.  
-**Links**: _add commit/PR once citations are inserted_
+**Links**: [`decisions/ADR-0002.md`](../decisions/ADR-0002.md)  
 
 ---
 
-## Logging protocol (keep this section)
+## Logging protocol
 - New external input that shapes scope, claims, or method → add a **DL-YYYY-MM-DD-NNN** entry.  
 - Keep excerpts short; store long transcripts in `/logs/dialogue/raw/` if needed.  
 - Every decision derived from a dialogue must reference the **DL ID** in the ADR.  
@@ -106,12 +110,12 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 
 ---
 
-## Open items (to be closed with ADRs/commits)
-- ADR-0001: Flagship positioning (AWO vs case studies).  
-- ADR-0002: Evidence registry & citation policy.  
-- ADR-0003: Audit gates and rejection loop as release blockers.  
-- ADR-0004: Logging schema (minimum fields; where dialogue/workflow/audits live).  
-- ADR-0005: Portability guarantees (templates, repo-agnostic config).
+## Cross-references
+- [`decisions/ADR-0001.md`](../decisions/ADR-0001.md) — Flagship positioning (AWO vs case studies)  
+- [`decisions/ADR-0002.md`](../decisions/ADR-0002.md) — Evidence registry & citation policy  
+- [`decisions/ADR-0003.md`](../decisions/ADR-0003.md) — Audit gates and rejection loop as release blockers  
+- [`decisions/ADR-0004.md`](../decisions/ADR-0004.md) — Logging schema (minimum fields; where dialogue/workflow/audits live)  
+- [`decisions/ADR-0005.md`](../decisions/ADR-0005.md) — Portability guarantees (templates, repo-agnostic config)  
 
 ---
 
