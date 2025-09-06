@@ -27,7 +27,7 @@ Linkage: each entry cites the repo artifacts it influenced (README, spec, templa
 **Source**: Prompt about a LinkedIn post; model proposed core requirements.  
 **Key excerpt**:  
 > Falsifiability, Logging, Independent audits, Rejection loop, Portability.  
-**Artifacts touched**:  
+**Artifacts touched**
 - `docs/AWO_Method_Spec_v1.1.md` (sections 2–3)  
 - `templates/falsifiability-manifest.md`, `templates/audit-checklist.md`, `templates/worklog-entry.md`  
 - `logs/README.md` (schema)  
