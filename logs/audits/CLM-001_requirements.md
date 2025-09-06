@@ -31,5 +31,4 @@ AWO must operationalize five non-negotiable requirements:
 ---
 
 ## Links
-- Dialogue log entry: DL-2025-09-04-001  
 - Decision record: [decisions/ADR-0003-audit-gates.md](../../decisions/ADR-0003-audit-gates.md)  
