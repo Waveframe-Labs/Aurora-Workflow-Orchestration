@@ -1,52 +1,35 @@
-# Audit Record — CLM-001 (Requirements)
+# Audit Report — CLM-001 (Core Requirements Definition)
 
-**Claim ID:** CLM-001  
-**Audit Type:** Requirements Conformance  
-**Date:** 2025-09-06  
-**Auditor:** External Model (feedback synthesis)  
-**Reviewer:** User  
+**Date**: 2025-09-04  
+**Source**: External model feedback (LinkedIn draft prompt → method pillars)  
+**Auditor**: Main Model (validated against external critique)  
 
 ---
 
 ## Claim
-AWO is defined by five non-negotiable requirements:
-1. Falsifiability  
-2. Logging  
-3. Independent audits  
-4. Rejection loop  
-5. Portability  
+AWO must operationalize five non-negotiable requirements:  
+1. Falsifiability — every claim gets a test.  
+2. Logging — dialogue and decisions are recorded.  
+3. Independent audits — separate models/reviewers validate outputs.  
+4. Rejection loop — failed audits force revision or withdrawal.  
+5. Portability — method must be template-driven and repo-agnostic.  
 
 ---
 
-## Criteria
-- Each requirement must appear explicitly in the method specification.  
-- Templates must exist to enforce each requirement.  
-- Release checklist must verify compliance with all five.  
+## Rationale
+- Derived from dialogue log entry (DL-2025-09-04-001).  
+- Mirrors reproducibility standards in workflow management systems (Nextflow, Galaxy).  
+- Adds auditability and portability as extensions specific to AI-assisted reasoning.
 
 ---
 
-## Evidence
-- `docs/AWO_Method_Spec_v1.1.md` (Sections 2–3 list the five requirements).  
-- `templates/falsifiability-manifest.md` (claim IDs, tests).  
-- `logs/README.md` (logging schema).  
-- `templates/audit-checklist.md` (independent audits).  
-- `templates/worklog-entry.md` + `decisions/ADR-0003.md` (rejection loop).  
-- `templates/awo.config.yaml` (portability).  
-- `templates/release-checklist.md` (ensures all five requirements are tested).  
-
----
-
-## Result
-**PASS** — All five requirements are explicitly defined and backed by artifacts.  
-
----
-
-## Notes
-- Need to ensure future ADRs continue linking new features back to one of the five requirements.  
-- Consider adding cross-references from the README “In-Repo Guarantees” section directly to these files for clarity.  
+## Outcome
+- Claim accepted.  
+- Incorporated into `docs/AWO_Method_Spec_v1.1.md` (Sections 2–3).  
+- Templates (`falsifiability-manifest.md`, `audit-checklist.md`, `worklog-entry.md`) created to enforce requirements.  
 
 ---
 
 ## Links
-- Dialogue log entry: [DL-2025-09-04-001](../../logs/dialogue/DIALOGUE_LOG.md#dl-2025-09-04-001)  
-- Decision record: [ADR-0003 Rejection Loop](../../decisions/ADR-0003-rejection-loop.md)  
+- Dialogue log entry: DL-2025-09-04-001  
+- Decision record: [decisions/ADR-0003-audit-gates.md](../../decisions/ADR-0003-audit-gates.md)  
