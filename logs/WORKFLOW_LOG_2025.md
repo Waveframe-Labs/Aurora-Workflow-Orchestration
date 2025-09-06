@@ -1,45 +1,32 @@
-# Changelog — AI Workflow Orchestration (AWO)
+# Workflow Log — AI Workflow Orchestration (AWO)
 
-This changelog tracks the evolution of the **AI Workflow Orchestration (AWO)** repository.  
-It documents naming decisions, README development, supporting artifacts, and tagged releases to ensure the project remains reproducible and auditable.
-
----
-
-## v0.1.0 — Initial Scaffold (August 2025)
-- Repository created with placeholder README.  
-- Early drafts still referenced “Epistemic Orchestration Method (EOM).”  
-- Decision made to remove epistemic framing entirely.  
-- Project name locked to **AI Workflow Orchestration (AWO)**.  
+This log documents the evolution of the **AI Workflow Orchestration (AWO)** repository.  
+Entries follow the standard template: **What I did, What I learned, Next step.**
 
 ---
 
-## v1.0.2 — Zenodo Integration & DOI Preparation (August 2025)
-- Added `.zenodo.json` with metadata (title, description, license, identifiers).  
-- Added `CITATION.cff` with version, author, and release date.  
-- Verified Zenodo concept DOI integration and generated DOI badge.  
-- README reframed to emphasize reproducibility, auditability, and human-in-the-loop oversight.  
-- Positioning clarified:  
-  - **AWO = flagship methodology**  
-  - **Waveframe v4.0 = first case study**  
-  - Future case studies (e.g., customer review analysis) will test generality.  
+## 2025-08-14 — v0.1.0 Initial Scaffold
+- What I did: Created repository with placeholder README; early drafts referenced “Epistemic Orchestration Method (EOM).” Locked final project name to **AI Workflow Orchestration (AWO)**.  
+- What I learned: Removing epistemic framing simplified the scope and clarified positioning.  
+- Next step: Build README and position AWO as flagship, with Waveframe as first case study.  
 
 ---
 
-## v1.1.0 — Whitepaper + Audit Framework (September 2025)
-- Added **AWO Whitepaper v1.0** in `/docs/` (Markdown + PDF).  
-- Introduced `/decisions/` folder with Architecture Decision Records (ADRs).  
-- Expanded `/logs/` with timestamped workflow entries.  
-- Updated README to link to decisions, case studies, and Concept DOI.  
-- Clarified dual-licensing: Apache 2.0 (code) + CC BY 4.0 (docs/logs).  
-- Established AWO as a **fully auditable, reproducible framework**, not just a method draft.  
+## 2025-08-31 — v1.0.2 Zenodo Integration & DOI Preparation
+- What I did: Added `.zenodo.json` metadata and `CITATION.cff`. Verified Zenodo concept DOI and inserted badge. Reframed README to emphasize reproducibility and auditability.  
+- What I learned: Zenodo integration ensures long-term archiving and makes AWO citable. Clarified AWO as flagship methodology with Waveframe v4.0 as first case study.  
+- Next step: Prepare whitepaper and supporting audit framework.  
+
+---
+
+## 2025-09-04 — v1.1.0 Whitepaper + Audit Framework
+- What I did: Added **AWO Whitepaper v1.0** (`/docs/` in Markdown + PDF). Introduced `/decisions/` with ADRs. Expanded `/logs/` with timestamped entries. Updated README with links to decisions, case studies, and DOI. Clarified dual-licensing: Apache 2.0 (code) + CC BY 4.0 (docs/logs).  
+- What I learned: Combining ADRs and logs formalizes auditability. Dual-licensing provides clarity between code and documentation.  
+- Next step: Cross-link ADRs with dialogue log entries and expand citations (`citation.bib`).  
 
 ---
 
 ## Current Status
-- **README.md** complete and recruiter-facing.  
-- **AWO Whitepaper v1.0** published in `/docs/`.  
-- **/decisions/** and **/logs/** provide audit trail of design choices and workflow evolution.  
-- Zenodo Concept DOI minted: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612).  
-- Waveframe v4.0.5 archived as the first major case study demonstrating AWO in practice.  
-
-AWO is formally established as the **flagship repository**, with case studies serving as proofs of generality across domains.
+- What I did: Published README, Whitepaper, ADRs, and Logs. Confirmed Zenodo DOI: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612). Archived Waveframe v4.0.5 as first case study.  
+- What I learned: AWO has matured from concept to fully auditable framework.  
+- Next step: Backfill dialogue logs with ADR references; expand supporting evidence in citations; prepare outreach (LinkedIn, publication).  
