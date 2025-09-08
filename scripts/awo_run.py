@@ -1,118 +1,183 @@
 #!/usr/bin/env python3
 """
-Minimal AWO runner (no secrets, no model calls).
-- Reads a simple workflow JSON (steps with 'name' and 'prompt' strings).
-- Creates runs/<timestamp>/ with immutable logs.
-- Writes a gate_decision.yml with status: pending (human approval needed).
-- Exits 78 to signal "pending gate" to GitHub Actions, which keeps artifacts.
+AWO multi-model runner (stdlib only, phone-friendly).
+- Executes a JSON workflow with steps:
+    * fanout_generate: send same prompt to multiple models
+    * consensus_vote:  pick a consensus (simple normalized majority)
+    * write_text:      emit an artifact file into the run
+    * audit_gate:      stop for human approval (exit code 78)
+- Writes immutable logs in runs/<timestamp>/.
+- No external APIs; backends are deterministic simulators.
 """
 
-import json, os, sys, hashlib, time, textwrap
+import json, os, sys, hashlib, time, textwrap, re
 from datetime import datetime, timezone
 from pathlib import Path
 
-EXIT_PENDING = 78  # conventional “needs human” exit
+# ---- backends (simulated, deterministic) ------------------------------------
+from awo.models.local_backend import LocalEcho
+from awo.models.alt_backend import LocalUpper
+
+BACKENDS = {
+    "echo": LocalEcho(),
+    "upper": LocalUpper(),
+}
+
+EXIT_PENDING = 78  # signals "needs human review"
 
 def now_iso():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
-def sha256(s: str) -> str:
+def sha12(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python scripts/awo_run.py <workflow.json>", file=sys.stderr)
-        sys.exit(2)
+def norm_text(s: str) -> str:
+    # very simple normalization for voting (case/space collapse)
+    s = s.strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    return s
 
-    wf_path = Path(sys.argv[1])
-    if not wf_path.exists():
-        print(f"Workflow file not found: {wf_path}", file=sys.stderr)
-        sys.exit(2)
+def write_json(p: Path, obj):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    # Load workflow
-    with wf_path.open("r", encoding="utf-8") as f:
-        wf = json.load(f)
+def write_text(p: Path, s: str):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(s, encoding="utf-8")
 
-    # Prepare run dir
+def ensure_run_dir() -> Path:
     run_id = f"run_{now_iso()}"
     run_dir = Path("runs") / run_id
     (run_dir / "steps").mkdir(parents=True, exist_ok=True)
+    return run_dir
 
-    # Save a frozen copy of the workflow used
-    with (run_dir / "workflow_frozen.json").open("w", encoding="utf-8") as f:
-        json.dump(wf, f, indent=2, ensure_ascii=False)
+def step_record(run_dir: Path, idx: int, name: str, payload: dict):
+    write_json(run_dir / "steps" / f"{idx:02d}_{name}.json", payload)
 
-    # Minimal “execution”: echo back prompts deterministically (no external calls)
-    steps = wf.get("steps", [])
-    records = []
-    for i, step in enumerate(steps, start=1):
-        name = step.get("name", f"step_{i}")
-        prompt = step.get("prompt", "")
-        # deterministic “response”: reverse + hash tail
-        echoed = prompt[::-1]
-        digest = sha256(prompt)
-        response = f"[SIMULATED-RESPONSE] {echoed}\n\n(hash:{digest})"
+def run(workflow_path: str) -> int:
+    wf = json.loads(Path(workflow_path).read_text(encoding="utf-8"))
+    run_dir = ensure_run_dir()
 
-        rec = {
-            "index": i,
-            "name": name,
-            "prompt": prompt,
-            "response": response,
-            "meta": {
-                "engine": "simulator:v0",
-                "seed": 0,
-                "timestamp": now_iso(),
-                "prompt_hash": sha256(prompt),
-            },
-        }
-        records.append(rec)
+    # freeze workflow used for the run
+    write_text(run_dir / "workflow_frozen.json", json.dumps(wf, indent=2))
 
-        # write per-step record
-        with (run_dir / "steps" / f"{i:02d}_{name}.json").open("w", encoding="utf-8") as f:
-            json.dump(rec, f, indent=2, ensure_ascii=False)
+    ctx = {}  # simple in-memory context across steps
+    idx = 0
+    report_lines = [f"# AWO Run Report — {run_dir.name}", ""]
+    report_lines += [f"- Workflow: {workflow_path}", f"- Started: {now_iso()}", ""]
 
-    # Write a compact summary
-    summary = {
-        "run_id": run_id,
-        "started_at": now_iso(),
-        "workflow_source": str(wf_path),
-        "num_steps": len(records),
-        "artifacts": [f"steps/{i:02d}_{r['name']}.json" for i, r in enumerate(records, start=1)]
-    }
-    with (run_dir / "summary.json").open("w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2, ensure_ascii=False)
+    for step in wf.get("steps", []):
+        idx += 1
+        op = step.get("op")
+        name = step.get("id", f"step_{idx}")
+        rec = {"ts": now_iso(), "id": name, "op": op}
 
-    # Produce a Markdown report skeleton
-    md = [f"# AWO Run Report — {run_id}\n"]
-    md.append("This is a runnable, audit-ready stub without external model calls.\n")
-    md.append("## Steps\n")
-    for rec in records:
-        md.append(f"### {rec['index']}. {rec['name']}\n")
-        md.append("**Prompt**\n")
-        md.append("```text\n" + rec["prompt"] + "\n```\n")
-        md.append("**Response (simulated)**\n")
-        md.append("```text\n" + rec["response"] + "\n```\n")
+        if op == "fanout_generate":
+            prompt = step["prompt"]
+            models = step.get("models", ["echo", "upper"])
+            params = step.get("params", {"seed": 0})
+            outputs = []
+            for m in models:
+                if m not in BACKENDS:
+                    raise RuntimeError(f"Unknown model backend: {m}")
+                out = BACKENDS[m].generate(prompt, params=params)
+                outputs.append({"model": m, "text": out["text"], "meta": out["meta"]})
 
-    md.append("## Gate\n")
-    md.append("Status: **PENDING** — requires human review.\n")
-    md.append("Edit `gate_decision.yml` to approve/reject, then re-run the Report workflow.\n")
+            rec.update({"prompt": prompt, "models": models, "outputs": outputs})
+            ctx[name] = outputs
+            step_record(run_dir, idx, name, rec)
 
-    with (run_dir / "report.md").open("w", encoding="utf-8") as f:
-        f.write("\n".join(md))
+            report_lines += [f"## {idx}. fanout_generate — {name}", "", f"Prompt: `{prompt}`", "Outputs:"]
+            for o in outputs:
+                report_lines.append(f"- **{o['model']}** → {o['text'][:160]}")
 
-    # Create a pending human gate
-    gate = textwrap.dedent("""\
-        status: pending
-        reason: "Initial run: awaiting human approval."
-        reviewer: null
-        reviewed_at: null
-        """)
-    with (run_dir / "gate_decision.yml").open("w", encoding="utf-8") as f:
-        f.write(gate)
+        elif op == "consensus_vote":
+            # inputs_from: step id of a fanout_generate
+            src = step["inputs_from"]
+            items = ctx.get(src, [])
+            bucket = {}
+            for o in items:
+                k = norm_text(o["text"])
+                bucket.setdefault(k, []).append(o["model"])
+            # pick the normalized text with max supporters (break ties by length desc)
+            winners = sorted(bucket.items(), key=lambda kv: (len(kv[1]), len(kv[0])), reverse=True)
+            if winners:
+                consensus_norm, voters = winners[0]
+                # retrieve one original (non-normalized) text matching consensus_norm
+                representative = next(o for o in items if norm_text(o["text"]) == consensus_norm)["text"]
+            else:
+                consensus_norm, voters, representative = "", [], ""
 
+            rec.update({
+                "inputs_from": src,
+                "voters": voters,
+                "consensus_text": representative,
+                "consensus_norm": consensus_norm,
+                "voter_count": len(voters),
+                "total_candidates": len(items),
+                "agreement_ratio": (len(voters) / max(1, len(items))),
+            })
+            ctx[name] = rec
+            step_record(run_dir, idx, name, rec)
+
+            report_lines += [
+                f"## {idx}. consensus_vote — {name}",
+                f"- inputs_from: {src}",
+                f"- voters: {', '.join(voters) if voters else '(none)'}",
+                f"- agreement_ratio: {rec['agreement_ratio']:.2f}",
+                "",
+                f"**Consensus:** {representative[:300]}",
+            ]
+
+        elif op == "write_text":
+            path = step["args"]["path"]
+            text = step["args"]["text"]
+            out_path = run_dir / "artifacts" / path
+            write_text(out_path, text)
+            rec.update({"wrote": str(out_path)})
+            step_record(run_dir, idx, name, rec)
+
+            report_lines += [f"## {idx}. write_text — {name}", f"- wrote: {out_path}", ""]
+
+        elif op == "audit_gate":
+            checklist = step.get("args", {}).get("checklist", "")
+            gate = {
+                "status": "pending",
+                "checklist": checklist,
+                "ts": now_iso()
+            }
+            write_text(run_dir / "gate_decision.yml",
+                       textwrap.dedent(f"""\
+                       status: pending
+                       checklist: {checklist or 'templates/audit-checklist.md'}
+                       created_at: {now_iso()}
+                       """))
+            rec.update({"gate": gate})
+            step_record(run_dir, idx, name, rec)
+
+            report_lines += [
+                f"## {idx}. audit_gate — {name}",
+                f"- checklist: {checklist or 'templates/audit-checklist.md'}",
+                "",
+                "> Run halted for human review.",
+            ]
+
+            # write report and exit with 78 to signal pending approval
+            write_text(run_dir / "report.md", "\n".join(report_lines))
+            print(f"Run created at: {run_dir}")
+            return EXIT_PENDING
+
+        else:
+            raise RuntimeError(f"Unknown op: {op}")
+
+    # normal completion (no gate)
+    write_text(run_dir / "report.md", "\n".join(report_lines))
     print(f"Run created at: {run_dir}")
-    # Exit 78 so the workflow can surface “needs human”
-    sys.exit(EXIT_PENDING)
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python scripts/awo_run.py <workflow.json>", file=sys.stderr)
+        sys.exit(2)
+    sys.exit(run(sys.argv[1]))
