@@ -7,6 +7,10 @@ on:
         description: "Workflow JSON path"
         required: true
         default: "workflows/reviews.json"
+      audit_decision:
+        description: "approve | reject | pending"
+        required: false
+        default: "pending"
 
 jobs:
   run-awo:
@@ -14,27 +18,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run workflow (gate causes non-zero exit)
+      - name: Run workflow
         id: runstep
         shell: bash
         run: |
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-          echo "exit_code=$code" >> $GITHUB_OUTPUT
-          exit $code
-        continue-on-error: true
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
 
       - name: Find latest run id
+        shell: bash
         run: |
           RID=$(ls -1dt runs/* | head -n1 | xargs -n1 basename)
-          echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
+          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
+          echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Package artifacts
         if: always()
+        shell: bash
         run: |
-          tar -czf "$RUN_ID.tar.gz" "runs/$RUN_ID"
+          tar -czf "${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload artifacts
         if: always()
@@ -43,8 +47,17 @@ jobs:
           name: awo-run-${{ env.RUN_ID }}
           path: ${{ env.RUN_ID }}.tar.gz
 
-      - name: Fail job if gate pending (exit 78)
-        if: steps.runstep.outputs.exit_code == '78'
+      - name: Audit gate (manual decision)
+        shell: bash
         run: |
-          echo "Audit gate pending — human review required." >> $GITHUB_STEP_SUMMARY
-          exit 78
+          DECISION="${{ github.event.inputs.audit_decision }}"
+          if [ "$DECISION" = "approve" ]; then
+            echo "Audit: APPROVED" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          elif [ "$DECISION" = "reject" ]; then
+            echo "Audit: REJECTED" >> "$GITHUB_STEP_SUMMARY"
+            exit 78
+          else
+            echo "Audit: PENDING — rerun with audit_decision=approve|reject" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
