@@ -28,7 +28,7 @@ jobs:
           if [ $code -eq 78 ]; then
             echo "audit=PENDING" >> $GITHUB_OUTPUT
             echo "Audit: PENDING — waiting for human approval." >> $GITHUB_STEP_SUMMARY
-            exit 0  # allow the job to continue to packaging
+            exit 0
           else
             echo "audit=PASSED" >> $GITHUB_OUTPUT
             echo "Audit: PASSED automatically." >> $GITHUB_STEP_SUMMARY
@@ -54,55 +54,30 @@ jobs:
           name: awo-run-${{ env.RUN_ID }}
           path: ${{ env.RUN_ID }}.tar.gz
 
+  # Only runs when audit == PENDING
   human-approval:
-    # Only require a protected environment if the audit gate is PENDING
     if: needs.run-awo.outputs.audit == 'PENDING'
     needs: run-awo
     runs-on: ubuntu-latest
     environment: awo-audit
     steps:
       - name: Await human approval
-        run: echo "Approve or Reject this deployment in the GitHub UI."
+        run: echo "Approve or reject in the GitHub UI."
 
-  finalize:
-    # Run whether approval was required or not
-    needs: [run-awo, human-approval]
+  # Finalize path for auto-passed audits
+  finalize-auto:
+    if: needs.run-awo.outputs.audit == 'PASSED'
+    needs: run-awo
     runs-on: ubuntu-latest
     steps:
-      - name: Decide approval state
-        id: decide
-        shell: bash
-        run: |
-          AUDIT="${{ needs.run-awo.outputs.audit }}"
-          if [ "$AUDIT" = "PENDING" ]; then
-            # If we required approval, only continue on 'success' (approved)
-            STATE="${{ github.event.deployment_status.state }}"
-            echo "state=${STATE:-approved}" >> $GITHUB_OUTPUT
-          else
-            # Auto-pass path
-            echo "state=approved" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Stop if rejected
-        if: steps.decide.outputs.state == 'rejected'
-        run: |
-          echo "Run ${{ needs.run-awo.outputs.run_id }} rejected by human reviewer."
-          exit 1
-
-      - name: Check out repo
-        uses: actions/checkout@v4
-
-      - name: Download run artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: awo-run-${{ needs.run-awo.outputs.run_id }}
           path: .
-
-      - name: Extract run folder
-        run: |
-          tar -xzf "${{ needs.run-awo.outputs.run_id }}.tar.gz"
-
-      - name: Commit run folder to main
+      - name: Extract run
+        run: tar -xzf "${{ needs.run-awo.outputs.run_id }}.tar.gz"
+      - name: Commit run to main
         env:
           GH_USER: ${{ github.actor }}
         run: |
@@ -112,7 +87,31 @@ jobs:
           git add "runs/${{ needs.run-awo.outputs.run_id }}"
           git commit -m "chore(runs): add ${{ needs.run-awo.outputs.run_id }} [skip ci]" || echo "Nothing to commit"
           git push origin HEAD:main
-
       - name: Summary
+        run: echo "Committed runs/${{ needs.run-awo.outputs.run_id }} (auto-passed)." >> $GITHUB_STEP_SUMMARY
+
+  # Finalize path for human-approved audits
+  finalize-approved:
+    if: needs.run-awo.outputs.audit == 'PENDING'
+    needs: [run-awo, human-approval]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ needs.run-awo.outputs.run_id }}
+          path: .
+      - name: Extract run
+        run: tar -xzf "${{ needs.run-awo.outputs.run_id }}.tar.gz"
+      - name: Commit run to main
+        env:
+          GH_USER: ${{ github.actor }}
         run: |
-          echo "Committed runs/${{ needs.run-awo.outputs.run_id }} to main." >> $GITHUB_STEP_SUMMARY
+          git config user.name "$GH_USER"
+          git config user.email "$GH_USER@users.noreply.github.com"
+          git pull --ff-only origin main
+          git add "runs/${{ needs.run-awo.outputs.run_id }}"
+          git commit -m "chore(runs): add ${{ needs.run-awo.outputs.run_id }} (approved) [skip ci]" || echo "Nothing to commit"
+          git push origin HEAD:main
+      - name: Summary
+        run: echo "Committed runs/${{ needs.run-awo.outputs.run_id }} after human approval." >> $GITHUB_STEP_SUMMARY
