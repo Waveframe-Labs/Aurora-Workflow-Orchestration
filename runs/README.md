@@ -1,4 +1,4 @@
- Runs Directory
+# Runs Directory
 
 This folder stores all **executed AWO workflow runs**.  
 Each run is written into a timestamped folder at the time of execution.
