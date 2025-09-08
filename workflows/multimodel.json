@@ -1,0 +1,30 @@
+{
+  "name": "Multi-model consensus demo",
+  "steps": [
+    {
+      "id": "fanout_1",
+      "op": "fanout_generate",
+      "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
+      "models": ["echo", "upper"],
+      "params": { "seed": 123 }
+    },
+    {
+      "id": "consensus_1",
+      "op": "consensus_vote",
+      "inputs_from": "fanout_1"
+    },
+    {
+      "id": "gate_review",
+      "op": "audit_gate",
+      "args": { "checklist": "templates/audit-checklist.md" }
+    },
+    {
+      "id": "write_note",
+      "op": "write_text",
+      "args": {
+        "path": "notes/consensus.txt",
+        "text": "Consensus has been captured (this step will only run if you remove the gate or approve and rerun a variant that continues after approval)."
+      }
+    }
+  ]
+}
