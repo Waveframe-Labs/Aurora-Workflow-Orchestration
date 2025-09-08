@@ -1,0 +1,21 @@
+{
+  "name": "customer-review-analysis",
+  "steps": [
+    {
+      "id": "generate_summary",
+      "op": "llm_map",
+      "prompt": "Summarize this review in one sentence: The battery life is decent, but the UI is confusing.",
+      "params": { "seed": 123 }
+    },
+    {
+      "id": "gate_review",
+      "op": "audit_gate",
+      "args": { "checklist": "templates/audit-checklist.md" }
+    },
+    {
+      "id": "write_note",
+      "op": "write_text",
+      "args": { "path": "notes/note.txt", "text": "Demo artifact written after audit (will not run until approved)." }
+    }
+  ]
+}
