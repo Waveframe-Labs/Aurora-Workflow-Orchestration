@@ -7,57 +7,81 @@ on:
         description: "Workflow JSON path"
         required: true
         default: "workflows/reviews.json"
-      audit_decision:
-        description: "approve | reject | pending"
-        required: false
-        default: "pending"
 
 jobs:
+  # 1) Run the AWO script. It always completes and packages artifacts.
   run-awo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run workflow
+      - name: Run workflow (gate may return 78=Pending)
         id: runstep
         shell: bash
         run: |
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-
-      - name: Find latest run id
-        shell: bash
-        run: |
+          echo "exit_code=$code" >> $GITHUB_OUTPUT
+          # capture latest run id for later jobs
           RID=$(ls -1dt runs/* | head -n1 | xargs -n1 basename)
-          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
-          echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
+          echo "RUN_ID=$RID" >> $GITHUB_ENV
+          echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
+          # Always exit 0 here so we can reach the manual gate.
+          exit 0
 
       - name: Package artifacts
-        if: always()
-        shell: bash
         run: |
-          tar -czf "${RUN_ID}.tar.gz" "runs/${RUN_ID}"
+          tar -czf "$RUN_ID.tar.gz" "runs/$RUN_ID"
 
       - name: Upload artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: awo-run-${{ env.RUN_ID }}
           path: ${{ env.RUN_ID }}.tar.gz
 
-      - name: Audit gate (manual decision)
-        shell: bash
+      - name: Note audit status
         run: |
-          DECISION="${{ github.event.inputs.audit_decision }}"
-          if [ "$DECISION" = "approve" ]; then
-            echo "Audit: APPROVED" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          elif [ "$DECISION" = "reject" ]; then
-            echo "Audit: REJECTED" >> "$GITHUB_STEP_SUMMARY"
-            exit 78
+          if [ "${{ steps.runstep.outputs.exit_code }}" = "78" ]; then
+            echo "Audit: PENDING — continue to manual approval." >> $GITHUB_STEP_SUMMARY
           else
-            echo "Audit: PENDING — rerun with audit_decision=approve|reject" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+            echo "Audit: AUTO-PASS (exit ${ {steps.runstep.outputs.exit_code} })" >> $GITHUB_STEP_SUMMARY
           fi
+
+  # 2) Manual approval gate (Approve or Reject buttons)
+  human-approval:
+    needs: run-awo
+    runs-on: ubuntu-latest
+    environment:
+      name: awo-audit   # requires reviewers you configured in Settings ▸ Environments
+    steps:
+      - name: Await human decision
+        run: |
+          echo "This job pauses until you Approve or Reject the deployment to 'awo-audit'."
+          echo "Open the 'Environments ▸ Deployments' panel on this run to decide."
+          # No-op; the pause is handled by the environment gate.
+
+  # 3) Mark decision & fail/succeed the run accordingly
+  finalize:
+    needs: human-approval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find latest run id
+        run: |
+          RID=$(ls -1dt runs/* | head -n1 | xargs -n1 basename)
+          echo "RUN_ID=$RID" >> $GITHUB_ENV
+          echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
+
+      - name: Write approval stamp
+        run: |
+          mkdir -p "runs/$RUN_ID"
+          echo "approved_by=${{ github.actor }}" > "runs/$RUN_ID/audit_approval.txt"
+          echo "approved_at=$(date -u +%FT%TZ)" >> "runs/$RUN_ID/audit_approval.txt"
+
+      - name: Upload approval stamp
+        uses: actions/upload-artifact@v4
+        with:
+          name: awo-approval-${{ env.RUN_ID }}
+          path: runs/${{ env.RUN_ID }}/audit_approval.txt
