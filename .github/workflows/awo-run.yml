@@ -7,48 +7,57 @@ on:
         description: "Workflow JSON path"
         required: true
         default: "workflows/reviews.json"
-      audit_decision:
-        description: "Audit decision (approve or reject)"
-        required: false
-        default: "pending"
 
 jobs:
+  # 1) Run the workflow and package artifacts
   run-awo:
     runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.pick.outputs.run_id }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run workflow
-        id: runstep
+      - name: Execute AWO script
+        id: exec
         run: |
-          mkdir -p runs
-          echo "Simulating run for ${{ github.event.inputs.workflow_file }}"
-          RID="run_$(date -u +'%Y-%m-%dT%H-%M-%SZ')"
-          mkdir -p "runs/$RID"
+          python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
+
+      # Pick the newest run directory that starts with run_
+      - name: Capture Run-ID
+        id: pick
+        shell: bash
+        run: |
+          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
           echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
+          echo "run_id=$RID" >> $GITHUB_OUTPUT
           echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo '{ "status": "PENDING", "reason": "Audit required" }' > "runs/$RID/result.json"
 
       - name: Upload artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: awo-run-${{ env.RUN_ID }}
-          path: runs/${{ env.RUN_ID }}
+          name: awo-run-${{ steps.pick.outputs.run_id }}
+          path: runs/${{ steps.pick.outputs.run_id }}
 
-  finalize:
+      - name: Mark as pending audit
+        run: echo "Audit: PENDING — awaiting human approval." >> $GITHUB_STEP_SUMMARY
+
+  # 2) Human approval gate (this PAUSES until you approve in the UI)
+  human-approval:
     needs: run-awo
     runs-on: ubuntu-latest
+    # This is the gate: the job won't start until the environment is approved.
+    environment:
+      name: awo-audit
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - name: Evaluate audit decision
+      - name: Note approval
+        run: echo "Human approval recorded via environment gate." >> $GITHUB_STEP_SUMMARY
+
+  # 3) Finalize after approval
+  finalize:
+    needs: [run-awo, human-approval]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Complete
         run: |
-          decision="${{ github.event.inputs.audit_decision }}"
-          if [ "$decision" = "approve" ]; then
-            echo "✅ Audit APPROVED" >> $GITHUB_STEP_SUMMARY
-            exit 0
-          elif [ "$decision" = "reject" ]; then
-            echo "❌ Audit REJECTED" >> $GITHUB_STEP_SUMMARY
-            exit 1
-          else
-            echo "⚠️ Audit still PENDING — rerun with audit_decision=approve|reject" >> $GITHUB_STEP_SUMMARY
-            exit 78
+          echo "✅ Finalized Run-ID: ${{ needs.run-awo.outputs.run_id }}" >> $GITHUB_STEP_SUMMARY
