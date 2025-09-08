@@ -11,6 +11,9 @@ on:
 jobs:
   run-awo:
     runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.getid.outputs.run_id }}
+      audit:  ${{ steps.runstep.outputs.audit }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,19 +24,23 @@ jobs:
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
+
           if [ $code -eq 78 ]; then
-            echo "Audit=PENDING" >> $GITHUB_ENV
+            echo "audit=PENDING" >> $GITHUB_OUTPUT
             echo "Audit: PENDING — waiting for human approval." >> $GITHUB_STEP_SUMMARY
-            exit 0   # do NOT fail here — pass control forward
+            exit 0  # allow the job to continue to packaging
           else
-            echo "Audit=PASSED" >> $GITHUB_ENV
+            echo "audit=PASSED" >> $GITHUB_OUTPUT
             echo "Audit: PASSED automatically." >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Find latest run id
+        id: getid
+        shell: bash
         run: |
           RID=$(ls -1dt runs/* | head -n1 | xargs -n1 basename)
           echo "RUN_ID=$RID" >> $GITHUB_ENV
+          echo "run_id=$RID" >> $GITHUB_OUTPUT
           echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
 
       - name: Package artifacts
@@ -48,22 +55,64 @@ jobs:
           path: ${{ env.RUN_ID }}.tar.gz
 
   human-approval:
+    # Only require a protected environment if the audit gate is PENDING
+    if: needs.run-awo.outputs.audit == 'PENDING'
     needs: run-awo
     runs-on: ubuntu-latest
     environment: awo-audit
     steps:
       - name: Await human approval
-        run: echo "Audit is pending — approve or reject this run in GitHub UI."
+        run: echo "Approve or Reject this deployment in the GitHub UI."
 
   finalize:
-    needs: human-approval
+    # Run whether approval was required or not
+    needs: [run-awo, human-approval]
     runs-on: ubuntu-latest
     steps:
-      - name: Finalize run
+      - name: Decide approval state
+        id: decide
+        shell: bash
         run: |
-          if [ "${{ github.event.deployment_status.state }}" = "rejected" ]; then
-            echo "Run ${{ env.RUN_ID }} rejected."
-            exit 1
+          AUDIT="${{ needs.run-awo.outputs.audit }}"
+          if [ "$AUDIT" = "PENDING" ]; then
+            # If we required approval, only continue on 'success' (approved)
+            STATE="${{ github.event.deployment_status.state }}"
+            echo "state=${STATE:-approved}" >> $GITHUB_OUTPUT
           else
-            echo "Run ${{ env.RUN_ID }} approved and finalized."
+            # Auto-pass path
+            echo "state=approved" >> $GITHUB_OUTPUT
           fi
+
+      - name: Stop if rejected
+        if: steps.decide.outputs.state == 'rejected'
+        run: |
+          echo "Run ${{ needs.run-awo.outputs.run_id }} rejected by human reviewer."
+          exit 1
+
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Download run artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ needs.run-awo.outputs.run_id }}
+          path: .
+
+      - name: Extract run folder
+        run: |
+          tar -xzf "${{ needs.run-awo.outputs.run_id }}.tar.gz"
+
+      - name: Commit run folder to main
+        env:
+          GH_USER: ${{ github.actor }}
+        run: |
+          git config user.name "$GH_USER"
+          git config user.email "$GH_USER@users.noreply.github.com"
+          git pull --ff-only origin main
+          git add "runs/${{ needs.run-awo.outputs.run_id }}"
+          git commit -m "chore(runs): add ${{ needs.run-awo.outputs.run_id }} [skip ci]" || echo "Nothing to commit"
+          git push origin HEAD:main
+
+      - name: Summary
+        run: |
+          echo "Committed runs/${{ needs.run-awo.outputs.run_id }} to main." >> $GITHUB_STEP_SUMMARY
