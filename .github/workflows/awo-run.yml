@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python -m awo.cli run "${{ github.event.inputs.workflow_file }}"
+          python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
           echo "exit_code=$code" >> $GITHUB_OUTPUT
           exit $code
