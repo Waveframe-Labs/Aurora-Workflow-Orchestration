@@ -14,6 +14,14 @@
       "inputs_from": "fanout_1"
     },
     {
+      "id": "emit_summary",
+      "op": "write_text",
+      "args": {
+        "path": "artifacts/summary.txt",
+        "text": "Consensus step completed successfully. This artifact is written on *every run* prior to audit gate approval."
+      }
+    },
+    {
       "id": "gate_review",
       "op": "audit_gate",
       "args": { "checklist": "templates/audit-checklist.md" }
