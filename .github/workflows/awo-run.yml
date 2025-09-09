@@ -51,11 +51,11 @@ jobs:
           echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create tar
-        if: ${{ always() && steps.findrun.outputs.run_id != '' }}
+        if: "${{ always() && steps.findrun.outputs.run_id != '' }}"
         run: tar -czf "${{ steps.findrun.outputs.run_id }}.tar.gz" "runs/${{ steps.findrun.outputs.run_id }}"
 
       - name: Upload artifact
-        if: ${{ always() && steps.findrun.outputs.run_id != '' }}
+        if: "${{ always() && steps.findrun.outputs.run_id != '' }}"
         uses: actions/upload-artifact@v4
         with:
           name: awo-run-${{ steps.findrun.outputs.run_id }}
@@ -63,23 +63,22 @@ jobs:
 
   human-approval:
     needs: run-awo
-    if: ${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' }}
+    if: "${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' }}"
     runs-on: ubuntu-latest
     environment: awo-audit
     steps:
       - name: Await human approval
-        run: echo "Approve or reject this deployment in Environment: awo-audit."
+        run: echo "Approve or reject this run in Environment: awo-audit."
 
   finalize-auto:
     needs: run-awo
-    if: ${{ needs['run-awo'].outputs.audit == 'PASSED' && needs['run-awo'].outputs.run_id != '' }}
+    if: "${{ needs['run-awo'].outputs.audit == 'PASSED' && needs['run-awo'].outputs.run_id != '' }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
-
       - name: Commit run folder to main (auto-pass)
         shell: bash
         run: |
@@ -100,14 +99,13 @@ jobs:
 
   finalize-approved:
     needs: [run-awo, human-approval]
-    if: ${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' && needs['human-approval'].result == 'success' }}
+    if: "${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' && needs['human-approval'].result == 'success' }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
-
       - name: Commit run folder to main (human-approved)
         shell: bash
         run: |
