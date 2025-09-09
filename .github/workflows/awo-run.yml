@@ -11,9 +11,6 @@ on:
 jobs:
   run-awo:
     runs-on: ubuntu-latest
-    outputs:
-      run_id: ${{ steps.getid.outputs.run_id }}
-      audit:  ${{ steps.runstep.outputs.audit }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,23 +21,19 @@ jobs:
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-
           if [ $code -eq 78 ]; then
-            echo "audit=PENDING" >> $GITHUB_OUTPUT
+            echo "Audit=PENDING" >> $GITHUB_ENV
             echo "Audit: PENDING — waiting for human approval." >> $GITHUB_STEP_SUMMARY
             exit 0
           else
-            echo "audit=PASSED" >> $GITHUB_OUTPUT
+            echo "Audit=PASSED" >> $GITHUB_ENV
             echo "Audit: PASSED automatically." >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Find latest run id
-        id: getid
-        shell: bash
         run: |
           RID=$(ls -1dt runs/* | head -n1 | xargs -n1 basename)
           echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo "run_id=$RID" >> $GITHUB_OUTPUT
           echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
 
       - name: Package artifacts
@@ -54,64 +47,35 @@ jobs:
           name: awo-run-${{ env.RUN_ID }}
           path: ${{ env.RUN_ID }}.tar.gz
 
-  # Only runs when audit == PENDING
   human-approval:
-    if: needs.run-awo.outputs.audit == 'PENDING'
+    if: needs.run-awo.outputs.Audit == 'PENDING'
     needs: run-awo
     runs-on: ubuntu-latest
     environment: awo-audit
     steps:
       - name: Await human approval
-        run: echo "Approve or reject in the GitHub UI."
+        run: echo "Audit is pending — approve or reject this run in GitHub UI."
 
-  # Finalize path for auto-passed audits
-  finalize-auto:
-    if: needs.run-awo.outputs.audit == 'PASSED'
-    needs: run-awo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: awo-run-${{ needs.run-awo.outputs.run_id }}
-          path: .
-      - name: Extract run
-        run: tar -xzf "${{ needs.run-awo.outputs.run_id }}.tar.gz"
-      - name: Commit run to main
-        env:
-          GH_USER: ${{ github.actor }}
-        run: |
-          git config user.name "$GH_USER"
-          git config user.email "$GH_USER@users.noreply.github.com"
-          git pull --ff-only origin main
-          git add "runs/${{ needs.run-awo.outputs.run_id }}"
-          git commit -m "chore(runs): add ${{ needs.run-awo.outputs.run_id }} [skip ci]" || echo "Nothing to commit"
-          git push origin HEAD:main
-      - name: Summary
-        run: echo "Committed runs/${{ needs.run-awo.outputs.run_id }} (auto-passed)." >> $GITHUB_STEP_SUMMARY
-
-  # Finalize path for human-approved audits
-  finalize-approved:
-    if: needs.run-awo.outputs.audit == 'PENDING'
+  finalize:
     needs: [run-awo, human-approval]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
         with:
-          name: awo-run-${{ needs.run-awo.outputs.run_id }}
-          path: .
-      - name: Extract run
-        run: tar -xzf "${{ needs.run-awo.outputs.run_id }}.tar.gz"
-      - name: Commit run to main
-        env:
-          GH_USER: ${{ github.actor }}
+          persist-credentials: true
+
+      - name: Commit approved run
+        if: env.Audit == 'PASSED' || github.event.deployment_status.state == 'success'
         run: |
-          git config user.name "$GH_USER"
-          git config user.email "$GH_USER@users.noreply.github.com"
-          git pull --ff-only origin main
-          git add "runs/${{ needs.run-awo.outputs.run_id }}"
-          git commit -m "chore(runs): add ${{ needs.run-awo.outputs.run_id }} (approved) [skip ci]" || echo "Nothing to commit"
-          git push origin HEAD:main
-      - name: Summary
-        run: echo "Committed runs/${{ needs.run-awo.outputs.run_id }} after human approval." >> $GITHUB_STEP_SUMMARY
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add runs/$RUN_ID
+          git commit -m "Add approved run $RUN_ID"
+          git push origin main
+          echo "Run $RUN_ID committed to main." >> $GITHUB_STEP_SUMMARY
+
+      - name: Reject run
+        if: github.event.deployment_status.state == 'rejected'
+        run: |
+          echo "Run $RUN_ID rejected — not committed." >> $GITHUB_STEP_SUMMARY
+          exit 1
