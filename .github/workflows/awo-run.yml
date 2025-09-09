@@ -63,7 +63,7 @@ jobs:
 
   human-approval:
     needs: run-awo
-    if: ${{ needs.run-awo.outputs.audit == 'PENDING' && needs.run-awo.outputs.run_id != '' }}
+    if: ${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' }}
     runs-on: ubuntu-latest
     environment: awo-audit
     steps:
@@ -72,7 +72,7 @@ jobs:
 
   finalize-auto:
     needs: run-awo
-    if: ${{ needs.run-awo.outputs.audit == 'PASSED' && needs.run-awo.outputs.run_id != '' }}
+    if: ${{ needs['run-awo'].outputs.audit == 'PASSED' && needs['run-awo'].outputs.run_id != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +85,7 @@ jobs:
         run: |
           set -e
           BRANCH="${{ github.ref_name }}"
-          RID="${{ needs.run-awo.outputs.run_id }}"
+          RID="${{ needs['run-awo'].outputs.run_id }}"
           [ -d "runs/$RID" ] || { echo "No run folder found"; exit 0; }
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -100,7 +100,7 @@ jobs:
 
   finalize-approved:
     needs: [run-awo, human-approval]
-    if: ${{ needs.run-awo.outputs.audit == 'PENDING' && needs.run-awo.outputs.run_id != '' && needs.human-approval.result == 'success' }}
+    if: ${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' && needs['human-approval'].result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -113,7 +113,7 @@ jobs:
         run: |
           set -e
           BRANCH="${{ github.ref_name }}"
-          RID="${{ needs.run-awo.outputs.run_id }}"
+          RID="${{ needs['run-awo'].outputs.run_id }}"
           [ -d "runs/$RID" ] || { echo "No run folder found"; exit 0; }
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
