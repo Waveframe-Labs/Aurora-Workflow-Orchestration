@@ -15,7 +15,7 @@ from __future__ import annotations
 import json, re, sys, hashlib
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 
 EXIT_PENDING = 78
 
@@ -186,11 +186,40 @@ def run(workflow_path: str) -> int:
             ]
 
         elif op == "write_text":
-            path = step["args"]["path"]
-            text = step["args"]["text"]
+            # NEW: support dynamic sources via from_step + field
+            args = step.get("args", {})
+            path = args["path"]
+            text: Union[str, None] = args.get("text")
+            from_step = args.get("from_step")
+            field = args.get("field", "consensus_text")
+
+            # If no explicit text and a source is provided, derive the content:
+            if text is None and from_step:
+                source = ctx.get(from_step)
+                if source is None:
+                    msg = f"write_text: source step '{from_step}' not found"
+                    rec.update({"error": "missing_source", "message": msg, "args": args})
+                    record_step(run_dir, step_idx, step_id, rec)
+                    report += ["## Error", "", msg, ""]
+                    finalize_report(run_dir, report)
+                    print(f"[AWO] {msg}", file=sys.stderr)
+                    return 2
+
+                if isinstance(source, list):
+                    # probably outputs from fanout_generate
+                    text = "\n\n".join([str(o.get("text", "")) for o in source])
+                elif isinstance(source, dict) and field in source:
+                    text = str(source[field])
+                else:
+                    # fallback: dump whatever object we have
+                    text = json.dumps(source, indent=2, ensure_ascii=False)
+
+            if text is None:
+                text = ""
+
             out_path = run_dir / "artifacts" / path
             write_text(out_path, text)
-            rec.update({"wrote": str(out_path)})
+            rec.update({"wrote": str(out_path), "from_step": from_step, "field": field if from_step else None})
             record_step(run_dir, step_idx, step_id, rec)
             report += [f"## {step_idx}. write_text — {step_id}", f"- wrote: {out_path}", ""]
 
