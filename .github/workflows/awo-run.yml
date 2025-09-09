@@ -17,47 +17,61 @@ concurrency:
 
 jobs:
   run_awo:
+    name: Run AWO workflow
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Execute AWO workflow
+      - name: Execute workflow
         shell: bash
         run: |
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-          echo "runner_exit_code=$code" >> $GITHUB_ENV
+          echo "RUNNER_EXIT_CODE=$code" >> "$GITHUB_ENV"
           if [ "$code" = "78" ]; then
-            echo "Audit: PENDING (human approval will be required)" >> $GITHUB_STEP_SUMMARY
+            echo "Audit: PENDING (human approval will be required)" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Audit: PASSED (still requires manual approval in this workflow)" >> $GITHUB_STEP_SUMMARY
+            echo "Audit: PASSED (this workflow still pauses for manual approval)" >> "$GITHUB_STEP_SUMMARY"
           fi
-          # Do NOT fail; always continue to the approval gate
+          # Always continue to approval gate
           exit 0
 
-      - name: Capture Run-ID
+      - name: Capture Run-ID (robust)
+        id: capture
         shell: bash
         run: |
-          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
-          echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
+          set -e
+          # Prefer breadcrumb written by the script
+          if [ -f runs/LAST_RUN ]; then
+            RID="$(cat runs/LAST_RUN)"
+          else
+            # Fallback to newest run_* folder if breadcrumb missing
+            RID="$(ls -1dt runs/run_* 2>/dev/null | head -n1 | xargs -n1 basename || true)"
+          fi
+          if [ -z "$RID" ]; then
+            echo "No run folder found. Did the script create one?" >&2
+            exit 123
+          fi
+          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
+          echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create payload
+        shell: bash
         run: tar -czf "${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
         uses: actions/upload-artifact@v4
         with:
-          name: awo-run-${{ env.RUN_ID }}
-          path: ${{ env.RUN_ID }}.tar.gz
+          name: "awo-run-${{ env.RUN_ID }}"
+          path: "${{ env.RUN_ID }}.tar.gz"
 
   human_approval:
+    name: Human approval gate
     needs: run_awo
     runs-on: ubuntu-latest
-    # This creates the actual pause with Approve/Reject buttons
     environment:
       name: awo-audit
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -65,6 +79,7 @@ jobs:
       - run: echo "Manual approval gate — approve in Environment 'awo-audit' to continue."
 
   finalize:
+    name: Finalize & commit run
     needs: [run_awo, human_approval]
     runs-on: ubuntu-latest
     steps:
@@ -73,7 +88,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Download run artifact(s)
+      - name: Download artifact(s)
         uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -82,17 +97,27 @@ jobs:
         shell: bash
         run: |
           set -e
-          cd artifacts
-          for f in *.tar.gz; do
-            [ -f "$f" ] && tar -xzf "$f"
-          done
-          cd ..
+          # Extract any payloads we downloaded (artifact may be nested)
+          find artifacts -type f -name '*.tar.gz' -print -exec tar -xzf {} -C artifacts \;
+
+          # Copy extracted runs/* into repo runs/
+          mkdir -p runs
           if [ -d artifacts/runs ]; then
-            rsync -a artifacts/runs/ runs/
+            cp -a artifacts/runs/* runs/ 2>/dev/null || true
           fi
-          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
-          echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo "Finalizing $RID" >> $GITHUB_STEP_SUMMARY
+
+          # Resolve RUN_ID again from breadcrumb or newest folder
+          if [ -f runs/LAST_RUN ]; then
+            RID="$(cat runs/LAST_RUN)"
+          else
+            RID="$(ls -1dt runs/run_* 2>/dev/null | head -n1 | xargs -n1 basename || true)"
+          fi
+          if [ -z "$RID" ]; then
+            echo "Could not resolve RUN_ID after extraction." >&2
+            exit 2
+          fi
+          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
+          echo "Finalizing $RID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit run to main
         shell: bash
@@ -102,6 +127,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git switch "${GITHUB_REF_NAME}"
           git add "runs/${RUN_ID}" || true
+          # Also update breadcrumb if changed
+          [ -f runs/LAST_RUN ] && git add runs/LAST_RUN || true
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
