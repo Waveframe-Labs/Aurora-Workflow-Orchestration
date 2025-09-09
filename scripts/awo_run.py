@@ -2,17 +2,13 @@
 """
 AWO multi-model runner (stdlib only, CI-safe).
 
-Guarantees
 - Creates runs/run_YYYY-MM-DDTHH-MM-SSZ immediately and writes runs/LAST_RUN.
-- On any failure (missing workflow, bad JSON, unknown op), writes an ERROR
-  record + report.md inside the run, then exits nonzero.
-- On audit_gate, writes report.md and exits with code 78 (pending human review).
+- Prints RUN_ID=<id> to stdout so GitHub Actions can capture it.
+- On any error, writes an error record + report.md inside the run, then exits nonzero.
+- On audit_gate, writes report.md and exits 78 (pending human approval).
 
-Ops supported
-  - fanout_generate
-  - consensus_vote
-  - write_text
-  - audit_gate
+Ops supported:
+  fanout_generate, consensus_vote, write_text, audit_gate
 """
 
 from __future__ import annotations
@@ -47,24 +43,19 @@ def write_json(p: Path, obj: Any) -> None:
     p.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
 def ensure_run_dir() -> Path:
-    """Create a new run folder and record pointers *up front*."""
-    runs_root = Path("runs")
-    runs_root.mkdir(parents=True, exist_ok=True)
-    run_id = f"run_{now_iso()}"
-    rd = runs_root / run_id
+    rd = Path("runs") / f"run_{now_iso()}"
     (rd / "steps").mkdir(parents=True, exist_ok=True)
     (rd / "artifacts").mkdir(parents=True, exist_ok=True)
-    # Pointers that make CI robust:
-    write_text(runs_root / "LAST_RUN", run_id)
-    write_text(rd / "RUN_ID", run_id)
+    # breadcrumb for CI (so the workflow can always find the latest run)
+    write_text(Path("runs") / "LAST_RUN", rd.name)
+    # emit RUN_ID so the workflow can parse it directly
+    print(f"RUN_ID={rd.name}")
     return rd
 
 def init_report(run_dir: Path, workflow_path: str) -> List[str]:
     return [
         f"# AWO Run Report — {run_dir.name}", "",
-        f"- Workflow: {workflow_path}",
-        f"- Started: {now_iso()}",
-        ""
+        f"- Workflow: {workflow_path}", f"- Started: {now_iso()}", ""
     ]
 
 def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) -> None:
@@ -75,13 +66,12 @@ def finalize_report(run_dir: Path, report_lines: List[str]) -> None:
 
 # ---- main logic --------------------------------------------------------------
 def run(workflow_path: str) -> int:
-    # Always create a run directory first so CI can find it.
-    run_dir = ensure_run_dir()
+    run_dir = ensure_run_dir()         # ALWAYS create a run directory first
     report = init_report(run_dir, workflow_path)
     step_idx = 0
     ctx: Dict[str, Any] = {}
 
-    # Load workflow (with helpful errors recorded into the run)
+    # Try to load workflow; on failure, record error but leave a usable run.
     wf_file = Path(workflow_path)
     if not wf_file.exists():
         msg = f"Workflow file not found: {workflow_path}"
@@ -107,131 +97,96 @@ def run(workflow_path: str) -> int:
     write_text(run_dir / "workflow_frozen.json", json.dumps(wf, indent=2))
 
     # Execute steps
-    try:
-        for step in wf.get("steps", []):
-            step_idx += 1
-            op = step.get("op")
-            step_id = step.get("id", f"step_{step_idx}")
-            rec: Dict[str, Any] = {"ts": now_iso(), "id": step_id, "op": op}
+    for step in wf.get("steps", []):
+        step_idx += 1
+        op = step.get("op")
+        step_id = step.get("id", f"step_{step_idx}")
+        rec: Dict[str, Any] = {"ts": now_iso(), "id": step_id, "op": op}
 
-            if op == "fanout_generate":
-                prompt = step["prompt"]
-                models = step.get("models", ["echo", "upper"])
-                params = step.get("params", {"seed": 0})
+        if op == "fanout_generate":
+            prompt = step["prompt"]
+            models = step.get("models", ["echo", "upper"])
+            params = step.get("params", {"seed": 0})
 
-                outs: List[Dict[str, Any]] = []
-                for m in models:
-                    if m not in BACKENDS:
-                        raise RuntimeError(f"Unknown model backend: {m}")
-                    out = BACKENDS[m].generate(prompt, params=params)
-                    outs.append({"model": m, "text": out["text"], "meta": out["meta"]})
+            outs: List[Dict[str, Any]] = []
+            for m in models:
+                if m not in BACKENDS:
+                    raise RuntimeError(f"Unknown model backend: {m}")
+                out = BACKENDS[m].generate(prompt, params=params)
+                outs.append({"model": m, "text": out["text"], "meta": out["meta"]})
 
-                rec.update({"prompt": prompt, "models": models, "params": params, "outputs": outs})
-                ctx[step_id] = outs
-                record_step(run_dir, step_idx, step_id, rec)
+            rec.update({"prompt": prompt, "models": models, "params": params, "outputs": outs})
+            ctx[step_id] = outs
+            record_step(run_dir, step_idx, step_id, rec)
 
-                # keep the report readable; show a hash of the prompt and truncated outputs
-                report += [
-                    f"## {step_idx}. fanout_generate — {step_id}",
-                    f"Prompt (sha12={sha12(prompt)}):",
-                    "",
-                    "```",
-                    prompt,
-                    "```",
-                    "",
-                    "Outputs:",
-                ]
-                for o in outs:
-                    report.append(f"- **{o['model']}** → {o['text'].replace(chr(10),' ')[:200]}")
-                report.append("")
+            report += [
+                f"## {step_idx}. fanout_generate — {step_id}",
+                f"Prompt (sha12={sha12(prompt)}):", "", "```", prompt, "```", "",
+                "Outputs:"
+            ] + [f"- **{o['model']}** → {o['text'].replace('\n',' ')[:200]}" for o in outs] + [""]
 
-            elif op == "consensus_vote":
-                src = step["inputs_from"]
-                items = ctx.get(src, [])
-                if not items:
-                    raise RuntimeError(f"consensus_vote: no inputs from '{src}'")
+        elif op == "consensus_vote":
+            src = step["inputs_from"]
+            items = ctx.get(src, [])
+            if not items:
+                raise RuntimeError(f"consensus_vote: no inputs from '{src}'")
 
-                buckets: Dict[str, List[str]] = {}
-                for o in items:
-                    k = norm_text(o["text"])
-                    buckets.setdefault(k, []).append(o["model"])
+            buckets: Dict[str, List[str]] = {}
+            for o in items:
+                k = norm_text(o["text"])
+                buckets.setdefault(k, []).append(o["model"])
 
-                ranked = sorted(buckets.items(),
-                                key=lambda kv: (len(kv[1]), len(kv[0])),
-                                reverse=True)
-                if ranked:
-                    consensus_norm, voters = ranked[0]
-                    representative = next(o for o in items
-                                          if norm_text(o["text"]) == consensus_norm)["text"]
-                else:
-                    consensus_norm, voters, representative = "", [], ""
-
-                rec.update({
-                    "inputs_from": src,
-                    "total_candidates": len(items),
-                    "voter_count": len(voters),
-                    "voters": voters,
-                    "consensus_norm": consensus_norm,
-                    "consensus_text": representative,
-                    "agreement_ratio": (len(voters) / max(1, len(items))),
-                })
-                ctx[step_id] = rec
-                record_step(run_dir, step_idx, step_id, rec)
-
-                report += [
-                    f"## {step_idx}. consensus_vote — {step_id}",
-                    f"- inputs_from: {src}",
-                    f"- voters: {', '.join(voters) if voters else '(none)'}",
-                    f"- agreement_ratio: {rec['agreement_ratio']:.2f}",
-                    "",
-                    "```",
-                    representative[:300],
-                    "```",
-                    "",
-                ]
-
-            elif op == "write_text":
-                path = step["args"]["path"]
-                text = step["args"]["text"]
-                out_path = run_dir / "artifacts" / path
-                write_text(out_path, text)
-                rec.update({"wrote": str(out_path)})
-                record_step(run_dir, step_idx, step_id, rec)
-                report += [f"## {step_idx}. write_text — {step_id}",
-                           f"- wrote: {out_path}", ""]
-
-            elif op == "audit_gate":
-                checklist = step.get("args", {}).get("checklist", "templates/audit-checklist.md")
-                rec.update({"gate": {"status": "pending", "checklist": checklist, "ts": now_iso()}})
-                record_step(run_dir, step_idx, step_id, rec)
-
-                write_text(run_dir / "gate_decision.yml",
-                           f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n")
-
-                report += [
-                    f"## {step_idx}. audit_gate — {step_id}",
-                    f"- checklist: {checklist}",
-                    "",
-                    "> Run halted for human review.",
-                    "",
-                ]
-                finalize_report(run_dir, report)
-                print(f"[AWO] Run created at: {run_dir}")
-                return EXIT_PENDING
-
+            ranked = sorted(buckets.items(), key=lambda kv: (len(kv[1]), len(kv[0])), reverse=True)
+            if ranked:
+                consensus_norm, voters = ranked[0]
+                representative = next(o for o in items if norm_text(o["text"]) == consensus_norm)["text"]
             else:
-                raise RuntimeError(f"Unknown op: {op}")
+                consensus_norm, voters, representative = "", [], ""
 
-    except Exception as e:
-        # Per-step error handling with visible artifact
-        record_step(run_dir, step_idx, "step_error",
-                    {"error": "step_failed", "message": str(e), "ts": now_iso()})
-        report += ["## Error during execution", "", str(e), ""]
-        finalize_report(run_dir, report)
-        print(f"[AWO] ERROR: {e}", file=sys.stderr)
-        return 1
+            rec.update({
+                "inputs_from": src,
+                "total_candidates": len(items),
+                "voter_count": len(voters),
+                "voters": voters,
+                "consensus_norm": consensus_norm,
+                "consensus_text": representative,
+                "agreement_ratio": (len(voters) / max(1, len(items))),
+            })
+            ctx[step_id] = rec
+            record_step(run_dir, step_idx, step_id, rec)
 
-    # Normal completion (no audit gate)
+            report += [
+                f"## {step_idx}. consensus_vote — {step_id}",
+                f"- inputs_from: {src}",
+                f"- voters: {', '.join(voters) if voters else '(none)'}",
+                f"- agreement_ratio: {rec['agreement_ratio']:.2f}",
+                "", "```", representative[:300], "```", ""
+            ]
+
+        elif op == "write_text":
+            path = step["args"]["path"]
+            text = step["args"]["text"]
+            out_path = run_dir / "artifacts" / path
+            write_text(out_path, text)
+            rec.update({"wrote": str(out_path)})
+            record_step(run_dir, step_idx, step_id, rec)
+            report += [f"## {step_idx}. write_text — {step_id}", f"- wrote: {out_path}", ""]
+
+        elif op == "audit_gate":
+            checklist = step.get("args", {}).get("checklist", "templates/audit-checklist.md")
+            rec.update({"gate": {"status": "pending", "checklist": checklist, "ts": now_iso()}})
+            record_step(run_dir, step_idx, step_id, rec)
+            write_text(run_dir / "gate_decision.yml",
+                       f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n")
+            report += [f"## {step_idx}. audit_gate — {step_id}",
+                       f"- checklist: {checklist}", "", "> Run halted for human review.", ""]
+            finalize_report(run_dir, report)
+            print(f"[AWO] Run created at: {run_dir}")
+            return EXIT_PENDING
+
+        else:
+            raise RuntimeError(f"Unknown op: {op}")
+
     finalize_report(run_dir, report)
     print(f"[AWO] Run created at: {run_dir}")
     return 0
@@ -244,11 +199,10 @@ if __name__ == "__main__":
     try:
         sys.exit(run(sys.argv[1]))
     except Exception as e:
-        # Absolute last-resort safety: still leave a usable run folder.
+        # If something unexpected bubbles up, still leave a usable run
         rd = ensure_run_dir()
-        record_step(rd, 0, "unhandled_error",
-                    {"error": "unhandled", "message": str(e), "ts": now_iso()})
-        finalize_report(rd, [f"# AWO Run Report — {rd.name}", "",
-                             "## Error", "", str(e), ""])
-        print(f"[AWO] UNHANDLED ERROR: {e}", file=sys.stderr)
+        write_json(rd / "steps" / "00_unhandled_error.json",
+                   {"error": "unhandled", "message": str(e), "ts": now_iso()})
+        write_text(rd / "report.md", f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+        print(f"[AWO] ERROR: {e}", file=sys.stderr)
         sys.exit(1)
