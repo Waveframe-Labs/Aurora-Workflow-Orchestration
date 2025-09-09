@@ -5,7 +5,7 @@
       "id": "fanout_1",
       "op": "fanout_generate",
       "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
-      "models": ["echo", "upper"],
+      "models": ["echo", "upper", "reverse"],
       "params": { "seed": 123 }
     },
     {
@@ -14,24 +14,25 @@
       "inputs_from": "fanout_1"
     },
     {
-      "id": "emit_summary",
-      "op": "write_text",
-      "args": {
-        "path": "artifacts/summary.txt",
-        "text": "Consensus step completed successfully. This artifact is written on *every run* prior to audit gate approval."
-      }
-    },
-    {
       "id": "gate_review",
       "op": "audit_gate",
       "args": { "checklist": "templates/audit-checklist.md" }
     },
     {
-      "id": "write_note",
+      "id": "emit_fanout",
+      "op": "write_text",
+      "args": {
+        "path": "notes/fanout.txt",
+        "from_step": "fanout_1"
+      }
+    },
+    {
+      "id": "emit_consensus",
       "op": "write_text",
       "args": {
         "path": "notes/consensus.txt",
-        "text": "Consensus has been captured (this step will only run if you remove the gate or approve and rerun a variant that continues after approval)."
+        "from_step": "consensus_1",
+        "field": "consensus_text"
       }
     }
   ]
