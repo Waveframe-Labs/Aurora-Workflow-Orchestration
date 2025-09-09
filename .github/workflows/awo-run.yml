@@ -1,4 +1,4 @@
-name: AWO Run (Manual)
+name: AWO Run (Manual Approve to Commit)
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       workflow_file:
         description: "Workflow JSON path"
         required: true
-        default: "workflows/reviews.json"
+        default: "workflows/multimodel.json"
 
 permissions:
   contents: write
@@ -16,110 +16,95 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  run-awo:
+  run_awo:
     runs-on: ubuntu-latest
-    outputs:
-      audit: ${{ steps.runstep.outputs.audit }}
-      run_id: ${{ steps.findrun.outputs.run_id }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run workflow (simulate audit gate)
-        id: runstep
+      - name: Execute AWO workflow
         shell: bash
         run: |
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-          if [ $code -eq 78 ]; then
-            echo "audit=PENDING" >> "$GITHUB_OUTPUT"
-            echo "Audit: PENDING — waiting for human approval." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+          echo "runner_exit_code=$code" >> $GITHUB_ENV
+          if [ "$code" = "78" ]; then
+            echo "Audit: PENDING (human approval will be required)" >> $GITHUB_STEP_SUMMARY
           else
-            echo "audit=PASSED" >> "$GITHUB_OUTPUT"
-            echo "Audit: PASSED automatically." >> "$GITHUB_STEP_SUMMARY"
+            echo "Audit: PASSED (still requires manual approval in this workflow)" >> $GITHUB_STEP_SUMMARY
           fi
+          # Do NOT fail; always continue to the approval gate
+          exit 0
 
-      - name: Find latest run id
-        id: findrun
+      - name: Capture Run-ID
         shell: bash
         run: |
-          RID=$(ls -1dt runs/* 2>/dev/null | head -n1 | xargs -n1 basename)
-          echo "run_id=$RID" >> "$GITHUB_OUTPUT"
-          echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
+          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
+          echo "RUN_ID=$RID" >> $GITHUB_ENV
+          echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
 
-      - name: Create tar
-        if: "${{ always() && steps.findrun.outputs.run_id != '' }}"
-        run: tar -czf "${{ steps.findrun.outputs.run_id }}.tar.gz" "runs/${{ steps.findrun.outputs.run_id }}"
+      - name: Create payload
+        run: tar -czf "${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
-      - name: Upload artifact
-        if: "${{ always() && steps.findrun.outputs.run_id != '' }}"
+      - name: Upload payload
         uses: actions/upload-artifact@v4
         with:
-          name: awo-run-${{ steps.findrun.outputs.run_id }}
-          path: ${{ steps.findrun.outputs.run_id }}.tar.gz
+          name: awo-run-${{ env.RUN_ID }}
+          path: ${{ env.RUN_ID }}.tar.gz
 
-  human-approval:
-    needs: run-awo
-    if: "${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' }}"
+  human_approval:
+    needs: run_awo
     runs-on: ubuntu-latest
-    environment: awo-audit
+    # This creates the actual pause with Approve/Reject buttons
+    environment:
+      name: awo-audit
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - name: Await human approval
-        run: echo "Approve or reject this run in Environment: awo-audit."
+      - run: echo "Manual approval gate — approve in Environment 'awo-audit' to continue."
 
-  finalize-auto:
-    needs: run-awo
-    if: "${{ needs['run-awo'].outputs.audit == 'PASSED' && needs['run-awo'].outputs.run_id != '' }}"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: true
-      - name: Commit run folder to main (auto-pass)
-        shell: bash
-        run: |
-          set -e
-          BRANCH="${{ github.ref_name }}"
-          RID="${{ needs['run-awo'].outputs.run_id }}"
-          [ -d "runs/$RID" ] || { echo "No run folder found"; exit 0; }
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git switch "$BRANCH"
-          git add "runs/$RID" || true
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git commit -m "AWO: add $RID (auto-pass)"
-          git push origin "$BRANCH"
-
-  finalize-approved:
-    needs: [run-awo, human-approval]
-    if: "${{ needs['run-awo'].outputs.audit == 'PENDING' && needs['run-awo'].outputs.run_id != '' && needs['human-approval'].result == 'success' }}"
+  finalize:
+    needs: [run_awo, human_approval]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
-      - name: Commit run folder to main (human-approved)
+
+      - name: Download run artifact(s)
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Extract run folder
         shell: bash
         run: |
           set -e
-          BRANCH="${{ github.ref_name }}"
-          RID="${{ needs['run-awo'].outputs.run_id }}"
-          [ -d "runs/$RID" ] || { echo "No run folder found"; exit 0; }
+          cd artifacts
+          for f in *.tar.gz; do
+            [ -f "$f" ] && tar -xzf "$f"
+          done
+          cd ..
+          if [ -d artifacts/runs ]; then
+            rsync -a artifacts/runs/ runs/
+          fi
+          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
+          echo "RUN_ID=$RID" >> $GITHUB_ENV
+          echo "Finalizing $RID" >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit run to main
+        shell: bash
+        run: |
+          set -e
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git switch "$BRANCH"
-          git add "runs/$RID" || true
+          git switch "${GITHUB_REF_NAME}"
+          git add "runs/${RUN_ID}" || true
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "AWO: add $RID (human-approved)"
-          git push origin "$BRANCH"
+          git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
+          git push origin "${GITHUB_REF_NAME}"
