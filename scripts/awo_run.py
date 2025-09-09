@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """
-AWO multi-model runner (stdlib only, CI-safe).
+AWO multi-model runner (stdlib only, CI/Actions safe).
 
-- Creates runs/run_YYYY-MM-DDTHH-MM-SSZ immediately and writes runs/LAST_RUN.
-- Prints RUN_ID=<id> to stdout so GitHub Actions can capture it.
-- On any error, writes an error record + report.md inside the run, then exits nonzero.
-- On audit_gate, writes report.md and exits 78 (pending human approval).
+Guarantees:
+- Always creates runs/run_YYYY-MM-DDTHH-MM-SSZ and writes runs/LAST_RUN
+  *before* doing anything that could fail.
+- On any failure (missing workflow, parse error, unknown op), writes an
+  ERROR record and report.md inside the run and exits non-zero.
+- On audit_gate, writes report.md and exits with code 78 (pending).
 
 Ops supported:
   fanout_generate, consensus_vote, write_text, audit_gate
+
+Backends (deterministic, no external APIs):
+  - echo  : returns the prompt with metadata
+  - upper : returns UPPERCASE(prompt) with metadata
 """
 
 from __future__ import annotations
@@ -17,7 +23,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List
 
-# ---- deterministic local backends (no external APIs) ------------------------
+# ---- deterministic local backends ------------------------------------------
 from awo.models.local_backend import LocalEcho
 from awo.models.alt_backend import LocalUpper
 
@@ -43,19 +49,23 @@ def write_json(p: Path, obj: Any) -> None:
     p.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
 def ensure_run_dir() -> Path:
+    Path("runs").mkdir(exist_ok=True)
     rd = Path("runs") / f"run_{now_iso()}"
     (rd / "steps").mkdir(parents=True, exist_ok=True)
     (rd / "artifacts").mkdir(parents=True, exist_ok=True)
-    # breadcrumb for CI (so the workflow can always find the latest run)
-    write_text(Path("runs") / "LAST_RUN", rd.name)
-    # emit RUN_ID so the workflow can parse it directly
-    print(f"RUN_ID={rd.name}")
     return rd
+
+def breadcrumb(run_dir: Path) -> None:
+    # Single source of truth for LAST_RUN writing
+    write_text(Path("runs") / "LAST_RUN", run_dir.name)
 
 def init_report(run_dir: Path, workflow_path: str) -> List[str]:
     return [
-        f"# AWO Run Report — {run_dir.name}", "",
-        f"- Workflow: {workflow_path}", f"- Started: {now_iso()}", ""
+        f"# AWO Run Report — {run_dir.name}",
+        "",
+        f"- Workflow: {workflow_path}",
+        f"- Started: {now_iso()}",
+        "",
     ]
 
 def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) -> None:
@@ -66,12 +76,15 @@ def finalize_report(run_dir: Path, report_lines: List[str]) -> None:
 
 # ---- main logic --------------------------------------------------------------
 def run(workflow_path: str) -> int:
-    run_dir = ensure_run_dir()         # ALWAYS create a run directory first
+    # Always prepare a run directory + breadcrumb first
+    run_dir = ensure_run_dir()
+    breadcrumb(run_dir)
+
     report = init_report(run_dir, workflow_path)
     step_idx = 0
     ctx: Dict[str, Any] = {}
 
-    # Try to load workflow; on failure, record error but leave a usable run.
+    # Load workflow safely
     wf_file = Path(workflow_path)
     if not wf_file.exists():
         msg = f"Workflow file not found: {workflow_path}"
@@ -121,8 +134,13 @@ def run(workflow_path: str) -> int:
 
             report += [
                 f"## {step_idx}. fanout_generate — {step_id}",
-                f"Prompt (sha12={sha12(prompt)}):", "", "```", prompt, "```", "",
-                "Outputs:"
+                f"Prompt (sha12={sha12(prompt)}):",
+                "",
+                "```",
+                prompt,
+                "```",
+                "",
+                "Outputs:",
             ] + [f"- **{o['model']}** → {o['text'].replace('\n',' ')[:200]}" for o in outs] + [""]
 
         elif op == "consensus_vote":
@@ -160,7 +178,11 @@ def run(workflow_path: str) -> int:
                 f"- inputs_from: {src}",
                 f"- voters: {', '.join(voters) if voters else '(none)'}",
                 f"- agreement_ratio: {rec['agreement_ratio']:.2f}",
-                "", "```", representative[:300], "```", ""
+                "",
+                "```",
+                representative[:300],
+                "```",
+                "",
             ]
 
         elif op == "write_text":
@@ -176,18 +198,39 @@ def run(workflow_path: str) -> int:
             checklist = step.get("args", {}).get("checklist", "templates/audit-checklist.md")
             rec.update({"gate": {"status": "pending", "checklist": checklist, "ts": now_iso()}})
             record_step(run_dir, step_idx, step_id, rec)
-            write_text(run_dir / "gate_decision.yml",
-                       f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n")
-            report += [f"## {step_idx}. audit_gate — {step_id}",
-                       f"- checklist: {checklist}", "", "> Run halted for human review.", ""]
+
+            # Persist a machine-readable decision stub
+            write_text(
+                run_dir / "gate_decision.yml",
+                f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n",
+            )
+
+            report += [
+                f"## {step_idx}. audit_gate — {step_id}",
+                f"- checklist: {checklist}",
+                "",
+                "> Run halted for human review.",
+                "",
+            ]
+
             finalize_report(run_dir, report)
+            breadcrumb(run_dir)  # ensure LAST_RUN definitely exists for CI
             print(f"[AWO] Run created at: {run_dir}")
             return EXIT_PENDING
 
         else:
-            raise RuntimeError(f"Unknown op: {op}")
+            # Unknown op → record + fail with report
+            msg = f"Unknown op: {op}"
+            rec.update({"error": "unknown_op", "message": msg})
+            record_step(run_dir, step_idx, step_id, rec)
+            report += ["## Error", "", msg, ""]
+            finalize_report(run_dir, report)
+            print(f"[AWO] {msg}", file=sys.stderr)
+            return 2
 
+    # Normal completion (no audit gate)
     finalize_report(run_dir, report)
+    breadcrumb(run_dir)  # refresh breadcrumb to last completed run
     print(f"[AWO] Run created at: {run_dir}")
     return 0
 
@@ -199,10 +242,12 @@ if __name__ == "__main__":
     try:
         sys.exit(run(sys.argv[1]))
     except Exception as e:
-        # If something unexpected bubbles up, still leave a usable run
+        # Defensive: create a minimal error run and breadcrumb on crash
         rd = ensure_run_dir()
+        breadcrumb(rd)
         write_json(rd / "steps" / "00_unhandled_error.json",
                    {"error": "unhandled", "message": str(e), "ts": now_iso()})
-        write_text(rd / "report.md", f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+        write_text(rd / "report.md",
+                   f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
         print(f"[AWO] ERROR: {e}", file=sys.stderr)
         sys.exit(1)
