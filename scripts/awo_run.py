@@ -2,19 +2,13 @@
 """
 AWO multi-model runner (stdlib only, CI/Actions safe).
 
-Guarantees:
-- Always creates runs/run_YYYY-MM-DDTHH-MM-SSZ and writes runs/LAST_RUN
-  *before* doing anything that could fail.
-- On any failure (missing workflow, parse error, unknown op), writes an
-  ERROR record and report.md inside the run and exits non-zero.
-- On audit_gate, writes report.md and exits with code 78 (pending).
+Hard guarantees:
+- Always creates runs/run_YYYY-MM-DDTHH-MM-SSZ and writes runs/LAST_RUN,
+  even if optional backends or the workflow file are missing.
+- On audit_gate -> exits 78 after writing report.md and breadcrumb.
+- On any error -> writes an ERROR step + report.md, exits nonzero.
 
-Ops supported:
-  fanout_generate, consensus_vote, write_text, audit_gate
-
-Backends (deterministic, no external APIs):
-  - echo  : returns the prompt with metadata
-  - upper : returns UPPERCASE(prompt) with metadata
+Ops: fanout_generate, consensus_vote, write_text, audit_gate
 """
 
 from __future__ import annotations
@@ -23,14 +17,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List
 
-# ---- deterministic local backends ------------------------------------------
-from awo.models.local_backend import LocalEcho
-from awo.models.alt_backend import LocalUpper
-
-BACKENDS = {"echo": LocalEcho(), "upper": LocalUpper()}
 EXIT_PENDING = 78
 
-# ---- utilities ---------------------------------------------------------------
+# ------------------------ tiny fallback backends ------------------------------
+class _Echo:
+    def generate(self, prompt: str, params=None):
+        return {"text": prompt, "meta": {"engine": "fallback:echo", "seed": (params or {}).get("seed", 0)}}
+
+class _Upper:
+    def generate(self, prompt: str, params=None):
+        return {"text": (prompt or "").upper(), "meta": {"engine": "fallback:upper", "seed": (params or {}).get("seed", 0)}}
+
+# ------------------------------- utils ---------------------------------------
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
@@ -56,16 +54,12 @@ def ensure_run_dir() -> Path:
     return rd
 
 def breadcrumb(run_dir: Path) -> None:
-    # Single source of truth for LAST_RUN writing
     write_text(Path("runs") / "LAST_RUN", run_dir.name)
 
 def init_report(run_dir: Path, workflow_path: str) -> List[str]:
     return [
-        f"# AWO Run Report — {run_dir.name}",
-        "",
-        f"- Workflow: {workflow_path}",
-        f"- Started: {now_iso()}",
-        "",
+        f"# AWO Run Report — {run_dir.name}", "",
+        f"- Workflow: {workflow_path}", f"- Started: {now_iso()}", ""
     ]
 
 def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) -> None:
@@ -74,9 +68,9 @@ def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) 
 def finalize_report(run_dir: Path, report_lines: List[str]) -> None:
     write_text(run_dir / "report.md", "\n".join(report_lines))
 
-# ---- main logic --------------------------------------------------------------
+# ------------------------------- main ----------------------------------------
 def run(workflow_path: str) -> int:
-    # Always prepare a run directory + breadcrumb first
+    # 1) Create run dir + breadcrumb FIRST so CI can always find it.
     run_dir = ensure_run_dir()
     breadcrumb(run_dir)
 
@@ -84,12 +78,22 @@ def run(workflow_path: str) -> int:
     step_idx = 0
     ctx: Dict[str, Any] = {}
 
-    # Load workflow safely
+    # 2) Try to import optional backends only AFTER breadcrumb exists.
+    BACKENDS = {"echo": _Echo(), "upper": _Upper()}
+    try:
+        # Optional — if these exist, they override fallbacks.
+        from awo.models.local_backend import LocalEcho
+        from awo.models.alt_backend import LocalUpper
+        BACKENDS = {"echo": LocalEcho(), "upper": LocalUpper()}
+    except Exception as e:
+        record_step(run_dir, step_idx, "backend_info",
+                    {"note": "using_fallback_backends", "detail": str(e), "ts": now_iso()})
+
+    # 3) Load workflow safely.
     wf_file = Path(workflow_path)
     if not wf_file.exists():
         msg = f"Workflow file not found: {workflow_path}"
-        record_step(run_dir, step_idx, "init_error",
-                    {"error": "workflow_missing", "message": msg, "ts": now_iso()})
+        record_step(run_dir, step_idx, "init_error", {"error": "workflow_missing", "message": msg, "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
         print(f"[AWO] {msg}", file=sys.stderr)
@@ -99,17 +103,16 @@ def run(workflow_path: str) -> int:
         wf = json.loads(wf_file.read_text(encoding="utf-8"))
     except Exception as e:
         msg = f"Failed to parse workflow JSON: {e}"
-        record_step(run_dir, step_idx, "init_error",
-                    {"error": "json_parse", "message": str(e), "ts": now_iso()})
+        record_step(run_dir, step_idx, "init_error", {"error": "json_parse", "message": str(e), "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
         print(f"[AWO] {msg}", file=sys.stderr)
         return 2
 
-    # Freeze workflow for provenance
+    # 4) Freeze the workflow used.
     write_text(run_dir / "workflow_frozen.json", json.dumps(wf, indent=2))
 
-    # Execute steps
+    # 5) Execute steps.
     for step in wf.get("steps", []):
         step_idx += 1
         op = step.get("op")
@@ -120,26 +123,24 @@ def run(workflow_path: str) -> int:
             prompt = step["prompt"]
             models = step.get("models", ["echo", "upper"])
             params = step.get("params", {"seed": 0})
-
             outs: List[Dict[str, Any]] = []
             for m in models:
                 if m not in BACKENDS:
-                    raise RuntimeError(f"Unknown model backend: {m}")
+                    msg = f"Unknown model backend: {m}"
+                    rec.update({"error": "unknown_backend", "message": msg})
+                    record_step(run_dir, step_idx, step_id, rec)
+                    report += ["## Error", "", msg, ""]
+                    finalize_report(run_dir, report)
+                    print(f"[AWO] {msg}", file=sys.stderr)
+                    return 2
                 out = BACKENDS[m].generate(prompt, params=params)
                 outs.append({"model": m, "text": out["text"], "meta": out["meta"]})
-
             rec.update({"prompt": prompt, "models": models, "params": params, "outputs": outs})
             ctx[step_id] = outs
             record_step(run_dir, step_idx, step_id, rec)
-
             report += [
                 f"## {step_idx}. fanout_generate — {step_id}",
-                f"Prompt (sha12={sha12(prompt)}):",
-                "",
-                "```",
-                prompt,
-                "```",
-                "",
+                f"Prompt (sha12={sha12(prompt)}):", "", "```", prompt, "```", "",
                 "Outputs:",
             ] + [f"- **{o['model']}** → {o['text'].replace('\n',' ')[:200]}" for o in outs] + [""]
 
@@ -147,20 +148,24 @@ def run(workflow_path: str) -> int:
             src = step["inputs_from"]
             items = ctx.get(src, [])
             if not items:
-                raise RuntimeError(f"consensus_vote: no inputs from '{src}'")
+                msg = f"consensus_vote: no inputs from '{src}'"
+                rec.update({"error": "missing_inputs", "message": msg})
+                record_step(run_dir, step_idx, step_id, rec)
+                report += ["## Error", "", msg, ""]
+                finalize_report(run_dir, report)
+                print(f"[AWO] {msg}", file=sys.stderr)
+                return 2
 
             buckets: Dict[str, List[str]] = {}
             for o in items:
                 k = norm_text(o["text"])
                 buckets.setdefault(k, []).append(o["model"])
-
             ranked = sorted(buckets.items(), key=lambda kv: (len(kv[1]), len(kv[0])), reverse=True)
             if ranked:
                 consensus_norm, voters = ranked[0]
                 representative = next(o for o in items if norm_text(o["text"]) == consensus_norm)["text"]
             else:
                 consensus_norm, voters, representative = "", [], ""
-
             rec.update({
                 "inputs_from": src,
                 "total_candidates": len(items),
@@ -172,17 +177,12 @@ def run(workflow_path: str) -> int:
             })
             ctx[step_id] = rec
             record_step(run_dir, step_idx, step_id, rec)
-
             report += [
                 f"## {step_idx}. consensus_vote — {step_id}",
                 f"- inputs_from: {src}",
                 f"- voters: {', '.join(voters) if voters else '(none)'}",
                 f"- agreement_ratio: {rec['agreement_ratio']:.2f}",
-                "",
-                "```",
-                representative[:300],
-                "```",
-                "",
+                "", "```", representative[:300], "```", ""
             ]
 
         elif op == "write_text":
@@ -198,28 +198,16 @@ def run(workflow_path: str) -> int:
             checklist = step.get("args", {}).get("checklist", "templates/audit-checklist.md")
             rec.update({"gate": {"status": "pending", "checklist": checklist, "ts": now_iso()}})
             record_step(run_dir, step_idx, step_id, rec)
-
-            # Persist a machine-readable decision stub
-            write_text(
-                run_dir / "gate_decision.yml",
-                f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n",
-            )
-
-            report += [
-                f"## {step_idx}. audit_gate — {step_id}",
-                f"- checklist: {checklist}",
-                "",
-                "> Run halted for human review.",
-                "",
-            ]
-
+            write_text(run_dir / "gate_decision.yml",
+                       f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n")
+            report += [f"## {step_idx}. audit_gate — {step_id}",
+                       f"- checklist: {checklist}", "", "> Run halted for human review.", ""]
             finalize_report(run_dir, report)
-            breadcrumb(run_dir)  # ensure LAST_RUN definitely exists for CI
+            breadcrumb(run_dir)
             print(f"[AWO] Run created at: {run_dir}")
             return EXIT_PENDING
 
         else:
-            # Unknown op → record + fail with report
             msg = f"Unknown op: {op}"
             rec.update({"error": "unknown_op", "message": msg})
             record_step(run_dir, step_idx, step_id, rec)
@@ -228,9 +216,9 @@ def run(workflow_path: str) -> int:
             print(f"[AWO] {msg}", file=sys.stderr)
             return 2
 
-    # Normal completion (no audit gate)
+    # Finished without gate
     finalize_report(run_dir, report)
-    breadcrumb(run_dir)  # refresh breadcrumb to last completed run
+    breadcrumb(run_dir)
     print(f"[AWO] Run created at: {run_dir}")
     return 0
 
@@ -242,12 +230,11 @@ if __name__ == "__main__":
     try:
         sys.exit(run(sys.argv[1]))
     except Exception as e:
-        # Defensive: create a minimal error run and breadcrumb on crash
+        # Last-ditch safety: still produce a run + breadcrumb.
         rd = ensure_run_dir()
         breadcrumb(rd)
         write_json(rd / "steps" / "00_unhandled_error.json",
                    {"error": "unhandled", "message": str(e), "ts": now_iso()})
-        write_text(rd / "report.md",
-                   f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+        write_text(rd / "report.md", f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
         print(f"[AWO] ERROR: {e}", file=sys.stderr)
         sys.exit(1)
