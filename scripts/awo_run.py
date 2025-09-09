@@ -2,13 +2,16 @@
 """
 AWO multi-model runner (stdlib only, CI/Actions safe).
 
-Hard guarantees:
-- Always creates runs/run_YYYY-MM-DDTHH-MM-SSZ and writes runs/LAST_RUN,
-  even if optional backends or the workflow file are missing.
-- On audit_gate -> exits 78 after writing report.md and breadcrumb.
-- On any error -> writes an ERROR step + report.md, exits nonzero.
+Adds:
+- index.json in each run root with {run_id, started_at, status, finished_at?}
+- third simulated backend "reverse" for clearer multi-model fan-out
+- dynamic write_text (from_step / field) and CI-safe breadcrumbs
 
-Ops: fanout_generate, consensus_vote, write_text, audit_gate
+Statuses written to index.json:
+  running  -> set when run starts
+  pending_review -> audit_gate hit (exit 78)
+  succeeded -> finished without gate
+  error -> any failure path
 """
 
 from __future__ import annotations
@@ -27,6 +30,10 @@ class _Echo:
 class _Upper:
     def generate(self, prompt: str, params=None):
         return {"text": (prompt or "").upper(), "meta": {"engine": "fallback:upper", "seed": (params or {}).get("seed", 0)}}
+
+class _Reverse:
+    def generate(self, prompt: str, params=None):
+        return {"text": (prompt or "")[::-1], "meta": {"engine": "fallback:reverse", "seed": (params or {}).get("seed", 0)}}
 
 # ------------------------------- utils ---------------------------------------
 def now_iso() -> str:
@@ -68,23 +75,31 @@ def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) 
 def finalize_report(run_dir: Path, report_lines: List[str]) -> None:
     write_text(run_dir / "report.md", "\n".join(report_lines))
 
+def write_index(run_dir: Path, *, started_at: str, status: str, finished_at: str | None = None) -> None:
+    idx = {"run_id": run_dir.name, "started_at": started_at, "status": status}
+    if finished_at:
+        idx["finished_at"] = finished_at
+    write_json(run_dir / "index.json", idx)
+
 # ------------------------------- main ----------------------------------------
 def run(workflow_path: str) -> int:
     # 1) Create run dir + breadcrumb FIRST so CI can always find it.
     run_dir = ensure_run_dir()
     breadcrumb(run_dir)
+    started_at = now_iso()
+    write_index(run_dir, started_at=started_at, status="running")
 
     report = init_report(run_dir, workflow_path)
     step_idx = 0
     ctx: Dict[str, Any] = {}
 
-    # 2) Try to import optional backends only AFTER breadcrumb exists.
-    BACKENDS = {"echo": _Echo(), "upper": _Upper()}
+    # 2) Optional backends; if imports fail, keep fallbacks (echo/upper/reverse).
+    BACKENDS = {"echo": _Echo(), "upper": _Upper(), "reverse": _Reverse()}
     try:
-        # Optional — if these exist, they override fallbacks.
         from awo.models.local_backend import LocalEcho
         from awo.models.alt_backend import LocalUpper
-        BACKENDS = {"echo": LocalEcho(), "upper": LocalUpper()}
+        # third remains fallback unless you add an override module later
+        BACKENDS.update({"echo": LocalEcho(), "upper": LocalUpper()})
     except Exception as e:
         record_step(run_dir, step_idx, "backend_info",
                     {"note": "using_fallback_backends", "detail": str(e), "ts": now_iso()})
@@ -96,6 +111,7 @@ def run(workflow_path: str) -> int:
         record_step(run_dir, step_idx, "init_error", {"error": "workflow_missing", "message": msg, "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
+        write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
         print(f"[AWO] {msg}", file=sys.stderr)
         return 2
 
@@ -106,6 +122,7 @@ def run(workflow_path: str) -> int:
         record_step(run_dir, step_idx, "init_error", {"error": "json_parse", "message": str(e), "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
+        write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
         print(f"[AWO] {msg}", file=sys.stderr)
         return 2
 
@@ -121,7 +138,7 @@ def run(workflow_path: str) -> int:
 
         if op == "fanout_generate":
             prompt = step["prompt"]
-            models = step.get("models", ["echo", "upper"])
+            models = step.get("models", ["echo", "upper", "reverse"])
             params = step.get("params", {"seed": 0})
             outs: List[Dict[str, Any]] = []
             for m in models:
@@ -131,6 +148,7 @@ def run(workflow_path: str) -> int:
                     record_step(run_dir, step_idx, step_id, rec)
                     report += ["## Error", "", msg, ""]
                     finalize_report(run_dir, report)
+                    write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                     print(f"[AWO] {msg}", file=sys.stderr)
                     return 2
                 out = BACKENDS[m].generate(prompt, params=params)
@@ -153,6 +171,7 @@ def run(workflow_path: str) -> int:
                 record_step(run_dir, step_idx, step_id, rec)
                 report += ["## Error", "", msg, ""]
                 finalize_report(run_dir, report)
+                write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                 print(f"[AWO] {msg}", file=sys.stderr)
                 return 2
 
@@ -186,14 +205,13 @@ def run(workflow_path: str) -> int:
             ]
 
         elif op == "write_text":
-            # NEW: support dynamic sources via from_step + field
+            # Supports literal text OR {from_step, field}
             args = step.get("args", {})
             path = args["path"]
             text: Union[str, None] = args.get("text")
             from_step = args.get("from_step")
             field = args.get("field", "consensus_text")
 
-            # If no explicit text and a source is provided, derive the content:
             if text is None and from_step:
                 source = ctx.get(from_step)
                 if source is None:
@@ -202,16 +220,15 @@ def run(workflow_path: str) -> int:
                     record_step(run_dir, step_idx, step_id, rec)
                     report += ["## Error", "", msg, ""]
                     finalize_report(run_dir, report)
+                    write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                     print(f"[AWO] {msg}", file=sys.stderr)
                     return 2
 
                 if isinstance(source, list):
-                    # probably outputs from fanout_generate
                     text = "\n\n".join([str(o.get("text", "")) for o in source])
                 elif isinstance(source, dict) and field in source:
                     text = str(source[field])
                 else:
-                    # fallback: dump whatever object we have
                     text = json.dumps(source, indent=2, ensure_ascii=False)
 
             if text is None:
@@ -232,6 +249,7 @@ def run(workflow_path: str) -> int:
             report += [f"## {step_idx}. audit_gate — {step_id}",
                        f"- checklist: {checklist}", "", "> Run halted for human review.", ""]
             finalize_report(run_dir, report)
+            write_index(run_dir, started_at=started_at, status="pending_review")
             breadcrumb(run_dir)
             print(f"[AWO] Run created at: {run_dir}")
             return EXIT_PENDING
@@ -242,11 +260,13 @@ def run(workflow_path: str) -> int:
             record_step(run_dir, step_idx, step_id, rec)
             report += ["## Error", "", msg, ""]
             finalize_report(run_dir, report)
+            write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
             print(f"[AWO] {msg}", file=sys.stderr)
             return 2
 
     # Finished without gate
     finalize_report(run_dir, report)
+    write_index(run_dir, started_at=started_at, status="succeeded", finished_at=now_iso())
     breadcrumb(run_dir)
     print(f"[AWO] Run created at: {run_dir}")
     return 0
@@ -259,11 +279,12 @@ if __name__ == "__main__":
     try:
         sys.exit(run(sys.argv[1]))
     except Exception as e:
-        # Last-ditch safety: still produce a run + breadcrumb.
+        # Last-ditch safety: still produce a run + breadcrumb + index.json.
         rd = ensure_run_dir()
         breadcrumb(rd)
         write_json(rd / "steps" / "00_unhandled_error.json",
                    {"error": "unhandled", "message": str(e), "ts": now_iso()})
         write_text(rd / "report.md", f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+        write_index(rd, started_at=now_iso(), status="error", finished_at=now_iso())
         print(f"[AWO] ERROR: {e}", file=sys.stderr)
         sys.exit(1)
