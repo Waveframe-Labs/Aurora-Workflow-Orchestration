@@ -1,0 +1,47 @@
+{
+  "name": "Multi-model consensus demo",
+  "steps": [
+    {
+      "id": "fanout_1",
+      "op": "fanout_generate",
+      "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
+      "models": [
+        "echo",
+        "upper",
+        "reverse"
+      ],
+      "params": {
+        "seed": 123
+      }
+    },
+    {
+      "id": "consensus_1",
+      "op": "consensus_vote",
+      "inputs_from": "fanout_1"
+    },
+    {
+      "id": "gate_review",
+      "op": "audit_gate",
+      "args": {
+        "checklist": "templates/audit-checklist.md"
+      }
+    },
+    {
+      "id": "emit_fanout",
+      "op": "write_text",
+      "args": {
+        "path": "notes/fanout.txt",
+        "from_step": "fanout_1"
+      }
+    },
+    {
+      "id": "emit_consensus",
+      "op": "write_text",
+      "args": {
+        "path": "notes/consensus.txt",
+        "from_step": "consensus_1",
+        "field": "consensus_text"
+      }
+    }
+  ]
+}

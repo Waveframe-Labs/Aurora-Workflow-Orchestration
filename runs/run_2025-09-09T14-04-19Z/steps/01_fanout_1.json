@@ -1,0 +1,40 @@
+{
+  "ts": "2025-09-09T14-04-19Z",
+  "id": "fanout_1",
+  "op": "fanout_generate",
+  "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
+  "models": [
+    "echo",
+    "upper",
+    "reverse"
+  ],
+  "params": {
+    "seed": 123
+  },
+  "outputs": [
+    {
+      "model": "echo",
+      "text": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
+      "meta": {
+        "engine": "fallback:echo",
+        "seed": 123
+      }
+    },
+    {
+      "model": "upper",
+      "text": "SUMMARIZE: THE BATTERY LASTS ALL DAY BUT THE UI IS CONFUSING FOR FIRST-TIME USERS.",
+      "meta": {
+        "engine": "fallback:upper",
+        "seed": 123
+      }
+    },
+    {
+      "model": "reverse",
+      "text": ".sresu emit-tsrif rof gnisufnoc si IU eht tub yad lla stsal yrettab ehT :ezirammuS",
+      "meta": {
+        "engine": "fallback:reverse",
+        "seed": 123
+      }
+    }
+  ]
+}
