@@ -1,81 +1,240 @@
-name: AWO Run (Manual)
+#!/usr/bin/env python3
+"""
+AWO minimal runner (no external deps)
 
-on:
-  workflow_dispatch:
-    inputs:
-      workflow_file:
-        description: "Workflow JSON path"
-        required: true
-        default: "workflows/reviews.json"
+Reads a workflow JSON file and executes it with simple, reproducible
+simulated models. Every run is written to runs/<Run-ID>/ with:
+  - input.json       (the workflow that was executed)
+  - output.json      (step-by-step model outputs)
+  - audit.json       (status: PASSED | PENDING, rationale)
+  - metrics.json     (very simple agreement/length metrics)
+  - report.md        (human-readable summary)
 
-jobs:
-  run-awo:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+Exit codes:
+  0  -> audit PASSED automatically
+  78 -> audit PENDING (human approval required)
 
-      - name: Run workflow (simulate audit gate)
-        id: runstep
-        shell: bash
-        run: |
-          set +e
-          python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
-          code=$?
-          if [ $code -eq 78 ]; then
-            echo "Audit=PENDING" >> $GITHUB_ENV
-            echo "Audit: PENDING — waiting for human approval." >> $GITHUB_STEP_SUMMARY
-            exit 0
-          else
-            echo "Audit=PASSED" >> $GITHUB_ENV
-            echo "Audit: PASSED automatically." >> $GITHUB_STEP_SUMMARY
-          fi
+Usage:
+  python scripts/awo_run.py workflows/reviews.json
+"""
+from __future__ import annotations
 
-      - name: Find latest run id
-        run: |
-          RID=$(ls -1dt runs/* | head -n1 | xargs -n1 basename)
-          echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
+import sys
+import os
+import json
+import time
+import hashlib
+import random
+from pathlib import Path
+from datetime import datetime
+from typing import Any, Dict, List
 
-      - name: Package artifacts
-        if: always()
-        run: tar -czf "$RUN_ID.tar.gz" "runs/$RUN_ID"
 
-      - name: Upload artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: awo-run-${{ env.RUN_ID }}
-          path: ${{ env.RUN_ID }}.tar.gz
+# ---------- utilities ----------
 
-  human-approval:
-    if: needs.run-awo.outputs.Audit == 'PENDING'
-    needs: run-awo
-    runs-on: ubuntu-latest
-    environment: awo-audit
-    steps:
-      - name: Await human approval
-        run: echo "Audit is pending — approve or reject this run in GitHub UI."
+def utc_stamp() -> str:
+    return datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
 
-  finalize:
-    needs: [run-awo, human-approval]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
-      - name: Commit approved run
-        if: env.Audit == 'PASSED' || github.event.deployment_status.state == 'success'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add runs/$RUN_ID
-          git commit -m "Add approved run $RUN_ID"
-          git push origin main
-          echo "Run $RUN_ID committed to main." >> $GITHUB_STEP_SUMMARY
+def run_id() -> str:
+    return f"run_{utc_stamp()}"
 
-      - name: Reject run
-        if: github.event.deployment_status.state == 'rejected'
-        run: |
-          echo "Run $RUN_ID rejected — not committed." >> $GITHUB_STEP_SUMMARY
-          exit 1
+
+def sha16(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()[:16]
+
+
+def ensure_dir(p: Path) -> None:
+    p.mkdir(parents=True, exist_ok=True)
+
+
+def write_json(path: Path, obj: Any) -> None:
+    path.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def write_text(path: Path, text: str) -> None:
+    path.write_text(text, encoding="utf-8")
+
+
+# ---------- tiny simulated models (deterministic) ----------
+
+def sim_model(prompt: str, seed: int = 0) -> str:
+    """Deterministic reversible text toy to prove reproducibility."""
+    rnd = random.Random(seed)
+    # reverse every other word in a deterministic way
+    words = prompt.split()
+    out = []
+    for i, w in enumerate(words):
+        if i % 2 == 0:
+            out.append(w[::-1])
+        else:
+            out.append(w.upper() if rnd.random() > 0.5 else w.lower())
+    return " ".join(out)
+
+
+def sim_model_b(prompt: str, seed: int = 0) -> str:
+    """Second toy model with different transform."""
+    rnd = random.Random(seed * 17 + 3)
+    # rotate characters and add a deterministic suffix
+    rotated = "".join(chr(((ord(c) - 32 + 1) % 95) + 32) if 32 <= ord(c) <= 126 else c for c in prompt)
+    suffix = f" [h{sha16(prompt)[:6]}:{rnd.randint(10,99)}]"
+    return rotated + suffix
+
+
+def call_model(engine: str, prompt: str, seed: int) -> str:
+    if engine == "simulator:v0":
+        return sim_model(prompt, seed)
+    elif engine == "simulator:v1":
+        return sim_model_b(prompt, seed)
+    else:
+        # Unknown engine: echo prompt with a tag so it's still deterministic
+        return f"[{engine}] {prompt}"
+
+
+# ---------- core runner ----------
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print("Usage: python scripts/awo_run.py <workflow.json>", file=sys.stderr)
+        return 2
+
+    wf_path = Path(sys.argv[1])
+    if not wf_path.exists():
+        print(f"Workflow file not found: {wf_path}", file=sys.stderr)
+        return 2
+
+    # Load workflow spec
+    try:
+        workflow: Dict[str, Any] = json.loads(wf_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"Failed to parse workflow JSON: {e}", file=sys.stderr)
+        return 2
+
+    # Prepare run folder
+    rid = run_id()
+    base = Path("runs") / rid
+    ensure_dir(base)
+
+    # Persist the exact input that drove this run
+    workflow_copy = dict(workflow)
+    workflow_copy["_run_id"] = rid
+    workflow_copy["_run_started"] = utc_stamp()
+    write_json(base / "input.json", workflow_copy)
+
+    steps: List[Dict[str, Any]] = workflow.get("steps", [])
+    default_seed = int(workflow.get("seed", 0))
+
+    outputs: List[Dict[str, Any]] = []
+    all_completions: List[str] = []
+
+    for idx, step in enumerate(steps, start=1):
+        prompt = step.get("prompt", "")
+        seed = int(step.get("seed", default_seed))
+        timestamp = utc_stamp()
+
+        # Support single "engine" or a list of "models"
+        models = []
+        if "models" in step and isinstance(step["models"], list) and step["models"]:
+            for m in step["models"]:
+                engine = m.get("engine", "simulator:v0")
+                m_seed = int(m.get("seed", seed))
+                resp = call_model(engine, prompt, m_seed)
+                models.append({
+                    "engine": engine,
+                    "seed": m_seed,
+                    "response": resp,
+                    "prompt_hash": sha16(prompt),
+                    "timestamp": timestamp
+                })
+                all_completions.append(resp)
+        else:
+            engine = step.get("engine", "simulator:v0")
+            resp = call_model(engine, prompt, seed)
+            models.append({
+                "engine": engine,
+                "seed": seed,
+                "response": resp,
+                "prompt_hash": sha16(prompt),
+                "timestamp": timestamp
+            })
+            all_completions.append(resp)
+
+        outputs.append({
+            "index": idx,
+            "prompt": prompt,
+            "models": models,
+            "meta": {
+                "timestamp": timestamp
+            }
+        })
+
+    # Simple metrics
+    avg_len = sum(len(c) for c in all_completions) / max(1, len(all_completions))
+    agreement = 1.0
+    if len(all_completions) > 1:
+        # toy agreement: proportion of identical strings
+        same = 0
+        base_c = all_completions[0]
+        for c in all_completions[1:]:
+            if c == base_c:
+                same += 1
+        agreement = same / (len(all_completions) - 1)
+
+    metrics = {
+        "n_steps": len(steps),
+        "n_completions": len(all_completions),
+        "avg_completion_length": round(avg_len, 2),
+        "string_identity_agreement": round(agreement, 3),
+    }
+
+    # Decide audit gate
+    require_human = bool(workflow.get("require_human_approval", False))
+    if not require_human:
+        # also allow per-step flag
+        for s in steps:
+            if s.get("require_human", False):
+                require_human = True
+                break
+
+    audit = {
+        "status": "PENDING" if require_human else "PASSED",
+        "reason": "Human approval required by workflow policy."
+                  if require_human else "No blocking checks; auto-pass for demo.",
+        "timestamp": utc_stamp()
+    }
+
+    # Write outputs
+    write_json(base / "output.json", {"run_id": rid, "steps": outputs})
+    write_json(base / "metrics.json", metrics)
+    write_json(base / "audit.json", audit)
+
+    # Minimal markdown report
+    report = f"""# AWO Run Report
+
+**Run-ID:** {rid}  
+**Started:** {workflow_copy['_run_started']}  
+**Audit:** {audit['status']}
+
+## Summary
+- Steps: {metrics['n_steps']}
+- Completions: {metrics['n_completions']}
+- Avg completion length: {metrics['avg_completion_length']}
+- String identity agreement: {metrics['string_identity_agreement']}
+
+## Notes
+This run was executed with simulated deterministic models to prove the
+orchestration loop and logging surface. Replace `simulator:*` engines
+with real providers when you add keys/adapters.
+"""
+    write_text(base / "report.md", report)
+
+    # Tell Actions what we created (helpful in logs)
+    print(f"Run-ID: {rid}")
+    print(f"Wrote: {base}/input.json, output.json, audit.json, metrics.json, report.md")
+
+    # Exit with audit code
+    return 78 if audit["status"] == "PENDING" else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
