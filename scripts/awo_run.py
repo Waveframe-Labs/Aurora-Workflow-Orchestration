@@ -6,6 +6,7 @@ Adds:
 - index.json in each run root with {run_id, started_at, status, finished_at?}
 - third simulated backend "reverse" for clearer multi-model fan-out
 - dynamic write_text (from_step / field) and CI-safe breadcrumbs
+- NEW: scope_validate op that enforces testable (falsifiable) claims
 
 Statuses written to index.json:
   running  -> set when run starts
@@ -15,10 +16,10 @@ Statuses written to index.json:
 """
 
 from __future__ import annotations
-import json, re, sys, hashlib
+import json, re, sys, hashlib, shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Tuple
 
 EXIT_PENDING = 78
 
@@ -81,6 +82,47 @@ def write_index(run_dir: Path, *, started_at: str, status: str, finished_at: str
         idx["finished_at"] = finished_at
     write_json(run_dir / "index.json", idx)
 
+# ----------------------------- scope helpers ---------------------------------
+REQUIRED_CLAIM_FIELDS = ["id", "statement"]
+REQUIRED_TESTABILITY = ["predictions", "falsification_tests"]  # at least one non-empty
+
+def _problems_for_claim(claim: Dict[str, Any]) -> List[str]:
+    probs: List[str] = []
+    for f in REQUIRED_CLAIM_FIELDS:
+        if f not in claim or claim[f] in (None, "", []):
+            probs.append(f"missing field: {f}")
+    # At least one of the testability buckets must be non-empty
+    preds = claim.get("predictions", [])
+    tests = claim.get("falsification_tests", [])
+    if not preds and not tests:
+        probs.append("claim is not testable: no predictions and no falsification_tests")
+    # If predictions exist, require tolerances
+    for i, p in enumerate(preds or []):
+        tol = (p or {}).get("tolerance")
+        if not tol:
+            probs.append(f"prediction[{i}] missing tolerance")
+    # If tests exist, require a recognizable shape
+    for i, t in enumerate(tests or []):
+        if not isinstance(t, dict) or not any(k in t for k in ("must_pass", "fail_if")):
+            probs.append(f"falsification_tests[{i}] missing must_pass/fail_if")
+    return probs
+
+def _load_claims(args: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[str]]:
+    loaded: List[Dict[str, Any]] = []
+    notes: List[str] = []
+    # Inline claim
+    if "claim" in args and isinstance(args["claim"], dict):
+        loaded.append(args["claim"])
+    # Glob claims
+    glob = args.get("claims_glob")
+    if glob:
+        for p in Path(".").glob(glob):
+            try:
+                loaded.append(json.loads(Path(p).read_text(encoding="utf-8")))
+            except Exception as e:
+                notes.append(f"failed to parse {p}: {e}")
+    return loaded, notes
+
 # ------------------------------- main ----------------------------------------
 def run(workflow_path: str) -> int:
     # 1) Create run dir + breadcrumb FIRST so CI can always find it.
@@ -98,7 +140,6 @@ def run(workflow_path: str) -> int:
     try:
         from awo.models.local_backend import LocalEcho
         from awo.models.alt_backend import LocalUpper
-        # third remains fallback unless you add an override module later
         BACKENDS.update({"echo": LocalEcho(), "upper": LocalUpper()})
     except Exception as e:
         record_step(run_dir, step_idx, "backend_info",
@@ -136,6 +177,51 @@ def run(workflow_path: str) -> int:
         step_id = step.get("id", f"step_{step_idx}")
         rec: Dict[str, Any] = {"ts": now_iso(), "id": step_id, "op": op}
 
+        # ----- NEW: scope_validate -------------------------------------------
+        if op == "scope_validate":
+            args = step.get("args", {})
+            claims, notes = _load_claims(args)
+            scope_dir = run_dir / "scope"
+            (scope_dir / "claims").mkdir(parents=True, exist_ok=True)
+
+            results: List[Dict[str, Any]] = []
+            overall_ok = True
+            for c in claims:
+                problems = _problems_for_claim(c)
+                ok = len(problems) == 0
+                overall_ok = overall_ok and ok
+                # copy each claim into the run for provenance
+                cid = c.get("id") or f"claim-{sha12(json.dumps(c))}"
+                write_json(scope_dir / "claims" / f"{cid}.json", c)
+                results.append({"id": cid, "ok": ok, "problems": problems})
+
+            summary = {
+                "claims_checked": len(claims),
+                "overall_ok": overall_ok,
+                "details": results,
+                "notes": notes,
+                "ts": now_iso(),
+            }
+            write_json(scope_dir / "summary.json", summary)
+            # Human-friendly markdown for quick review
+            md = [f"# Scope Check — {run_dir.name}", ""]
+            if not claims:
+                md += ["**No claims found.** Gate will likely block.", ""]
+            for r in results:
+                md += [f"## {r['id']} — {'OK' if r['ok'] else 'PROBLEMS'}", ""]
+                if r["problems"]:
+                    md += [f"- {p}" for p in r["problems"]] + [""]
+            md += [f"**OVERALL:** {'OK' if overall_ok else 'NOT OK'}"]
+            write_text(scope_dir / "README.md", "\n".join(md))
+
+            rec.update({"args": args, "summary": summary})
+            record_step(run_dir, step_idx, step_id, rec)
+            report += [f"## {step_idx}. scope_validate — {step_id}",
+                       f"- claims_checked: {summary['claims_checked']}",
+                       f"- overall_ok: {summary['overall_ok']}", ""]
+            continue
+
+        # ----- existing ops --------------------------------------------------
         if op == "fanout_generate":
             prompt = step["prompt"]
             models = step.get("models", ["echo", "upper", "reverse"])
@@ -205,7 +291,6 @@ def run(workflow_path: str) -> int:
             ]
 
         elif op == "write_text":
-            # Supports literal text OR {from_step, field}
             args = step.get("args", {})
             path = args["path"]
             text: Union[str, None] = args.get("text")
@@ -279,7 +364,6 @@ if __name__ == "__main__":
     try:
         sys.exit(run(sys.argv[1]))
     except Exception as e:
-        # Last-ditch safety: still produce a run + breadcrumb + index.json.
         rd = ensure_run_dir()
         breadcrumb(rd)
         write_json(rd / "steps" / "00_unhandled_error.json",
