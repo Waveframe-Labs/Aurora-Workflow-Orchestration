@@ -38,6 +38,7 @@ jobs:
           else
             echo "Audit: PASSED (this workflow still requires manual approval)" >> $GITHUB_STEP_SUMMARY
           fi
+          # Always continue to approval; we will package whatever run was created.
           exit 0
 
       - name: Capture Run-ID (from breadcrumb)
@@ -45,13 +46,13 @@ jobs:
         shell: bash
         run: |
           set -e
-          if [ ! -f runs/LAST_RUN ]; then
+          if [ ! -f runs/LAST_RUN ] ; then
             echo "No LAST_RUN breadcrumb found. Did the script create a run?" >&2
             echo "run_id=none" >> $GITHUB_OUTPUT
             exit 1
           fi
           RID="$(cat runs/LAST_RUN)"
-          if [ ! -d "runs/$RID" ]; then
+          if [ ! -d "runs/$RID" ] ; then
             echo "LAST_RUN points to missing directory: runs/$RID" >&2
             echo "run_id=none" >> $GITHUB_OUTPUT
             exit 1
@@ -80,7 +81,133 @@ jobs:
       name: awo-audit
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - run: echo "Manual approval gate — approve in Environment 'awo-audit' to continue."
+      - name: Download run artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ needs.run_awo.outputs.run_id }}
+          path: audit_artifacts
+
+      - name: Prepare preview bundle
+        id: prep
+        shell: bash
+        run: |
+          set -e
+          RID="${{ needs.run_awo.outputs.run_id }}"
+          echo "RUN_ID=$RID" >> $GITHUB_ENV
+          mkdir -p preview
+          tar -xzf "audit_artifacts/awo-run-${RID}.tar.gz" -C preview
+          echo "RD=preview/runs/${RID}" >> $GITHUB_ENV
+          echo "Run-ID: ${RID}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Install jq (for parsing)
+        shell: bash
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Compute rubric & gather facts
+        id: rubric
+        shell: bash
+        run: |
+          set -e
+          RD="${RD}"
+          INDEX="$RD/index.json"
+          CONS="$(ls -1 $RD/steps/*consensus*json 2>/dev/null | head -n1 || true)"
+          FAN="$(ls -1 $RD/steps/*fanout*json 2>/dev/null | head -n1 || true)"
+          REPORT="$RD/report.md"
+          CHECKLIST_FILE=$(grep -m1 '^checklist:' "$RD/gate_decision.yml" 2>/dev/null | awk '{print $2}')
+          [ -z "$CHECKLIST_FILE" ] && CHECKLIST_FILE="templates/audit-checklist.md"
+
+          STARTED=$(jq -r '.started_at // "unknown"' "$INDEX" 2>/dev/null || echo unknown)
+          STATUS=$(jq -r   '.status      // "unknown"' "$INDEX" 2>/dev/null || echo unknown)
+
+          CONS_TEXT=$(jq -r '.consensus_text // ""' "$CONS" 2>/dev/null || echo "")
+          AGREE=$(jq -r     '.agreement_ratio // 0' "$CONS" 2>/dev/null || echo 0)
+
+          # basic rubric
+          MIN_AGREE=0.66
+          MIN_LEN=20
+          LEN=${#CONS_TEXT}
+          if awk "BEGIN{exit !($AGREE >= $MIN_AGREE)}"; then OK_AGREE="yes"; else OK_AGREE="no"; fi
+          if [ "$LEN" -ge "$MIN_LEN" ]; then OK_LEN="yes"; else OK_LEN="no"; fi
+          if [ "$OK_AGREE" = "yes" ] && [ "$OK_LEN" = "yes" ]; then
+            SUGGESTION="PASS"
+          else
+            SUGGESTION="REVIEW"
+          fi
+
+          echo "started=$STARTED"        >> $GITHUB_OUTPUT
+          echo "status=$STATUS"          >> $GITHUB_OUTPUT
+          echo "agree=$AGREE"            >> $GITHUB_OUTPUT
+          echo "cons_len=$LEN"           >> $GITHUB_OUTPUT
+          echo "suggestion=$SUGGESTION"  >> $GITHUB_OUTPUT
+          echo "cons_file=$CONS"         >> $GITHUB_OUTPUT
+          echo "fan_file=$FAN"           >> $GITHUB_OUTPUT
+          echo "report_file=$REPORT"     >> $GITHUB_OUTPUT
+          echo "checklist=$CHECKLIST_FILE" >> $GITHUB_OUTPUT
+
+      - name: Render approval summary
+        shell: bash
+        run: |
+          set -e
+          RD="${RD}"
+          CONS="${{ steps.rubric.outputs.cons_file }}"
+          FAN="${{ steps.rubric.outputs.fan_file }}"
+          REPORT="${{ steps.rubric.outputs.report_file }}"
+          CHECKLIST="${{ steps.rubric.outputs.checklist }}"
+          SUGGEST="${{ steps.rubric.outputs.suggestion }}"
+          AGREE="${{ steps.rubric.outputs.agree }}"
+          LEN="${{ steps.rubric.outputs.cons_len }}"
+          STARTED="${{ steps.rubric.outputs.started }}"
+          STATUS="${{ steps.rubric.outputs.status }}"
+
+          {
+            echo "### Human Review — ${RUN_ID}"
+            echo ""
+            echo "- **Started**: $STARTED"
+            echo "- **Status**: $STATUS"
+            echo "- **Agreement ratio**: ${AGREE}"
+            echo "- **Consensus length**: ${LEN}"
+            echo "- **Suggested decision (rubric)**: **${SUGGEST}**"
+            echo ""
+            echo "**Consensus**"
+            echo ""
+            if [ -f "$RD/artifacts/notes/consensus.txt" ]; then
+              echo '```'; sed -n '1,200p' "$RD/artifacts/notes/consensus.txt"; echo '```'
+            elif [ -f "$CONS" ]; then
+              jq -r '.consensus_text // ""' "$CONS" | sed -n '1,200p' | sed '1s/^/```/;$s/$/\n```/'
+            else
+              echo "_(no consensus text found)_"
+            fi
+            echo ""
+            echo "**Model outputs (fan-out)**"
+            echo ""
+            if [ -f "$FAN" ]; then
+              jq -r '.outputs[] | "- **\(.model)** → \(.text|tostring|gsub("\n";" ")|.[0:220])"' "$FAN"
+            else
+              echo "_fanout details not found_"
+            fi
+            echo ""
+            echo "**Checklist**"
+            echo ""
+            if [ -f "$CHECKLIST" ]; then
+              echo '```'; sed -n '1,200p' "$CHECKLIST"; echo '```'
+            else
+              echo "_No checklist file at $CHECKLIST_"
+            fi
+            echo ""
+            echo "**Files in the run**"
+            echo ""
+            (cd "$RD" && find . -maxdepth 2 -type f | sed 's|^\./||' | sed 's/^/- /' | sed -n '1,80p')
+            echo ""
+            if [ -f "$REPORT" ]; then
+              echo "_See full report in artifact: ${REPORT}_"
+            fi
+            echo ""
+            echo "> Approve if the evidence above meets your standards, otherwise Reject."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - run: echo "Review the summary above, then use the Approve/Reject buttons for environment **awo-audit**."
 
   finalize:
     needs: [run_awo, human_approval]
@@ -90,9 +217,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: true
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Download run artifact
         uses: actions/download-artifact@v4
@@ -109,10 +233,10 @@ jobs:
           [ -f "$TAR" ] || { echo "Artifact tarball not found: $TAR" >&2; exit 1; }
           mkdir -p extracted
           tar -xzf "$TAR" -C extracted
+          # Copy the run folder into repo
           rsync -a extracted/runs/ runs/
-          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
-          echo "RUN_ID=$RID" >> $GITHUB_ENV
-          echo "Finalizing $RID" >> $GITHUB_STEP_SUMMARY
+          echo "RUN_ID=${{ needs.run_awo.outputs.run_id }}" >> $GITHUB_ENV
+          echo "Finalizing ${{ needs.run_awo.outputs.run_id }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Write approval record
         shell: bash
@@ -128,19 +252,29 @@ jobs:
           }
           EOF
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Build consolidated run_summary.json
         shell: bash
         run: |
           set -e
           RUN_DIR="runs/${RUN_ID}"
 
-          # Ensure inputs exist
-          test -f "${RUN_DIR}/index.json" || echo '{}' > "${RUN_DIR}/index.json"
-          test -f "${RUN_DIR}/approval.json" || echo '{}' > "${RUN_DIR}/approval.json"
+          echo "📂 Inspecting run dir: $RUN_DIR"
+          ls -R "$RUN_DIR" || echo "Run dir missing contents"
+
+          # Safe fallbacks if files are missing
+          [ -f "${RUN_DIR}/index.json" ] || echo '{}' > "${RUN_DIR}/index.json"
+          [ -f "${RUN_DIR}/approval.json" ] || echo '{}' > "${RUN_DIR}/approval.json"
 
           STEP_COUNT=$(ls -1 "${RUN_DIR}/steps" 2>/dev/null | wc -l | tr -d ' ')
           NOTE_COUNT=$(find "${RUN_DIR}/artifacts/notes" -type f 2>/dev/null | wc -l | tr -d ' ')
           HAS_REPORT=$([ -f "${RUN_DIR}/report.md" ] && echo true || echo false)
+
+          echo "Steps: $STEP_COUNT"
+          echo "Notes: $NOTE_COUNT"
+          echo "Has report: $HAS_REPORT"
 
           jq -n \
             --slurpfile idx "${RUN_DIR}/index.json" \
@@ -161,7 +295,7 @@ jobs:
               }
             }' > "${RUN_DIR}/run_summary.json"
 
-          echo "Wrote ${RUN_DIR}/run_summary.json"
+          echo "✅ Wrote ${RUN_DIR}/run_summary.json"
 
       - name: Commit run to branch
         shell: bash
