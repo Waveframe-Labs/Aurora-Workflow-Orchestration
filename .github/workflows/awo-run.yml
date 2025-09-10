@@ -127,6 +127,41 @@ jobs:
           }
           EOF
 
+      - name: Build consolidated run_summary.json
+        shell: bash
+        run: |
+          set -e
+          RUN_DIR="runs/${RUN_ID}"
+
+          # Ensure the files exist (some may be absent depending on the path taken)
+          test -f "${RUN_DIR}/index.json" || echo '{}' > "${RUN_DIR}/index.json"
+          test -f "${RUN_DIR}/approval.json" || echo '{}' > "${RUN_DIR}/approval.json"
+
+          STEP_COUNT=$(ls -1 "${RUN_DIR}/steps" 2>/dev/null | wc -l | tr -d ' ')
+          NOTE_COUNT=$(find "${RUN_DIR}/artifacts/notes" -type f 2>/dev/null | wc -l | tr -d ' ')
+          HAS_REPORT=$([ -f "${RUN_DIR}/report.md" ] && echo true || echo false)
+
+          jq -n \
+            --slurpfile idx "${RUN_DIR}/index.json" \
+            --slurpfile apr "${RUN_DIR}/approval.json" \
+            --arg steps "$STEP_COUNT" \
+            --arg notes "$NOTE_COUNT" \
+            --arg has_report "$HAS_REPORT" \
+            '{
+              run_id: ($idx[0].run_id // "unknown"),
+              started_at: ($idx[0].started_at // null),
+              finished_at: ($idx[0].finished_at // null),
+              status: ($idx[0].status // "unknown"),
+              approval: $apr[0],
+              stats: {
+                step_files: ($steps|tonumber),
+                note_files: ($notes|tonumber),
+                report_md: ($has_report == "true")
+              }
+            }' > "${RUN_DIR}/run_summary.json"
+
+          echo "Wrote ${RUN_DIR}/run_summary.json"
+
       - name: Commit run to branch
         shell: bash
         run: |
