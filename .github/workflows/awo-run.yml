@@ -38,7 +38,6 @@ jobs:
           else
             echo "Audit: PASSED (this workflow still requires manual approval)" >> $GITHUB_STEP_SUMMARY
           fi
-          # Always continue to approval; we will package whatever run was created.
           exit 0
 
       - name: Capture Run-ID (from breadcrumb)
@@ -92,6 +91,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Download run artifact
         uses: actions/download-artifact@v4
         with:
@@ -102,12 +104,11 @@ jobs:
         shell: bash
         run: |
           set -e
-          ls -l artifacts
+          ls -l artifacts || true
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
           [ -f "$TAR" ] || { echo "Artifact tarball not found: $TAR" >&2; exit 1; }
           mkdir -p extracted
           tar -xzf "$TAR" -C extracted
-          # Copy the run folder into repo
           rsync -a extracted/runs/ runs/
           RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
           echo "RUN_ID=$RID" >> $GITHUB_ENV
@@ -133,7 +134,7 @@ jobs:
           set -e
           RUN_DIR="runs/${RUN_ID}"
 
-          # Ensure the files exist (some may be absent depending on the path taken)
+          # Ensure inputs exist
           test -f "${RUN_DIR}/index.json" || echo '{}' > "${RUN_DIR}/index.json"
           test -f "${RUN_DIR}/approval.json" || echo '{}' > "${RUN_DIR}/approval.json"
 
