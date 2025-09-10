@@ -20,13 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ steps.capture.outputs.run_id }}
-      artifact_name: ${{ steps.capture.outputs.artifact_name }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Execute AWO workflow
+        id: runstep
         shell: bash
         run: |
           set +e
@@ -49,20 +49,17 @@ jobs:
           if [ ! -f runs/LAST_RUN ]; then
             echo "No LAST_RUN breadcrumb found. Did the script create a run?" >&2
             echo "run_id=none" >> $GITHUB_OUTPUT
-            echo "artifact_name=awo-run-none" >> $GITHUB_OUTPUT
             exit 1
           fi
           RID="$(cat runs/LAST_RUN)"
           if [ ! -d "runs/$RID" ]; then
             echo "LAST_RUN points to missing directory: runs/$RID" >&2
             echo "run_id=none" >> $GITHUB_OUTPUT
-            echo "artifact_name=awo-run-none" >> $GITHUB_OUTPUT
             exit 1
           fi
           echo "Run-ID: $RID" >> $GITHUB_STEP_SUMMARY
           echo "RUN_ID=$RID" >> $GITHUB_ENV
           echo "run_id=$RID" >> $GITHUB_OUTPUT
-          echo "artifact_name=awo-run-$RID.tar.gz" >> $GITHUB_OUTPUT
 
       - name: Create payload
         shell: bash
@@ -112,19 +109,37 @@ jobs:
           tar -xzf "$TAR" -C extracted
           # Copy the run folder into repo
           rsync -a extracted/runs/ runs/
-          echo "RUN_ID=${{ needs.run_awo.outputs.run_id }}" >> $GITHUB_ENV
-          echo "Finalizing ${{ needs.run_awo.outputs.run_id }}" >> $GITHUB_STEP_SUMMARY
+          RID=$(ls -1dt runs/run_* | head -n1 | xargs -n1 basename)
+          echo "RUN_ID=$RID" >> $GITHUB_ENV
+          echo "Finalizing $RID" >> $GITHUB_STEP_SUMMARY
 
-      - name: Commit run to main
+      - name: Write approval record
         shell: bash
         run: |
           set -e
+          mkdir -p "runs/${RUN_ID}"
+          cat > "runs/${RUN_ID}/approval.json" <<EOF
+          {
+            "run_id": "${RUN_ID}",
+            "approved_by": "${{ github.actor }}",
+            "approved_at": "$(date -u +%FT%TZ)",
+            "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF
+
+      - name: Commit run to branch
+        shell: bash
+        run: |
+          set -e
+          BR="${GITHUB_REF_NAME:-main}"
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$BR" --depth=1
+          git switch "$BR"
           git add "runs/${RUN_ID}" || true
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
-          git push
+          git push origin "$BR"
