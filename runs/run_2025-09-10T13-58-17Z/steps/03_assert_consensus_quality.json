@@ -1,0 +1,7 @@
+{
+  "ts": "2025-09-10T13-58-17Z",
+  "id": "assert_consensus_quality",
+  "op": "assert_contains",
+  "error": "unknown_op",
+  "message": "Unknown op: assert_contains"
+}
