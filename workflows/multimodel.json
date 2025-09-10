@@ -14,6 +14,18 @@
       "inputs_from": "fanout_1"
     },
     {
+      "id": "assert_consensus_quality",
+      "op": "assert_contains",
+      "args": {
+        "from_step": "consensus_1",
+        "field": "consensus_text",
+        "must_include": [
+          "battery lasts all day",
+          "ui is confusing"
+        ]
+      }
+    },
+    {
       "id": "gate_review",
       "op": "audit_gate",
       "args": { "checklist": "templates/audit-checklist.md" }
@@ -21,19 +33,12 @@
     {
       "id": "emit_fanout",
       "op": "write_text",
-      "args": {
-        "path": "notes/fanout.txt",
-        "from_step": "fanout_1"
-      }
+      "args": { "path": "notes/fanout.txt", "from_step": "fanout_1" }
     },
     {
       "id": "emit_consensus",
       "op": "write_text",
-      "args": {
-        "path": "notes/consensus.txt",
-        "from_step": "consensus_1",
-        "field": "consensus_text"
-      }
+      "args": { "path": "notes/consensus.txt", "from_step": "consensus_1", "field": "consensus_text" }
     }
   ]
 }
