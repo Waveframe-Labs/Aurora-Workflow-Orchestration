@@ -1,58 +1,50 @@
 {
-  "name": "Multi-model consensus demo",
-  "_note": "Demonstrates tri-model fanout, consensus, quality assertion, artifact emission BEFORE audit gate, then manual approval.",
+  "name": "Multi-model consensus demo (with Scope Gate)",
   "steps": [
     {
       "id": "fanout_1",
       "op": "fanout_generate",
       "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
       "models": ["echo", "upper", "reverse"],
-      "params": { "seed": 123 },
-      "_note": "Fan out the same prompt to three backends (echo/upper/reverse) to force disagreement and show true multi-model orchestration."
+      "params": { "seed": 123 }
     },
     {
       "id": "consensus_1",
       "op": "consensus_vote",
-      "inputs_from": "fanout_1",
-      "_note": "Pick a representative answer by normalized majority vote; also records voter list and agreement ratio."
+      "inputs_from": "fanout_1"
     },
+
+    // ---- Scope Gate: machine-check that produces scope/summary.json ----
     {
-      "id": "assert_consensus_quality",
+      "id": "scope_check",
       "op": "assert_contains",
       "args": {
         "from_step": "consensus_1",
         "field": "consensus_text",
         "must_include": [
           "battery lasts all day",
-          "UI is confusing for first-time users"
-        ]
-      },
-      "_note": "Sanity check: fail fast if the consensus misses key ideas. Keeps bad outputs from reaching the human gate."
+          "ui is confusing"
+        ],
+        "emit_scope": true          // <= tells the runner to write scope/summary.json
+      }
     },
+
+    {
+      "id": "gate_review",
+      "op": "audit_gate",
+      "args": { "checklist": "templates/audit-checklist.md" }
+    },
+
+    // ---- Artifacts for humans ----
     {
       "id": "emit_fanout",
       "op": "write_text",
-      "args": {
-        "path": "notes/fanout.txt",
-        "from_step": "fanout_1"
-      },
-      "_note": "Persist all raw model outputs to artifacts/notes/fanout.txt so you can inspect them before approval."
+      "args": { "path": "notes/fanout.txt", "from_step": "fanout_1" }
     },
     {
       "id": "emit_consensus",
       "op": "write_text",
-      "args": {
-        "path": "notes/consensus.txt",
-        "from_step": "consensus_1",
-        "field": "consensus_text"
-      },
-      "_note": "Persist the consensus text to artifacts/notes/consensus.txt (also available in steps/* JSON)."
-    },
-    {
-      "id": "gate_review",
-      "op": "audit_gate",
-      "args": { "checklist": "templates/audit-checklist.md" },
-      "_note": "Human approval gate. The run halts here (exit 78). Review artifacts/notes/* and report.md, then approve/reject in GitHub."
+      "args": { "path": "notes/consensus.txt", "from_step": "consensus_1", "field": "consensus_text" }
     }
   ]
 }
