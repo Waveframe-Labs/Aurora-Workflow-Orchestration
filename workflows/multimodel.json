@@ -1,6 +1,31 @@
 {
-  "name": "Multi-model consensus demo (with Scope Gate)",
+  "name": "Multi-model scope + consensus demo",
   "steps": [
+    {
+      "id": "scope_check",
+      "op": "scope_validate",
+      "args": {
+        "claims": [
+          {
+            "id": "claim-001",
+            "statement": "H(t) ∝ (t - t0)^-1/2 under constant dS/dt",
+            "assumptions": ["flat FRW", "apparent horizon RH=c/H", "Planck units"],
+            "formal": "S=π/H^2; dS/dt=α>0; derive H(t)",
+            "predictions": [
+              {
+                "name": "H-scaling",
+                "function": "fit(H(t))",
+                "tolerance": { "metric": "RMSE", "max": 0.05 }
+              }
+            ],
+            "falsification_tests": [
+              { "name": "Unit consistency", "tool": "pint", "must_pass": true },
+              { "name": "Symbolic derivation", "tool": "sympy", "must_pass": true }
+            ]
+          }
+        ]
+      }
+    },
     {
       "id": "fanout_1",
       "op": "fanout_generate",
@@ -13,10 +38,8 @@
       "op": "consensus_vote",
       "inputs_from": "fanout_1"
     },
-
-    // ---- Scope Gate: machine-check that produces scope/summary.json ----
     {
-      "id": "scope_check",
+      "id": "assert_consensus_quality",
       "op": "assert_contains",
       "args": {
         "from_step": "consensus_1",
@@ -24,27 +47,41 @@
         "must_include": [
           "battery lasts all day",
           "ui is confusing"
-        ],
-        "emit_scope": true          // <= tells the runner to write scope/summary.json
+        ]
       }
     },
-
     {
       "id": "gate_review",
       "op": "audit_gate",
-      "args": { "checklist": "templates/audit-checklist.md" }
+      "args": {
+        "checklist": "templates/audit-checklist.md"
+      }
     },
-
-    // ---- Artifacts for humans ----
+    {
+      "id": "emit_scope",
+      "op": "write_text",
+      "args": {
+        "path": "notes/scope.txt",
+        "from_step": "scope_check",
+        "field": "summary"
+      }
+    },
     {
       "id": "emit_fanout",
       "op": "write_text",
-      "args": { "path": "notes/fanout.txt", "from_step": "fanout_1" }
+      "args": {
+        "path": "notes/fanout.txt",
+        "from_step": "fanout_1"
+      }
     },
     {
       "id": "emit_consensus",
       "op": "write_text",
-      "args": { "path": "notes/consensus.txt", "from_step": "consensus_1", "field": "consensus_text" }
+      "args": {
+        "path": "notes/consensus.txt",
+        "from_step": "consensus_1",
+        "field": "consensus_text"
+      }
     }
   ]
 }
