@@ -6,17 +6,18 @@ Adds:
 - index.json in each run root with {run_id, started_at, status, finished_at?}
 - third simulated backend "reverse" for clearer multi-model fan-out
 - dynamic write_text (from_step / field) and CI-safe breadcrumbs
-- NEW: scope_validate op that enforces testable (falsifiable) claims
+- scope_validate op that enforces testable (falsifiable) claims
+- assert_contains op for simple content gating (used by multimodel.json)
 
 Statuses written to index.json:
-  running  -> set when run starts
-  pending_review -> audit_gate hit (exit 78)
-  succeeded -> finished without gate
-  error -> any failure path
+  running         -> set when run starts
+  pending_review  -> audit_gate hit (exit 78)
+  succeeded       -> finished without gate
+  error           -> any failure path
 """
 
 from __future__ import annotations
-import json, re, sys, hashlib, shutil
+import json, re, sys, hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Union, Tuple
@@ -177,7 +178,7 @@ def run(workflow_path: str) -> int:
         step_id = step.get("id", f"step_{step_idx}")
         rec: Dict[str, Any] = {"ts": now_iso(), "id": step_id, "op": op}
 
-        # ----- NEW: scope_validate -------------------------------------------
+        # ----- scope_validate -------------------------------------------------
         if op == "scope_validate":
             args = step.get("args", {})
             claims, notes = _load_claims(args)
@@ -219,6 +220,50 @@ def run(workflow_path: str) -> int:
             report += [f"## {step_idx}. scope_validate — {step_id}",
                        f"- claims_checked: {summary['claims_checked']}",
                        f"- overall_ok: {summary['overall_ok']}", ""]
+            continue
+
+        # ----- assert_contains -----------------------------------------------
+        if op == "assert_contains":
+            args = step.get("args", {})
+            src = args.get("from_step")
+            field = args.get("field", "consensus_text")
+            musts: List[str] = [m for m in args.get("must_include", []) if isinstance(m, str)]
+            if not src:
+                msg = "assert_contains: 'from_step' is required"
+                rec.update({"error": "missing_from_step"})
+                record_step(run_dir, step_idx, step_id, rec)
+                report += ["## Error", "", msg, ""]
+                finalize_report(run_dir, report)
+                write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
+                print(f"[AWO] {msg}", file=sys.stderr)
+                return 2
+
+            source = ctx.get(src)
+            hay = ""
+            if isinstance(source, dict) and field in source:
+                hay = str(source[field])
+            elif isinstance(source, list):  # e.g., fanout outputs
+                hay = "\n".join([str(o.get("text", "")) for o in source])
+            elif source is not None:
+                hay = json.dumps(source, ensure_ascii=False)
+
+            missing = [m for m in musts if m.lower() not in hay.lower()]
+            ok = len(missing) == 0
+
+            rec.update({"from_step": src, "field": field, "must_include": musts,
+                        "missing": missing, "ok": ok, "sample": hay[:400]})
+            record_step(run_dir, step_idx, step_id, rec)
+
+            if not ok:
+                msg = f"assert_contains failed; missing: {missing}"
+                report += ["## Error", "", msg, ""]
+                finalize_report(run_dir, report)
+                write_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
+                print(f"[AWO] {msg}", file=sys.stderr)
+                return 2
+
+            report += [f"## {step_idx}. assert_contains — {step_id}",
+                       f"- ok: {ok}", ""]
             continue
 
         # ----- existing ops --------------------------------------------------
