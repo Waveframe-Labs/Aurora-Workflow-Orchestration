@@ -22,8 +22,7 @@ jobs:
       run_id: ${{ steps.capture.outputs.run_id }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - name: Execute AWO workflow
         id: runstep
@@ -32,7 +31,7 @@ jobs:
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-          echo "runner_exit_code=$code" >> "$GITHUB_ENV"
+          echo "runner_exit_code=$code" >> $GITHUB_ENV
           if [ "$code" = "78" ]; then
             echo "Audit: PENDING (human approval will be required)" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -45,26 +44,16 @@ jobs:
         shell: bash
         run: |
           set -e
-          if [ ! -f runs/LAST_RUN ]; then
-            echo "run_id=none" >> "$GITHUB_OUTPUT"
-            echo "No LAST_RUN breadcrumb found." >&2
-            exit 1
-          fi
+          test -f runs/LAST_RUN || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
           RID="$(cat runs/LAST_RUN)"
-          if [ ! -d "runs/$RID" ]; then
-            echo "run_id=none" >> "$GITHUB_OUTPUT"
-            echo "LAST_RUN points to missing directory: runs/$RID" >&2
-            exit 1
-          fi
+          test -d "runs/$RID" || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
           echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
 
       - name: Create payload
         shell: bash
-        run: |
-          set -e
-          tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
+        run: tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
         uses: actions/upload-artifact@v4
@@ -73,8 +62,8 @@ jobs:
           path: awo-run-${{ env.RUN_ID }}.tar.gz
           if-no-files-found: error
 
-  # ---- Render scope report BEFORE any approval gates -------------------------
-  scope_preview:
+  # Renders a human-readable summary BEFORE approval, inside the job summary
+  render_summary:
     needs: run_awo
     runs-on: ubuntu-latest
     steps:
@@ -83,55 +72,63 @@ jobs:
           name: awo-run-${{ needs.run_awo.outputs.run_id }}
           path: artifacts
 
-      - name: Extract & locate run folder
+      - name: Extract run
         id: locate
         shell: bash
         run: |
           set -e
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
-          mkdir -p extracted
-          tar -xzf "$TAR" -C extracted
+          mkdir -p extracted && tar -xzf "$TAR" -C extracted
           RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
           echo "rd=$RD" >> "$GITHUB_OUTPUT"
-          ls -l "$RD" || true
-          [ -f "$RD/scope/summary.json" ] || echo "WARN: scope/summary.json missing"
+          echo "### Files" >> "$GITHUB_STEP_SUMMARY"
+          find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Install jq (for parsing)
+      - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Render scope summary
+      - name: Show scope summary (if present)
         shell: bash
         run: |
-          set -e
           RD="${{ steps.locate.outputs.rd }}"
           if [ -f "$RD/scope/summary.json" ]; then
             OVERALL="$(jq -r '.overall_ok' "$RD/scope/summary.json" 2>/dev/null || echo null)"
-            {
-              echo "# Scope Gate — Pre-Review"
-              echo
-              echo "Below is the machine check of testability (predictions/tolerances or falsification tests)."
-              echo
-              echo "**overall_ok:** \`$OVERALL\`"
-              echo
-              echo '```json'
-              cat "$RD/scope/summary.json"
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
+            echo "**overall_ok:** \`$OVERALL\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "No scope summary found. The scope gate will likely require attention." >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
+            echo "_No scope/summary.json found (scope_validate may be missing)._" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-  # ---- Scope approval gate (uses environment protection) --------------------
+      - name: Show run report excerpt
+        shell: bash
+        run: |
+          RD="${{ steps.locate.outputs.rd }}"
+          if [ -f "$RD/report.md" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
+            head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "_Full report committed after approval._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  # Early gate (Scope)
   scope_gate:
-    needs: [run_awo, scope_preview]
+    needs: [run_awo, render_summary]
     runs-on: ubuntu-latest
     environment:
       name: awo-scope
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - run: echo "Scope Gate — review the 'scope_preview' job summary above, then approve to continue."
+      - run: echo "Scope Gate — review the 'render_summary' job summary above, then approve."
 
-  # ---- Human approval (merge gate) ------------------------------------------
+  # Final merge gate
   human_approval:
     needs: [run_awo, scope_gate]
     runs-on: ubuntu-latest
@@ -139,17 +136,14 @@ jobs:
       name: awo-audit
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - run: echo "Manual approval (merge gate) — approve in Environment 'awo-audit' to continue."
+      - run: echo "Merge Gate — Approve in Environment 'awo-audit' to commit run to the repo."
 
-  # ---- Finalize: commit approved run into main ------------------------------
   finalize:
     needs: [run_awo, human_approval]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: true
+        with: { fetch-depth: 0, persist-credentials: true }
 
       - uses: actions/download-artifact@v4
         with:
@@ -161,8 +155,7 @@ jobs:
         run: |
           set -e
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
-          mkdir -p extracted
-          tar -xzf "$TAR" -C extracted
+          mkdir -p extracted && tar -xzf "$TAR" -C extracted
           rsync -a extracted/runs/ runs/
           echo "RUN_ID=${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_ENV"
           echo "Finalizing ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
