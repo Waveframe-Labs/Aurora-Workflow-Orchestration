@@ -1,0 +1,43 @@
+{
+  "ts": "2025-09-13T00-25-53Z",
+  "id": "scope_1",
+  "op": "scope_validate",
+  "args": {
+    "claim": {
+      "id": "claim-hello-001",
+      "statement": "We can summarize a two-clause review into one sentence preserving both sentiments.",
+      "predictions": [
+        {
+          "name": "Contains both sentiments",
+          "function": "text_includes",
+          "tolerance": {
+            "metric": "contains",
+            "terms": [
+              "battery lasts all day",
+              "ui is confusing"
+            ]
+          }
+        }
+      ],
+      "falsification_tests": [
+        {
+          "name": "Missing any sentiment -> fail",
+          "fail_if": "omits one of the key clauses"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "claims_checked": 1,
+    "overall_ok": true,
+    "details": [
+      {
+        "id": "claim-hello-001",
+        "ok": true,
+        "problems": []
+      }
+    ],
+    "notes": [],
+    "ts": "2025-09-13T00-25-53Z"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "claim-hello-001",
+  "statement": "We can summarize a two-clause review into one sentence preserving both sentiments.",
+  "predictions": [
+    {
+      "name": "Contains both sentiments",
+      "function": "text_includes",
+      "tolerance": {
+        "metric": "contains",
+        "terms": [
+          "battery lasts all day",
+          "ui is confusing"
+        ]
+      }
+    }
+  ],
+  "falsification_tests": [
+    {
+      "name": "Missing any sentiment -> fail",
+      "fail_if": "omits one of the key clauses"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "name": "Multi-model consensus demo",
+  "steps": [
+    {
+      "id": "scope_1",
+      "op": "scope_validate",
+      "args": {
+        "claim": {
+          "id": "claim-hello-001",
+          "statement": "We can summarize a two-clause review into one sentence preserving both sentiments.",
+          "predictions": [
+            {
+              "name": "Contains both sentiments",
+              "function": "text_includes",
+              "tolerance": {
+                "metric": "contains",
+                "terms": [
+                  "battery lasts all day",
+                  "ui is confusing"
+                ]
+              }
+            }
+          ],
+          "falsification_tests": [
+            {
+              "name": "Missing any sentiment -> fail",
+              "fail_if": "omits one of the key clauses"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fanout_1",
+      "op": "fanout_generate",
+      "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
+      "models": [
+        "echo",
+        "upper",
+        "reverse"
+      ],
+      "params": {
+        "seed": 123
+      }
+    },
+    {
+      "id": "consensus_1",
+      "op": "consensus_vote",
+      "inputs_from": "fanout_1"
+    },
+    {
+      "id": "assert_consensus_quality",
+      "op": "assert_contains",
+      "args": {
+        "from_step": "consensus_1",
+        "field": "consensus_text",
+        "must_include": [
+          "battery lasts all day",
+          "ui is confusing"
+        ]
+      }
+    },
+    {
+      "id": "gate_review",
+      "op": "audit_gate",
+      "args": {
+        "checklist": "templates/audit-checklist.md"
+      }
+    },
+    {
+      "id": "emit_fanout",
+      "op": "write_text",
+      "args": {
+        "path": "notes/fanout.txt",
+        "from_step": "fanout_1"
+      }
+    },
+    {
+      "id": "emit_consensus",
+      "op": "write_text",
+      "args": {
+        "path": "notes/consensus.txt",
+        "from_step": "consensus_1",
+        "field": "consensus_text"
+      }
+    }
+  ]
+}
