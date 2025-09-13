@@ -23,6 +23,9 @@ This repository is intentionally built in public with AI assistance.
 The aim isn’t to hide AI involvement — it’s to show how AI can be audited,  
 structured, and trusted in real workflows.
 
+> **New:** AWO now integrates into a broader idea: **Continuous Research Integration (CRI)**.  
+> CRI is like CI/CD for research — every run is validated, logged, and archived,  
+> turning hypotheses into reproducible, continuously improving artifacts.
 ---
 
 ## Why It Matters
