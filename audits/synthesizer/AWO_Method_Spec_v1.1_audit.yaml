@@ -1,0 +1,129 @@
+- title: "[SEV:high] Define falsifiability test criteria"
+  labels: ["audit", "docs", "reproducibility", "severity:high"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Falsifiability requirement lacks operational definitions and examples.
+    Impact: 3
+    Confidence: 0.93
+    Sources: GPT-5 DOCS-007; Claude SPEC-001; Gemini METH-002
+    Fix: Add compliance matrix + concrete adequate vs. inadequate examples.
+
+- title: "[SEV:high] Specify auditor independence criteria"
+  labels: ["audit", "logic", "reproducibility", "severity:high"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Auditor independence asserted without enforceable rules.
+    Impact: 3
+    Confidence: 0.83
+    Sources: GPT-5 DOCS-008; Claude SPEC-002
+    Fix: Define rules (different model families, separate contexts, or human oversight).
+
+- title: "[SEV:high] Expand logging schema"
+  labels: ["audit", "reproducibility", "severity:high"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Logging schema insufficient to reproduce decisions.
+    Impact: 3
+    Confidence: 0.87
+    Sources: GPT-5 DOCS-011; Claude SPEC-004
+    Fix: Mandate standard format + required fields (input params, model versions, alternatives considered).
+
+- title: "[SEV:medium] Define artifact schemas"
+  labels: ["audit", "docs", "reproducibility", "severity:medium"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Core artifacts referenced but schemas unspecified.
+    Impact: 2
+    Confidence: 0.80
+    Sources: GPT-5 DOCS-009
+    Fix: Specify metadata/schema for artifacts.
+
+- title: "[SEV:medium] Expand setup procedures"
+  labels: ["audit", "docs", "severity:medium"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Setup step under-specified.
+    Impact: 2
+    Confidence: 0.85
+    Sources: Claude SPEC-003
+    Fix: Add SMART claims, quantitative baselines, audit criteria upfront.
+
+- title: "[SEV:low] Add lifecycle timing guidance"
+  labels: ["audit", "docs", "severity:low"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Lifecycle lacks iteration frequency guidance.
+    Impact: 1
+    Confidence: 0.75
+    Sources: GPT-5 DOCS-010
+    Fix: Suggest cadence (per hypothesis, per dataset change).
+
+- title: "[SEV:low] Add lifecycle visuals"
+  labels: ["audit", "docs", "severity:low"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Lifecycle description is text-heavy.
+    Impact: 1
+    Confidence: 0.90
+    Sources: Gemini METH-001
+    Fix: Include flowchart or diagram.
+
+- title: "[SEV:medium] Clarify rejection handling"
+  labels: ["audit", "logic", "severity:medium"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: No-appeals policy risks blocking correction of errors.
+    Impact: 2
+    Confidence: 0.70
+    Sources: Claude SPEC-005
+    Fix: Allow appeals on procedural errors.
+
+- title: "[SEV:low] Define Model Roster"
+  labels: ["audit", "docs", "severity:low"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Model Roster referenced but undefined.
+    Impact: 1
+    Confidence: 0.80
+    Sources: Claude SPEC-006
+    Fix: Provide structure/file location.
+
+- title: "[SEV:medium] Strengthen conformance checklist"
+  labels: ["audit", "docs", "reproducibility", "severity:medium"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Checklist lacks thresholds and links.
+    Impact: 2
+    Confidence: 0.73
+    Sources: GPT-5 DOCS-012; Claude SPEC-007
+    Fix: Add thresholds + repo hyperlinks.
+
+- title: "[SEV:medium] Add cross-domain examples"
+  labels: ["audit", "docs", "severity:medium"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Only Waveframe example given.
+    Impact: 2
+    Confidence: 0.80
+    Sources: Claude SPEC-009
+    Fix: Add 2–3 examples from other domains.
+
+- title: "[SEV:low] Improve claim ID format scalability"
+  labels: ["audit", "data", "severity:low"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: Claim ID scheme may not scale.
+    Impact: 1
+    Confidence: 0.60
+    Sources: Claude SPEC-008
+    Fix: Use hierarchical/domain-prefixed IDs.
+
+- title: "[SEV:nit] Clarify 'continuity' term"
+  labels: ["audit", "docs", "severity:nit"]
+  body: |
+    File: docs/AWO_Method_Spec_v1.1.md
+    Canonical Statement: 'Main Model (Continuity)' ambiguous.
+    Impact: 1
+    Confidence: 0.70
+    Sources: Gemini METH-003
+    Fix: Expand explanation.
