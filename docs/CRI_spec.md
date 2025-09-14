@@ -95,9 +95,10 @@ approval.json
   "notes": [],
   "ts": "2025-09-12T01-31-09Z"
 }
+```
 
 Claim requirements:
-
+```json
 {
   "id": "string",
   "statement": "string",
@@ -108,6 +109,7 @@ Claim requirements:
     { "name":"...", "must_pass":true }
   ]
 }
+```
 
 ### 6.2 fanout_generate
 	•	Simulates multiple models (echo, upper, reverse).
@@ -155,7 +157,7 @@ Claim requirements:
 ⸻
 
 ## Appendix A — Example Workflow
-
+```json
 {
   "name": "Multi-model consensus demo (CRI)",
   "steps": [
@@ -215,3 +217,4 @@ Claim requirements:
     }
   ]
 }
+```
