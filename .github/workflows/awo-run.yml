@@ -15,10 +15,6 @@ concurrency:
   group: awo-run
   cancel-in-progress: true
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   # ---- Preflight: validate the workflow JSON before running -----------------
   validate_workflow_json:
@@ -33,6 +29,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Validate JSON syntax
+        shell: bash
         run: |
           set -euo pipefail
           WF="${{ github.event.inputs.workflow_file }}"
@@ -41,14 +38,14 @@ jobs:
           jq . "$WF" >/dev/null
           echo "Workflow JSON is valid."
 
-      - name: Setup Python for schema validation
-        if: ${{ hashFiles('workflows/schema.json') != '' }}
+      - name: Setup Python (for optional schema validation)
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Validate against schema (if present)
         if: ${{ hashFiles('workflows/schema.json') != '' }}
+        shell: bash
         run: |
           set -euo pipefail
           pip install --disable-pip-version-check -q jsonschema
@@ -82,27 +79,44 @@ jobs:
 
       - name: Install dependencies (if requirements.txt exists)
         if: ${{ hashFiles('requirements.txt') != '' }}
+        shell: bash
         run: |
+          set -euo pipefail
           pip install --upgrade --disable-pip-version-check -r requirements.txt
 
-      - name: Execute AWO workflow
+      # ====== STRONGER DEBUG LOGGING HERE ======
+      - name: Execute AWO workflow (debug)
         id: runstep
+        shell: bash
         run: |
-          set +e
-          python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
-          code=$?
-          echo "runner_exit_code=$code" >> "$GITHUB_ENV"
-          if [ "$code" = "78" ]; then
-            echo "Audit: PENDING (human approval will be required)" >> "$GITHUB_STEP_SUMMARY"
-          elif [ "$code" = "0" ]; then
-            echo "Audit: PASSED (this workflow still requires manual approval)" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "::error::AWO runner failed with exit code $code"
+          set -euo pipefail
+          WF="${{ github.event.inputs.workflow_file }}"
+          echo "::group::Environment"
+          python --version
+          echo "PWD=$(pwd)"
+          echo "WF=${WF}"
+          ls -la
+          echo "::endgroup::"
+
+          echo "::group::Workflow file (first 80 lines)"
+          nl -ba "$WF" | head -n 80 || true
+          echo "::endgroup::"
+
+          echo "Running: python -u scripts/awo_run.py \"$WF\""
+          # Run with unbuffered output so tracebacks stream to logs
+          if ! python -u scripts/awo_run.py "$WF"; then
+            code=$?
+            echo "::error::AWO runner failed with exit code ${code}"
+            echo "::group::Debug LAST_RUN & tree"
+            test -f runs/LAST_RUN && cat runs/LAST_RUN || echo "runs/LAST_RUN not created"
+            (command -v tree >/dev/null && tree -a runs || find runs -maxdepth 3 -type f | sed 's/^/- /') || true
+            echo "::endgroup::"
             exit $code
           fi
 
       - name: Capture Run-ID (from breadcrumb)
         id: capture
+        shell: bash
         run: |
           set -euo pipefail
           if [ ! -f runs/LAST_RUN ]; then
@@ -121,6 +135,7 @@ jobs:
           echo "- Artifact: awo-run-$RID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create payload
+        shell: bash
         run: |
           set -euo pipefail
           tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
@@ -145,14 +160,9 @@ jobs:
           name: awo-run-${{ needs.run_awo.outputs.run_id }}
           path: artifacts
 
-      - name: Ensure artifact exists
-        run: |
-          set -euo pipefail
-          test -f "artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz" \
-            || { echo "::error::Artifact missing; check run_awo job"; exit 1; }
-
       - name: Extract run
         id: locate
+        shell: bash
         run: |
           set -euo pipefail
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
@@ -168,6 +178,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Show scope summary (if present)
+        shell: bash
         run: |
           set -euo pipefail
           RD="${{ steps.locate.outputs.rd }}"
@@ -185,6 +196,7 @@ jobs:
           fi
 
       - name: Show run report excerpt (redacted)
+        shell: bash
         run: |
           set -euo pipefail
           RD="${{ steps.locate.outputs.rd }}"
@@ -239,6 +251,7 @@ jobs:
           path: artifacts
 
       - name: Extract run folder (guarded)
+        shell: bash
         run: |
           set -euo pipefail
           RID="${{ needs.run_awo.outputs.run_id }}"
@@ -252,6 +265,7 @@ jobs:
           echo "Finalizing ${RID}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Write approval record
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p "runs/${RUN_ID}"
@@ -265,6 +279,7 @@ jobs:
           EOF
 
       - name: Commit run to branch
+        shell: bash
         run: |
           set -euo pipefail
           BR="${GITHUB_REF_NAME:-main}"
