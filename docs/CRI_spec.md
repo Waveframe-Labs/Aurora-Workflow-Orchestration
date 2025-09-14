@@ -112,47 +112,47 @@ Claim requirements:
 ```
 
 ### 6.2 fanout_generate
-	•	Simulates multiple models (echo, upper, reverse).
+ •	Simulates multiple models (echo, upper, reverse).
 
 ### 6.3 consensus_vote
-	•	Normalizes outputs; counts agreement; emits consensus_text.
+ •	Normalizes outputs; counts agreement; emits consensus_text.
 
 ### 6.4 assert_contains
-	•	Guards required content.
-	•	Fails the run if missing.
+ •	Guards required content.
+ •	Fails the run if missing.
 
 ### 6.5 audit_gate
-	•	Creates gate_decision.yml, halts run with status pending_review.
+ •	Creates gate_decision.yml, halts run with status pending_review.
 
 ⸻
 
 ## 7. Gates & UX
-	•	Scope Gate (awo-scope): Preview + approve scope summary.
-	•	Merge Gate (awo-audit): Preview + approve final run facts.
-	•	After approval, the run is auto-committed.
+ •	Scope Gate (awo-scope): Preview + approve scope summary.
+ •	Merge Gate (awo-audit): Preview + approve final run facts.
+ •	After approval, the run is auto-committed.
 
 ⸻
 
 ## 8. Versioning & Invariants
-	•	Runner always writes workflow_frozen.json and index.json at start.
-	•	All timestamps UTC, format YYYY-MM-DDTHH-MM-SSZ.
-	•	Adding ops = backward compatible.
-	•	Breaking changes → bump minor version + ADR.
+ •	Runner always writes workflow_frozen.json and index.json at start.
+ •	All timestamps UTC, format YYYY-MM-DDTHH-MM-SSZ.
+ •	Adding ops = backward compatible.
+ •	Breaking changes → bump minor version + ADR.
 
 ⸻
 
 ## 9. Security & Privacy
-	•	No external network calls (MVP).
-	•	No secrets required.
-	•	Future adapters must handle secrets via GitHub encrypted secrets.
+ •	No external network calls (MVP).
+ •	No secrets required.
+ •	Future adapters must handle secrets via GitHub encrypted secrets.
 
 ⸻
 
 ## 10. Roadmap
-	•	Refuter: adversarial rounds, halts if unaddressed failures.
-	•	Replicator: containerized re-run + tolerance diff.
-	•	Provider adapters: OpenAI, Claude, local LLMs (all logged).
-	•	Consensus with dissent ledger: record unresolved objections.
+ •	Refuter: adversarial rounds, halts if unaddressed failures.
+ •	Replicator: containerized re-run + tolerance diff.
+ •	Provider adapters: OpenAI, Claude, local LLMs (all logged).
+ •	Consensus with dissent ledger: record unresolved objections.
 
 ⸻
 
