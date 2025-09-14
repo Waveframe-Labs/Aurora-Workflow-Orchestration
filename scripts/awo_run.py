@@ -31,13 +31,22 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
 EXIT_PENDING = 78  # conventional code to indicate "needs human review"
+
+# ---------------------------- repo-rooted paths ------------------------------
+REPO_ROOT = Path(os.getenv("GITHUB_WORKSPACE", Path.cwd())).resolve()
+RUNS_ROOT = (REPO_ROOT / "runs").resolve()
+
+def _debug(msg: str) -> None:
+    print(f"[AWO] {msg}", file=sys.stdout, flush=True)
 
 # --------------------------- deterministic local backends --------------------
 class _Echo:
@@ -80,19 +89,37 @@ def write_json(path: Path, obj: Any) -> None:
     path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
 def ensure_run_dir() -> Path:
-    Path("runs").mkdir(exist_ok=True)
-    rd = Path("runs") / f"run_{now_iso()}"
+    RUNS_ROOT.mkdir(parents=True, exist_ok=True)
+    rd = RUNS_ROOT / f"run_{now_iso()}"
     (rd / "steps").mkdir(parents=True, exist_ok=True)
     (rd / "artifacts").mkdir(parents=True, exist_ok=True)
+    # verify directory exists
+    if not rd.exists():
+        raise RuntimeError(f"Failed to create run dir: {rd}")
     return rd
 
 def breadcrumb(run_dir: Path) -> None:
-    write_text(Path("runs") / "LAST_RUN", run_dir.name)
+    """Write runs/LAST_RUN with verification (absolute repo path)."""
+    last_run = RUNS_ROOT / "LAST_RUN"
+    write_text(last_run, run_dir.name)
+    # fsync/verify write in CI environments
+    for _ in range(3):
+        try:
+            # Re-read to verify
+            val = last_run.read_text(encoding="utf-8").strip()
+            if val == run_dir.name:
+                return
+        except Exception:
+            pass
+        time.sleep(0.05)
+    raise RuntimeError(f"Breadcrumb verification failed: {last_run} != {run_dir.name}")
 
 def init_report(run_dir: Path, workflow_path: str) -> List[str]:
     return [
         f"# AWO Run Report — {run_dir.name}",
         "",
+        f"- Repo root: {REPO_ROOT}",
+        f"- Runs root: {RUNS_ROOT}",
         f"- Workflow: {workflow_path}",
         f"- Started: {now_iso()}",
         "",
@@ -144,7 +171,7 @@ def _load_claims(args: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[str]]
     # Glob claims from the repo (e.g., claims/*.json)
     glob = args.get("claims_glob")
     if glob:
-        for p in Path(".").glob(glob):
+        for p in REPO_ROOT.glob(glob):
             try:
                 loaded.append(json.loads(Path(p).read_text(encoding="utf-8")))
             except Exception as e:
@@ -159,6 +186,11 @@ def run(workflow_path: str) -> int:
     started_at = now_iso()
     update_index(run_dir, started_at=started_at, status="running")
 
+    _debug(f"Repo root: {REPO_ROOT}")
+    _debug(f"Runs root: {RUNS_ROOT}")
+    _debug(f"Run dir : {run_dir}")
+    _debug(f"Breadcrumb: {(RUNS_ROOT / 'LAST_RUN')}")
+
     report = init_report(run_dir, workflow_path)
     step_idx = 0
     ctx: Dict[str, Any] = {}
@@ -166,7 +198,6 @@ def run(workflow_path: str) -> int:
     # 2) Optional local overrides; keep fallbacks if imports fail.
     BACKENDS = {"echo": _Echo(), "upper": _Upper(), "reverse": _Reverse()}
     try:
-        # If user has local override modules, they take precedence for echo/upper
         from awo.models.local_backend import LocalEcho  # type: ignore
         from awo.models.alt_backend import LocalUpper  # type: ignore
         BACKENDS.update({"echo": LocalEcho(), "upper": LocalUpper()})
@@ -179,9 +210,9 @@ def run(workflow_path: str) -> int:
         )
 
     # 3) Load workflow (safe).
-    wf_file = Path(workflow_path)
-    if not wf_file.exists():
-        msg = f"Workflow file not found: {workflow_path}"
+    wf_path = (REPO_ROOT / workflow_path).resolve()
+    if not wf_path.exists():
+        msg = f"Workflow file not found: {wf_path}"
         record_step(run_dir, step_idx, "init_error", {"error": "workflow_missing", "message": msg, "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
@@ -190,7 +221,7 @@ def run(workflow_path: str) -> int:
         return 2
 
     try:
-        wf = json.loads(wf_file.read_text(encoding="utf-8"))
+        wf = json.loads(wf_path.read_text(encoding="utf-8"))
     except Exception as e:
         msg = f"Failed to parse workflow JSON: {e}"
         record_step(run_dir, step_idx, "init_error", {"error": "json_parse", "message": str(e), "ts": now_iso()})
@@ -236,7 +267,6 @@ def run(workflow_path: str) -> int:
             }
             write_json(scope_dir / "summary.json", summary)
 
-            # quick human-readable summary
             md = [f"# Scope Check — {run_dir.name}", ""]
             if not claims:
                 md += ["**No claims found.** Gate will likely block.", ""]
@@ -286,14 +316,7 @@ def run(workflow_path: str) -> int:
             ok = len(missing) == 0
 
             rec.update(
-                {
-                    "from_step": src,
-                    "field": field,
-                    "must_include": musts,
-                    "missing": missing,
-                    "ok": ok,
-                    "sample": hay[:400],
-                }
+                {"from_step": src, "field": field, "must_include": musts, "missing": missing, "ok": ok, "sample": hay[:400]}
             )
             record_step(run_dir, step_idx, step_id, rec)
 
@@ -332,7 +355,6 @@ def run(workflow_path: str) -> int:
             ctx[step_id] = outs
             record_step(run_dir, step_idx, step_id, rec)
 
-            # human report (truncate long lines)
             report += [
                 f"## {step_idx}. fanout_generate — {step_id}",
                 f"Prompt (sha12={sha12(prompt)}):",
@@ -453,7 +475,7 @@ def run(workflow_path: str) -> int:
             finalize_report(run_dir, report)
             update_index(run_dir, started_at=started_at, status="pending_review")
             breadcrumb(run_dir)
-            print(f"[AWO] Run created at: {run_dir}")
+            _debug(f"Run created at: {run_dir}")
             return EXIT_PENDING
 
         else:
@@ -470,7 +492,7 @@ def run(workflow_path: str) -> int:
     finalize_report(run_dir, report)
     update_index(run_dir, started_at=started_at, status="succeeded", finished_at=now_iso())
     breadcrumb(run_dir)
-    print(f"[AWO] Run created at: {run_dir}")
+    _debug(f"Run created at: {run_dir}")
     return 0
 
 
@@ -483,7 +505,10 @@ if __name__ == "__main__":
     except Exception as e:
         # Last-ditch safety: still produce a run, breadcrumb, index, and report.
         rd = ensure_run_dir()
-        breadcrumb(rd)
+        try:
+            breadcrumb(rd)
+        except Exception:
+            pass
         write_json(rd / "steps" / "00_unhandled_error.json",
                    {"error": "unhandled", "message": str(e), "ts": now_iso()})
         write_text(rd / "report.md", f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
