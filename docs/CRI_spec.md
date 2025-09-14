@@ -166,12 +166,17 @@ runs/
 
 ---
 
-## 10. Roadmap
+ ## 10. Roadmap
 
-- **Refuter**: adversarial rounds, halts if unaddressed failures.  
-- **Replicator**: containerized re-run + tolerance diff.  
-- **Provider adapters**: OpenAI, Claude, local LLMs (all logged).  
-- **Consensus with dissent ledger**: record unresolved objections.  
+- **Refuter:** adversarial rounds; halt if unaddressed failures remain.
+- **Replicator:** containerized re-run + tolerance diff.
+- **Provider adapters (future):** pluggable connectors to external LLM APIs.  
+  *Status:* **not implemented in the MVP.** When added, adapters will:
+  - run behind a provider interface,
+  - log `{provider, model, api_version, params, seed, cost_estimate}` to `steps/*.json`,
+  - respect repo-wide reproducibility settings (seeds/temps), and
+  - be optional—local fallbacks remain the default.
+- **Consensus with dissent ledger:** record unresolved objections. 
 
 ---
 
