@@ -9,14 +9,14 @@
 ## 1. Goals & Non-Goals
 
 **Goals**
-- **Reproducibility**: every run writes a timestamped, immutable folder under `runs/`.
-- **Falsifiability**: claims must include predictions with tolerances or explicit falsification tests.
-- **Human-in-the-loop**: two gates (Scope & Merge) with checklists and recorded approvals.
-- **Minimal vendor lock**: local fallbacks work in CI; providers are pluggable later.
+- **Reproducibility**: every run writes a timestamped, immutable folder under `runs/`.  
+- **Falsifiability**: claims must include predictions with tolerances or explicit falsification tests.  
+- **Human-in-the-loop**: two gates (Scope & Merge) with checklists and recorded approvals.  
+- **Minimal vendor lock**: local fallbacks work in CI; providers are pluggable later.  
 
 **Non-Goals (MVP)**
-- No external LLM providers required (local fallbacks only).
-- No dataset downloads or networked replication (air-gapped default).
+- No external LLM providers required (local fallbacks only).  
+- No dataset downloads or networked replication (air-gapped default).  
 
 ---
 
@@ -29,7 +29,7 @@
    - `assert_contains` applies content guardrails.  
 4. **Scope Gate**: Environment `awo-scope` renders preview summary for human approval.  
 5. **Merge Gate**: Environment `awo-audit` presents final run facts for approval.  
-6. **Publish**: Full run directory is committed to `runs/run_YYYY-MM-DDTHH-MM-SSZ/`.
+6. **Publish**: Full run directory is committed to `runs/run_YYYY-MM-DDTHH-MM-SSZ/`.  
 
 ---
 
@@ -39,42 +39,49 @@
 - **Auditor-Static**: deterministic checks (`scope_validate`, `assert_contains`).  
 - **Consensus**: reduces multiple outputs to a representative result.  
 - **Human Gate**: scope + merge approvals recorded.  
-- **Planned**: Refuter (adversarial rounds), Replicator (containerized re-run).
+- **Planned**: Refuter (adversarial rounds), Replicator (containerized re-run).  
 
 ---
 
 ## 4. Required Artifacts (Per Run)
 
-Each run directory (`runs/run_<UTC_ISO>/`) must include:
+Each run directory (`runs/run_<UTC_ISO>/`) includes:
 
+**Always**
 - `index.json` — run metadata `{ run_id, started_at, status, finished_at? }`.  
 - `workflow_frozen.json` — exact workflow used.  
 - `report.md` — human-readable step summary.  
 - `steps/*.json` — structured logs of each step.  
-- `scope/summary.json` — results of scope validation.  
+- `scope/summary.json` — scope validation results.  
 - `scope/claims/*.json` — frozen claim inputs.  
-- `gate_decision.yml` — audit gate metadata.  
-- `approval.json` — human approval record (who, when, run URL).
+
+**Conditional**
+- `gate_decision.yml` — only written if `audit_gate` triggers.  
+- `approval.json` — only written after merge approval.  
 
 ---
 
 ## 5. File / Folder Contract
 
+```text
 workflows/
-multimodel.json        # example workflow
+  multimodel.json        # example workflow
 scripts/
-awo_run.py             # CRI runner (stdlib only)
+  awo_run.py             # CRI runner (stdlib only)
 .github/workflows/
-awo-run.yml            # CI runner
+  awo-run.yml            # CI runner
 runs/
-run_YYYY-MM-DDTHH-MM-SSZ/
-index.json
-workflow_frozen.json
-report.md
-steps/
-scope/
-gate_decision.yml
-approval.json
+  run_YYYY-MM-DDTHH-MM-SSZ/
+    index.json
+    workflow_frozen.json
+    report.md
+    steps/
+    scope/
+      summary.json
+      claims/*.json
+    gate_decision.yml    (conditional)
+    approval.json        (conditional)
+```
 
 ---
 
@@ -82,9 +89,9 @@ approval.json
 
 ### 6.1 `scope_validate`
 - **Purpose**: enforce testability.  
-- **Output**: `scope/summary.json`, `scope/claims/*.json`.
+- **Output**: `scope/summary.json`, `scope/claims/*.json`.  
 
-**Schema (summary.json)**:
+**Schema (`summary.json`)**:
 ```json
 {
   "claims_checked": 1,
@@ -97,7 +104,7 @@ approval.json
 }
 ```
 
-Claim requirements:
+**Claim requirements**:
 ```json
 {
   "id": "string",
@@ -111,71 +118,65 @@ Claim requirements:
 }
 ```
 
-### 6.2 fanout_generate
+---
 
- •	Simulates multiple models (echo, upper, reverse).
+### 6.2 `fanout_generate`
+- Simulates multiple models (`echo`, `upper`, `reverse`).  
 
-### 6.3 consensus_vote
+---
 
- •	Normalizes outputs; counts agreement; emits consensus_text.
+### 6.3 `consensus_vote`
+- Normalizes outputs, counts agreement, emits `consensus_text`.  
 
-### 6.4 assert_contains
+---
 
- •	Guards required content.
+### 6.4 `assert_contains`
+- Guards required content.  
+- Fails the run if missing.  
 
- •	Fails the run if missing.
+---
 
-### 6.5 audit_gate
+### 6.5 `audit_gate`
+- Creates `gate_decision.yml`, halts run with status `pending_review`.  
 
- •	Creates gate_decision.yml, halts run with status pending_review.
-
-⸻
+---
 
 ## 7. Gates & UX
 
- •	Scope Gate (awo-scope): Preview + approve scope summary.
+- **Scope Gate (`awo-scope`)**: Preview + approve scope summary.  
+- **Merge Gate (`awo-audit`)**: Preview + approve final run facts.  
+- After approval, the run is auto-committed.  
 
- •	Merge Gate (awo-audit): Preview + approve final run facts.
-
- •	After approval, the run is auto-committed.
-
-⸻
+---
 
 ## 8. Versioning & Invariants
 
- •	Runner always writes workflow_frozen.json and index.json at start.
+- Runner always writes `workflow_frozen.json` and `index.json` at start.  
+- All timestamps UTC, format `YYYY-MM-DDTHH-MM-SSZ`.  
+- Adding ops = backward compatible.  
+- Breaking changes → bump minor version + ADR.  
 
- •	All timestamps UTC, format YYYY-MM-DDTHH-MM-SSZ.
-
- •	Adding ops = backward compatible.
-
- •	Breaking changes → bump minor version + ADR.
-
-⸻
+---
 
 ## 9. Security & Privacy
 
- •	No external network calls (MVP).
+- No external network calls (MVP).  
+- No secrets required.  
+- Future adapters must handle secrets via GitHub encrypted secrets.  
 
- •	No secrets required.
-
- •	Future adapters must handle secrets via GitHub encrypted secrets.
-
-⸻
+---
 
 ## 10. Roadmap
 
- •	Refuter: adversarial rounds, halts if unaddressed failures.
+- **Refuter**: adversarial rounds, halts if unaddressed failures.  
+- **Replicator**: containerized re-run + tolerance diff.  
+- **Provider adapters**: OpenAI, Claude, local LLMs (all logged).  
+- **Consensus with dissent ledger**: record unresolved objections.  
 
- •	Replicator: containerized re-run + tolerance diff.
-
- •	Provider adapters: OpenAI, Claude, local LLMs (all logged).
-
- •	Consensus with dissent ledger: record unresolved objections.
-
-⸻
+---
 
 ## Appendix A — Example Workflow
+
 ```json
 {
   "name": "Multi-model consensus demo (CRI)",
