@@ -5,7 +5,7 @@ on:
     inputs:
       workflow_file:
         description: "Workflow JSON path"
-        required: true
+        required: false
         default: "workflows/multimodel.json"
 
 permissions:
@@ -15,8 +15,37 @@ concurrency:
   group: awo-run
   cancel-in-progress: false
 
+env:
+  # Make the JSON path available to every job (workflow_dispatch may be empty on re-runs)
+  WORKFLOW_FILE: ${{ github.event.inputs.workflow_file != '' && github.event.inputs.workflow_file || 'workflows/multimodel.json' }}
+
 jobs:
+  # ------------------------------ 1) Validate JSON ------------------------------
+  validate_workflow_json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Validate workflow JSON
+        shell: bash
+        run: |
+          set -e
+          FILE="${WORKFLOW_FILE}"
+          if [ ! -f "$FILE" ]; then
+            echo "❌ Workflow file not found: $FILE"
+            exit 1
+          fi
+          python - <<'PY'
+import json, os, sys
+p = os.environ["WORKFLOW_FILE"]
+with open(p, "r", encoding="utf-8") as f:
+    json.load(f)
+print(f"✅ Workflow file is valid JSON: {p}")
+PY
+
+  # ------------------------------ 2) Run AWO -----------------------------------
   run_awo:
+    needs: validate_workflow_json
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ steps.capture.outputs.run_id }}
@@ -29,7 +58,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
+          python scripts/awo_run.py "${WORKFLOW_FILE}"
           code=$?
           echo "runner_exit_code=$code" >> $GITHUB_ENV
           if [ "$code" = "78" ]; then
@@ -44,9 +73,17 @@ jobs:
         shell: bash
         run: |
           set -e
-          test -f runs/LAST_RUN || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
+          if [ ! -f runs/LAST_RUN ]; then
+            echo "run_id=none" >> "$GITHUB_OUTPUT"
+            echo "No LAST_RUN breadcrumb found." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
           RID="$(cat runs/LAST_RUN)"
-          test -d "runs/$RID" || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
+          if [ ! -d "runs/$RID" ]; then
+            echo "run_id=none" >> "$GITHUB_OUTPUT"
+            echo "Run folder missing: runs/$RID" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
           echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
@@ -62,7 +99,7 @@ jobs:
           path: awo-run-${{ env.RUN_ID }}.tar.gz
           if-no-files-found: error
 
-  # Renders a human-readable summary BEFORE approval, inside the job summary
+  # -------- 3) Render summary BEFORE approval (appears in the job summary) -----
   render_summary:
     needs: run_awo
     runs-on: ubuntu-latest
@@ -81,7 +118,8 @@ jobs:
           mkdir -p extracted && tar -xzf "$TAR" -C extracted
           RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
           echo "rd=$RD" >> "$GITHUB_OUTPUT"
-          echo "### Files" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "## Files" >> "$GITHUB_STEP_SUMMARY"
           find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install jq
@@ -91,18 +129,16 @@ jobs:
         shell: bash
         run: |
           RD="${{ steps.locate.outputs.rd }}"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
           if [ -f "$RD/scope/summary.json" ]; then
             OVERALL="$(jq -r '.overall_ok' "$RD/scope/summary.json" 2>/dev/null || echo null)"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
             echo "**overall_ok:** \`$OVERALL\`" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo '```json' >> "$GITHUB_STEP_SUMMARY"
             cat "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
             echo "_No scope/summary.json found (scope_validate may be missing)._" >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -118,7 +154,7 @@ jobs:
             echo "_Full report committed after approval._" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-  # Early gate (Scope)
+  # ------------------------------ 4) Early human gate (Scope) ------------------
   scope_gate:
     needs: [run_awo, render_summary]
     runs-on: ubuntu-latest
@@ -128,7 +164,7 @@ jobs:
     steps:
       - run: echo "Scope Gate — review the 'render_summary' job summary above, then approve."
 
-  # Final merge gate
+  # ------------------------------ 5) Final merge gate --------------------------
   human_approval:
     needs: [run_awo, scope_gate]
     runs-on: ubuntu-latest
@@ -138,6 +174,7 @@ jobs:
     steps:
       - run: echo "Merge Gate — Approve in Environment 'awo-audit' to commit run to the repo."
 
+  # ------------------------------ 6) Commit artifacts --------------------------
   finalize:
     needs: [run_awo, human_approval]
     runs-on: ubuntu-latest
