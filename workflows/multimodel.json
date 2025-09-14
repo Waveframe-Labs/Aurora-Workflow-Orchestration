@@ -1,5 +1,7 @@
 {
   "name": "Multi-model consensus demo (CRI)",
+  "version": "1.0",
+  "description": "Demo workflow: scope validation -> multi-model fanout -> consensus -> content check -> gate -> emit artifacts.",
   "steps": [
     {
       "id": "scope_1",
@@ -29,9 +31,25 @@
       "params": { "seed": 123 }
     },
     {
+      "id": "emit_fanout_texts",
+      "op": "write_text",
+      "args": {
+        "path": "notes/fanout.txt",
+        "from_step": "fanout_1"
+      }
+    },
+    {
       "id": "consensus_1",
       "op": "consensus_vote",
       "inputs_from": "fanout_1"
+    },
+    {
+      "id": "emit_consensus_record",
+      "op": "write_text",
+      "args": {
+        "path": "notes/consensus.json",
+        "from_step": "consensus_1"
+      }
     },
     {
       "id": "assert_consensus_quality",
@@ -51,7 +69,7 @@
       "args": { "checklist": "templates/audit-checklist.md" }
     },
     {
-      "id": "emit_consensus",
+      "id": "emit_consensus_text",
       "op": "write_text",
       "args": {
         "path": "notes/consensus.txt",
