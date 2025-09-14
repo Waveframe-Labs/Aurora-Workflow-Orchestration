@@ -1,5 +1,5 @@
 {
-  "name": "Multi-model consensus demo",
+  "name": "Multi-model consensus demo (CRI)",
   "steps": [
     {
       "id": "scope_1",
@@ -7,16 +7,16 @@
       "args": {
         "claim": {
           "id": "claim-hello-001",
-          "statement": "We can summarize a two-clause review into one sentence preserving both sentiments.",
+          "statement": "A demo claim asserting the summary mentions battery life and confusing UI.",
           "predictions": [
             {
-              "name": "Contains both sentiments",
-              "function": "text_includes",
-              "tolerance": { "metric": "contains", "terms": ["battery lasts all day", "ui is confusing"] }
+              "name": "mentions-battery",
+              "function": "text-contains('battery lasts all day')",
+              "tolerance": { "metric": "boolean", "max": 1 }
             }
           ],
           "falsification_tests": [
-            { "name": "Missing any sentiment -> fail", "fail_if": "omits one of the key clauses" }
+            { "name": "mentions-ui-confusing", "must_pass": true }
           ]
         }
       }
@@ -24,7 +24,7 @@
     {
       "id": "fanout_1",
       "op": "fanout_generate",
-      "prompt": "Summarize: The battery lasts all day but the UI is confusing for first-time users.",
+      "prompt": "Summarize: The battery lasts all day but the UI is confusing.",
       "models": ["echo", "upper", "reverse"],
       "params": { "seed": 123 }
     },
@@ -51,14 +51,13 @@
       "args": { "checklist": "templates/audit-checklist.md" }
     },
     {
-      "id": "emit_fanout",
-      "op": "write_text",
-      "args": { "path": "notes/fanout.txt", "from_step": "fanout_1" }
-    },
-    {
       "id": "emit_consensus",
       "op": "write_text",
-      "args": { "path": "notes/consensus.txt", "from_step": "consensus_1", "field": "consensus_text" }
+      "args": {
+        "path": "notes/consensus.txt",
+        "from_step": "consensus_1",
+        "field": "consensus_text"
+      }
     }
   ]
 }
