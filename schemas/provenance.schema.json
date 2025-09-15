@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/provenance.schema.json",
+  "title": "AWO Provenance Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "role", "model", "started", "ended"],
+  "properties": {
+    "run_id": { "type": "string" },
+    "role": {
+      "type": "string",
+      "description": "Logical role of the actor producing this artifact.",
+      "enum": ["Proposer", "Refuter", "Auditor", "Replicator", "Consensus", "Editor", "Other"]
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "Model or tool name (e.g., echo, gpt-4o-mini)." },
+        "version": { "type": "string" },
+        "provider": { "type": "string", "description": "e.g., openai, anthropic, local" }
+      }
+    },
+    "prompt_id": { "type": "string", "description": "Hash of system+user prompts (e.g., sha256:...)." },
+    "temperature": { "type": ["number", "null"] },
+    "top_p": { "type": ["number", "null"] },
+    "seed": { "type": ["integer", "null"] },
+    "tools": {
+      "type": "object",
+      "description": "Tool versions used (e.g., sympy, pint).",
+      "additionalProperties": { "type": "string" }
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Relative paths to produced artifacts.",
+      "items": { "type": "string" }
+    },
+    "hashes": {
+      "type": "object",
+      "description": "Content hashes for key artifacts.",
+      "additionalProperties": { "type": "string" }
+    },
+    "cost_estimate": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "currency": { "type": "string", "default": "USD" },
+        "amount": { "type": "number", "minimum": 0 }
+      }
+    },
+    "started": { "type": "string", "format": "date-time" },
+    "ended": { "type": "string", "format": "date-time" },
+    "notes": { "type": ["string", "null"] }
+  },
+  "examples": [
+    {
+      "run_id": "run_2025-09-12T01-31-09Z",
+      "role": "Proposer",
+      "model": { "name": "echo", "version": "fallback", "provider": "local" },
+      "prompt_id": "sha256:deadbeef...",
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "seed": 123,
+      "tools": { "sympy": "1.12", "pint": "0.23" },
+      "artifacts": ["artifacts/notes/consensus.txt"],
+      "hashes": { "artifacts/notes/consensus.txt": "sha256:abc123..." },
+      "cost_estimate": null,
+      "started": "2025-09-12T01:31:11Z",
+      "ended": "2025-09-12T01:31:12Z",
+      "notes": "Local deterministic backend."
+    }
+  ]
+}
