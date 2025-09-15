@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/run_manifest.schema.json",
+  "title": "AWO Run Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "workflow", "started_at", "status", "ops"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Directory name for the run (e.g., run_2025-09-12T01-31-09Z)."
+    },
+    "workflow": {
+      "type": "string",
+      "description": "Path or name of the workflow JSON used."
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": ["string", "null"], "format": "date-time" },
+    "status": {
+      "type": "string",
+      "enum": ["running", "pending_review", "succeeded", "error"],
+      "description": "Lifecycle state of the run."
+    },
+    "ops": {
+      "type": "array",
+      "description": "Flat list of executed steps in order.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["idx", "id", "op"],
+        "properties": {
+          "idx": { "type": "integer", "minimum": 1 },
+          "id": { "type": "string" },
+          "op": { "type": "string" }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional human notes."
+    }
+  },
+  "examples": [
+    {
+      "run_id": "run_2025-09-12T01-31-09Z",
+      "workflow": "workflows/multimodel.json",
+      "started_at": "2025-09-12T01:31:09Z",
+      "finished_at": null,
+      "status": "running",
+      "ops": [
+        { "idx": 1, "id": "fanout_1", "op": "fanout_generate" }
+      ]
+    }
+  ]
+}
