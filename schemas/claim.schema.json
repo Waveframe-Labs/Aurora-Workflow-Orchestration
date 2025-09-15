@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/claim.schema.json",
+  "title": "AWO Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "statement"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable identifier for the claim (e.g., claim-2025-09-10-001)."
+    },
+    "statement": {
+      "type": "string",
+      "description": "Natural language claim."
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Optional list of explicit assumptions.",
+      "items": { "type": "string" }
+    },
+    "formal": {
+      "type": "string",
+      "description": "Math or pseudo-code formalization of the claim.",
+      "minLength": 1
+    },
+    "predictions": {
+      "type": "array",
+      "description": "Measurable predictions implied by the claim.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "function", "tolerance"],
+        "properties": {
+          "name": { "type": "string" },
+          "function": {
+            "type": "string",
+            "description": "How to compute/verify the prediction (free-form or DSL)."
+          },
+          "tolerance": {
+            "type": "object",
+            "description": "Objective pass/fail bounds.",
+            "additionalProperties": false,
+            "required": ["metric"],
+            "properties": {
+              "metric": { "type": "string", "description": "e.g., RMSE, MAE, accuracy, boolean" },
+              "max": { "type": "number", "description": "Upper bound (if applicable)." },
+              "min": { "type": "number", "description": "Lower bound (if applicable)." },
+              "target": { "type": "number", "description": "Desired central value (optional)." }
+            }
+          }
+        }
+      }
+    },
+    "falsification_tests": {
+      "type": "array",
+      "description": "Explicit procedures that could falsify the claim.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "tool": { "type": "string", "description": "e.g., sympy, pint" },
+          "procedure": { "type": "string", "description": "Human/machine-readable steps." },
+          "must_pass": { "type": "boolean", "description": "If true, failure falsifies claim." },
+          "fail_if": { "type": "string", "description": "Condition that constitutes failure." }
+        }
+      }
+    },
+    "citations": {
+      "type": "array",
+      "description": "Optional list of supporting/contradicting sources.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url"],
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "archival_hash": { "type": "string", "description": "Hash of archived copy if available." }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "Testability: at least one of predictions or falsification_tests must be present and non-empty.",
+      "anyOf": [
+        { "properties": { "predictions": { "minItems": 1 } }, "required": ["predictions"] },
+        { "properties": { "falsification_tests": { "minItems": 1 } }, "required": ["falsification_tests"] }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "id": "claim-hello-001",
+      "statement": "H(t) scales as (t - t0)^-1/2 under constant dS/dt.",
+      "assumptions": ["flat FRW", "Planck units"],
+      "predictions": [
+        {
+          "name": "H-scaling",
+          "function": "fit(H(t))",
+          "tolerance": { "metric": "RMSE", "max": 0.05 }
+        }
+      ],
+      "falsification_tests": [
+        { "name": "Unit consistency", "tool": "pint", "must_pass": true }
+      ]
+    }
+  ]
+}
