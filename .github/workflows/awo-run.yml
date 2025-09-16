@@ -304,3 +304,101 @@ jobs:
           fi
           git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
           git push origin "$BR"
+  run_and_validate:
+    needs: validate_workflow_json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies for schema validation
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema
+
+      - name: Run AWO workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          WF="${{ github.event.inputs.workflow_file }}"
+          echo "[AWO] Running workflow: $WF"
+          test -f "$WF" || { echo "::error::Workflow file not found: $WF"; exit 1; }
+          python scripts/awo_run.py "$WF" || EXIT=$?
+          if [[ "${EXIT:-0}" != "0" && "${EXIT:-0}" != "78" ]]; then
+            echo "::error::Runner exited with code ${EXIT}"
+            exit "${EXIT}"
+          fi
+          echo "runner_exit_code=${EXIT:-0}" >> "$GITHUB_OUTPUT"
+
+      - name: Discover LAST_RUN directory
+        id: last
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f runs/LAST_RUN || { echo "::error::runs/LAST_RUN not found"; exit 1; }
+          RUN_DIR="runs/$(cat runs/LAST_RUN | tr -d '\n\r')"
+          echo "RUN_DIR=${RUN_DIR}"
+          test -d "${RUN_DIR}" || { echo "::error::Run directory ${RUN_DIR} not found"; exit 1; }
+          echo "run_dir=${RUN_DIR}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate run_manifest.json and provenance.json against schemas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - << 'PYEOF'
+import json, sys, pathlib
+from jsonschema import Draft202012Validator
+
+repo = pathlib.Path(".").resolve()
+schemas = repo / "schemas"
+run_dir = pathlib.Path("${{ steps.last.outputs.run_dir }}").resolve()
+
+def load(p):
+    with open(p, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+man = load(run_dir / "run_manifest.json")
+prov = load(run_dir / "provenance.json")
+man_schema = load(schemas / "run_manifest.schema.json")
+prov_schema = load(schemas / "provenance.schema.json")
+
+Draft202012Validator(man_schema).validate(man)
+if not isinstance(prov, list):
+    print(f"::error file={run_dir/'provenance.json'},line=1::provenance.json must be a list")
+    sys.exit(2)
+for i, rec in enumerate(prov):
+    try:
+        Draft202012Validator(prov_schema).validate(rec)
+    except Exception as e:
+        print(f"::error file={run_dir/'provenance.json'},line=1::Provenance record {i} invalid: {e}")
+        raise
+print('Schema validation OK')
+PYEOF
+
+      - name: Upload run artifacts (for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: awo-run-${{ steps.last.outputs.run_dir }}
+          path: |
+            ${{ steps.last.outputs.run_dir }}/run_manifest.json
+            ${{ steps.last.outputs.run_dir }}/provenance.json
+            ${{ steps.last.outputs.run_dir }}/workflow_frozen.json
+            ${{ steps.last.outputs.run_dir }}/report.md
+            ${{ steps.last.outputs.run_dir }}/steps
+            ${{ steps.last.outputs.run_dir }}/artifacts
+
+      - name: Exit with pending when gate triggered
+        shell: bash
+        run: |
+          echo "Runner exit code was: ${runner_exit_code:-0}"
+          if [[ "${runner_exit_code:-0}" == "78" ]]; then
+            echo "::notice::Run is pending human review (audit gate)."
+            exit 0
