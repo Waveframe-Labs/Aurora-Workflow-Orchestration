@@ -402,3 +402,5 @@ PYEOF
           if [[ "${runner_exit_code:-0}" == "78" ]]; then
             echo "::notice::Run is pending human review (audit gate)."
             exit 0
+          fi
+  
