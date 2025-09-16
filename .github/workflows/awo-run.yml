@@ -54,7 +54,7 @@ jobs:
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           CODE=$?
           echo "RUNNER_EXIT_CODE=$CODE" >> "$GITHUB_ENV"
-          # do not fail yet; we still want to capture/validate
+          # don't fail yet; we still want to capture/validate
           exit 0
 
       - name: Capture LAST_RUN
@@ -78,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
+          python - <<'PYEOF'
 import json, os, sys, pathlib
 from jsonschema import Draft202012Validator
 
@@ -101,7 +101,7 @@ if not isinstance(prov, list):
 for i, rec in enumerate(prov):
     Draft202012Validator(prov_schema).validate(rec)
 print("Schema validation OK")
-PY
+PYEOF
 
       - name: Upload run artifacts
         if: always()
