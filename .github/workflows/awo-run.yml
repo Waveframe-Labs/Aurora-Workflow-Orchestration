@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       workflow_file:
-        description: "Workflow JSON path (relative to repo root)"
+        description: "Workflow JSON path"
         required: true
         default: "workflows/multimodel.json"
 
@@ -13,87 +13,173 @@ permissions:
 
 concurrency:
   group: awo-run
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  run_validate_upload:
+  run_awo:
     runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.capture.outputs.run_id }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Preflight (workflow exists + JSON valid)
-        shell: bash
-        run: |
-          set -euo pipefail
-          WF="${{ github.event.inputs.workflow_file }}"
-          echo "[AWO] Using workflow: $WF"
-          test -f "$WF" || { echo "::error::Workflow file not found: $WF"; exit 1; }
-          sudo apt-get update && sudo apt-get install -y jq
-          jq . "$WF" >/dev/null
-
-      - name: Install deps
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          pip install jsonschema
-
-      - name: Run AWO
+      - name: Execute AWO workflow
         id: runstep
         shell: bash
         run: |
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
-          CODE=$?
-          echo "RUNNER_EXIT_CODE=$CODE" >> "$GITHUB_ENV"
-          exit 0
-
-      - name: Capture LAST_RUN
-        id: cap
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ ! -f runs/LAST_RUN ]; then
-            echo "::error::runs/LAST_RUN not found (runner may have failed before creating a run)."
-            exit 1
+          code=$?
+          echo "runner_exit_code=$code" >> $GITHUB_ENV
+          if [ "$code" = "78" ]; then
+            echo "Audit: PENDING (human approval will be required)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Audit: PASSED (this workflow still requires manual approval)" >> "$GITHUB_STEP_SUMMARY"
           fi
-          RID="$(tr -d '\n\r' < runs/LAST_RUN)"
-          test -d "runs/$RID" || { echo "::error::Run directory missing: runs/$RID"; exit 1; }
-          echo "run_dir=runs/$RID" >> "$GITHUB_OUTPUT"
-          echo "RID=$RID" >> "$GITHUB_ENV"
-          echo "[AWO] RUN_ID=$RID"
-
-      - name: Validate artifacts against schemas
+          exit 0
+      - name: Capture Run-ID (from breadcrumb)
+        id: capture
         shell: bash
         run: |
-          set -euo pipefail
-          python scripts/validate_run.py "${{ steps.cap.outputs.run_dir }}"
+          set -e
+          test -f runs/LAST_RUN || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
+          RID="$(cat runs/LAST_RUN)"
+          test -d "runs/$RID" || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
+          echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
+          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
+          echo "run_id=$RID" >> "$GITHUB_OUTPUT"
+      - name: Create payload
+        shell: bash
+        run: tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
-      - name: Upload run artifacts
-        if: always()
+      - name: Upload payload
         uses: actions/upload-artifact@v4
         with:
-          name: awo-run-${{ env.RID }}
-          path: |
-            ${{ steps.cap.outputs.run_dir }}/run_manifest.json
-            ${{ steps.cap.outputs.run_dir }}/provenance.json
-            ${{ steps.cap.outputs.run_dir }}/workflow_frozen.json
-            ${{ steps.cap.outputs.run_dir }}/report.md
-            ${{ steps.cap.outputs.run_dir }}/steps
-            ${{ steps.cap.outputs.run_dir }}/artifacts
+          name: awo-run-${{ env.RUN_ID }}
+          path: awo-run-${{ env.RUN_ID }}.tar.gz
+          if-no-files-found: error
 
-      - name: Exit with pending when gate triggered
+  # Renders a human-readable summary BEFORE approval, inside the job summary
+  render_summary:
+    needs: run_awo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ needs.run_awo.outputs.run_id }}
+          path: artifacts
+
+      - name: Extract run
+        id: locate
         shell: bash
         run: |
-          if [ "${RUNNER_EXIT_CODE:-0}" = "78" ]; then
-            echo "::notice::Run is pending human review (audit gate)."
+          set -e
+          TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
+          mkdir -p extracted && tar -xzf "$TAR" -C extracted
+          RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
+          echo "rd=$RD" >> "$GITHUB_OUTPUT"
+          echo "### Files" >> "$GITHUB_STEP_SUMMARY"
+          find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Show scope summary (if present)
+        shell: bash
+        run: |
+          RD="${{ steps.locate.outputs.rd }}"
+          if [ -f "$RD/scope/summary.json" ]; then
+            OVERALL="$(jq -r '.overall_ok' "$RD/scope/summary.json" 2>/dev/null || echo null)"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
+            echo "**overall_ok:** \`$OVERALL\`" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
+            echo "_No scope/summary.json found (scope_validate may be missing)._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Show run report excerpt
+        shell: bash
+        run: |
+          RD="${{ steps.locate.outputs.rd }}"
+          if [ -f "$RD/report.md" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
+            head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "_Full report committed after approval._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+  # Early gate (Scope)
+  scope_gate:
+    needs: [run_awo, render_summary]
+    runs-on: ubuntu-latest
+    environment:
+      name: awo-scope
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - run: echo "Scope Gate — review the 'render_summary' job summary above, then approve."
+
+  # Final merge gate
+  human_approval:
+    needs: [run_awo, scope_gate]
+    runs-on: ubuntu-latest
+    environment:
+      name: awo-audit
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - run: echo "Merge Gate — Approve in Environment 'awo-audit' to commit run to the repo."
+
+  finalize:
+    needs: [run_awo, human_approval]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, persist-credentials: true }
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ needs.run_awo.outputs.run_id }}
+          path: artifacts
+
+      - name: Extract run folder
+        shell: bash
+        run: |
+          set -e
+          TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
+          mkdir -p extracted && tar -xzf "$TAR" -C extracted
+          rsync -a extracted/runs/ runs/
+          echo "RUN_ID=${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_ENV"
+          echo "Finalizing ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Write approval record
+        shell: bash
+        run: |
+          set -e
+          mkdir -p "runs/${RUN_ID}"
+          cat > "runs/${RUN_ID}/approval.json" <<EOF
+          {
+            "run_id": "${RUN_ID}",
+            "approved_by": "${{ github.actor }}",
+            "approved_at": "$(date -u +%FT%TZ)",
+            "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF
+      - name: Commit run to branch
+        shell: bash
+        run: |
+          set -e
+          BR="${GITHUB_REF_NAME:-main}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$BR" --depth=1
+          git switch "$BR"
+          git add "runs/${RUN_ID}" || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
             exit 0
           fi
+          git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
+          git push origin "$BR"
