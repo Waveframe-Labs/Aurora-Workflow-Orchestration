@@ -30,10 +30,7 @@ def main():
     man_schema = load_json(schemas / "run_manifest.schema.json")
     prov_schema = load_json(schemas / "provenance.schema.json")
 
-    # Validate manifest
     Validator(man_schema).validate(man)
-
-    # Validate provenance (list of records)
     if not isinstance(prov, list):
         die("provenance.json must be a list")
 
