@@ -54,7 +54,7 @@ jobs:
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           CODE=$?
           echo "RUNNER_EXIT_CODE=$CODE" >> "$GITHUB_ENV"
-          # don't fail yet; we still want to capture/validate
+          # continue so we can capture/validate even on 78
           exit 0
 
       - name: Capture LAST_RUN
@@ -78,31 +78,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo '
-import json, os, sys, pathlib
-from jsonschema import Draft202012Validator
-
-run_dir = pathlib.Path(os.environ["RUN_DIR"]).resolve()
-schemas = pathlib.Path("schemas").resolve()
-
-def load(p):
-    with open(p, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-man = load(run_dir / "run_manifest.json")
-prov = load(run_dir / "provenance.json")
-man_schema = load(schemas / "run_manifest.schema.json")
-prov_schema = load(schemas / "provenance.schema.json")
-
-Draft202012Validator(man_schema).validate(man)
-if not isinstance(prov, list):
-    print(f"::error file={run_dir}/provenance.json,line=1::provenance.json must be a list")
-    sys.exit(2)
-for i, rec in enumerate(prov):
-    Draft202012Validator(prov_schema).validate(rec)
-print("Schema validation OK")
-' > validate.py
-          python validate.py
+          python -c "import json,os,sys,pathlib; \
+from jsonschema import Draft202012Validator as V; \
+run_dir=pathlib.Path(os.environ['RUN_DIR']).resolve(); \
+schemas=pathlib.Path('schemas').resolve(); \
+load=lambda p: json.load(open(p,'r',encoding='utf-8')); \
+man=load(run_dir/'run_manifest.json'); \
+prov=load(run_dir/'provenance.json'); \
+man_schema=load(schemas/'run_manifest.schema.json'); \
+prov_schema=load(schemas/'provenance.schema.json'); \
+V(man_schema).validate(man); \
+assert isinstance(prov,list), 'provenance.json must be a list'; \
+[V(prov_schema).validate(rec) for rec in prov]; \
+print('Schema validation OK')"
 
       - name: Upload run artifacts
         if: always()
@@ -124,4 +112,3 @@ print("Schema validation OK")
             echo "::notice::Run is pending human review (audit gate)."
             exit 0
           fi
-    
