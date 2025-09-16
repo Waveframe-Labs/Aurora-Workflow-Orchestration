@@ -78,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PYEOF'
+          cat > validate.py <<'PYCODE'
 import json, os, sys, pathlib
 from jsonschema import Draft202012Validator
 
@@ -101,7 +101,8 @@ if not isinstance(prov, list):
 for i, rec in enumerate(prov):
     Draft202012Validator(prov_schema).validate(rec)
 print("Schema validation OK")
-PYEOF
+PYCODE
+          python validate.py
 
       - name: Upload run artifacts
         if: always()
