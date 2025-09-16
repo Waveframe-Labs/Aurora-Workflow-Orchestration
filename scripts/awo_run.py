@@ -1,30 +1,12 @@
 #!/usr/bin/env python3
 """
-AWO multi-model runner (stdlib only, CI/Actions safe).
+AWO multi-model runner (CI/Actions safe).
 
-Features
-- Deterministic local "backends": echo / upper / reverse (no external APIs)
-- fanout_generate, consensus_vote, write_text, audit_gate
-- scope_validate: block unfalsifiable claims early
-- assert_contains: simple content gate for sanity checks
-- Provenance per-run:
-    runs/
-      run_YYYY-MM-DDTHH-MM-SSZ/
-        index.json            # {run_id, started_at, status[, finished_at]}
-        workflow_frozen.json  # exact JSON executed
-        report.md             # human-readable run report
-        steps/*.json          # machine-readable step records
-        artifacts/...         # any files emitted by write_text
-        scope/claims/*.json   # (optional) copied claims checked
-        scope/summary.json    # (optional) scope validation summary
-- Breadcrumb for CI:
-    runs/LAST_RUN -> run directory name
-
-Statuses in index.json:
-  running         -> set when run starts
-  pending_review  -> audit_gate hit (exit 78)
-  succeeded       -> finished without gate
-  error           -> any failure path
+Changes in this version:
+- Emits schema-compliant run_manifest.json (start/update/finalize)
+- Emits schema-compliant provenance.json (per step + artifacts)
+- Validates both with jsonschema (fail-fast)
+- Still uses only deterministic local backends (echo/upper/reverse) by default
 """
 
 from __future__ import annotations
@@ -39,11 +21,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
+# --- required for schema validation (install in CI): pip install jsonschema ---
+try:
+    import jsonschema
+except Exception as _e:  # make failure explicit and early
+    print(
+        "[AWO] FATAL: jsonschema not installed. Add `pip install jsonschema` in CI.",
+        file=sys.stderr,
+    )
+    raise
+
 EXIT_PENDING = 78  # conventional code to indicate "needs human review"
 
 # ---------------------------- repo-rooted paths ------------------------------
 REPO_ROOT = Path(os.getenv("GITHUB_WORKSPACE", Path.cwd())).resolve()
 RUNS_ROOT = (REPO_ROOT / "runs").resolve()
+SCHEMAS_ROOT = (REPO_ROOT / "schemas").resolve()
+
+RUN_MANIFEST_PATH = "run_manifest.json"
+PROVENANCE_PATH = "provenance.json"
 
 def _debug(msg: str) -> None:
     print(f"[AWO] {msg}", file=sys.stdout, flush=True)
@@ -74,6 +70,9 @@ class _Reverse:
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
+def sha256_hex(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
 def sha12(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
 
@@ -93,7 +92,6 @@ def ensure_run_dir() -> Path:
     rd = RUNS_ROOT / f"run_{now_iso()}"
     (rd / "steps").mkdir(parents=True, exist_ok=True)
     (rd / "artifacts").mkdir(parents=True, exist_ok=True)
-    # verify directory exists
     if not rd.exists():
         raise RuntimeError(f"Failed to create run dir: {rd}")
     return rd
@@ -102,10 +100,8 @@ def breadcrumb(run_dir: Path) -> None:
     """Write runs/LAST_RUN with verification (absolute repo path)."""
     last_run = RUNS_ROOT / "LAST_RUN"
     write_text(last_run, run_dir.name)
-    # fsync/verify write in CI environments
     for _ in range(3):
         try:
-            # Re-read to verify
             val = last_run.read_text(encoding="utf-8").strip()
             if val == run_dir.name:
                 return
@@ -131,32 +127,48 @@ def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) 
 def finalize_report(run_dir: Path, report_lines: List[str]) -> None:
     write_text(run_dir / "report.md", "\n".join(report_lines))
 
-def update_index(run_dir: Path, *, started_at: str, status: str, finished_at: str | None = None) -> None:
-    idx = {"run_id": run_dir.name, "started_at": started_at, "status": status}
-    if finished_at:
-        idx["finished_at"] = finished_at
-    write_json(run_dir / "index.json", idx)
+# ------------------------------ schema helpers -------------------------------
+def _load_schema(name: str) -> Dict[str, Any]:
+    p = (SCHEMAS_ROOT / name).resolve()
+    if not p.exists():
+        raise FileNotFoundError(f"Schema not found: {p}")
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        raise RuntimeError(f"Invalid JSON in schema {p}: {e}")
+
+RUN_MANIFEST_SCHEMA = None
+PROVENANCE_SCHEMA = None
+
+def _ensure_schemas_loaded() -> None:
+    global RUN_MANIFEST_SCHEMA, PROVENANCE_SCHEMA
+    if RUN_MANIFEST_SCHEMA is None:
+        RUN_MANIFEST_SCHEMA = _load_schema("run_manifest.schema.json")  # matches required fields, ops[] [oai_citation:2‡run_manifest.schema.json](file-service://file-Q3XViKBCN8vNnd5RGxEoeY)
+    if PROVENANCE_SCHEMA is None:
+        PROVENANCE_SCHEMA = _load_schema("provenance.schema.json")      # run_id, role, model, started, ended [oai_citation:3‡provenance.schema.json](file-service://file-G56EwSEJiZGzZeiRfEU3qF)
+
+def _validate_or_die(obj: Dict[str, Any], schema: Dict[str, Any], label: str) -> None:
+    try:
+        jsonschema.validate(obj, schema)
+    except jsonschema.ValidationError as e:
+        raise RuntimeError(f"{label} failed schema validation: {e.message}")
 
 # --------------------------- scope validation helpers ------------------------
 REQUIRED_CLAIM_FIELDS = ["id", "statement"]
 
 def _problems_for_claim(claim: Dict[str, Any]) -> List[str]:
     probs: List[str] = []
-    # Required fields
     for f in REQUIRED_CLAIM_FIELDS:
         if f not in claim or claim[f] in (None, "", []):
             probs.append(f"missing field: {f}")
-    # Testability: at least one of predictions / falsification_tests present and non-empty
     preds = claim.get("predictions", [])
     tests = claim.get("falsification_tests", [])
     if not preds and not tests:
         probs.append("claim is not testable: no predictions and no falsification_tests")
-    # If predictions exist, require a tolerance block
     for i, p in enumerate(preds or []):
         tol = (p or {}).get("tolerance")
         if not tol:
             probs.append(f"prediction[{i}] missing tolerance")
-    # If tests exist, require a recognizable shape
     for i, t in enumerate(tests or []):
         if not isinstance(t, dict) or not any(k in t for k in ("must_pass", "fail_if")):
             probs.append(f"falsification_tests[{i}] missing must_pass/fail_if")
@@ -165,10 +177,8 @@ def _problems_for_claim(claim: Dict[str, Any]) -> List[str]:
 def _load_claims(args: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[str]]:
     loaded: List[Dict[str, Any]] = []
     notes: List[str] = []
-    # Inline claim
     if "claim" in args and isinstance(args["claim"], dict):
         loaded.append(args["claim"])
-    # Glob claims from the repo (e.g., claims/*.json)
     glob = args.get("claims_glob")
     if glob:
         for p in REPO_ROOT.glob(glob):
@@ -178,13 +188,88 @@ def _load_claims(args: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[str]]
                 notes.append(f"failed to parse {p}: {e}")
     return loaded, notes
 
+# --------------------------- manifest/provenance ------------------------------
+def _init_run_manifest(run_dir: Path, workflow_path: str, started_at: str) -> Dict[str, Any]:
+    m = {
+        "run_id": run_dir.name,
+        "workflow": workflow_path,
+        "started_at": started_at,
+        "finished_at": None,
+        "status": "running",
+        "ops": [],
+        "notes": [],
+    }
+    _ensure_schemas_loaded()
+    _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
+    write_json(run_dir / RUN_MANIFEST_PATH, m)
+    return m
+
+def _append_manifest_op(run_dir: Path, manifest: Dict[str, Any], idx: int, step_id: str, op: str) -> None:
+    manifest["ops"].append({"idx": idx, "id": step_id, "op": op})
+    _validate_or_die(manifest, RUN_MANIFEST_SCHEMA, "run_manifest")
+    write_json(run_dir / RUN_MANIFEST_PATH, manifest)
+
+def _finalize_manifest(run_dir: Path, manifest: Dict[str, Any], status: str) -> None:
+    manifest["status"] = status
+    manifest["finished_at"] = now_iso()
+    _validate_or_die(manifest, RUN_MANIFEST_SCHEMA, "run_manifest")
+    write_json(run_dir / RUN_MANIFEST_PATH, manifest)
+
+def _init_provenance(run_dir: Path) -> List[Dict[str, Any]]:
+    return []
+
+def _write_provenance(run_dir: Path, prov: List[Dict[str, Any]]) -> None:
+    # Validate each entry individually (schema is per-record)
+    _ensure_schemas_loaded()
+    for rec in prov:
+        _validate_or_die(rec, PROVENANCE_SCHEMA, "provenance")
+    write_json(run_dir / PROVENANCE_PATH, prov)
+
+def _prov_record_template(run_id: str, role: str, model_name: str, provider: str | None = None,
+                          version: str | None = None, prompt_id: str | None = None,
+                          params: Dict[str, Any] | None = None,
+                          artifacts: List[str] | None = None,
+                          hashes: Dict[str, str] | None = None,
+                          started: str | None = None, ended: str | None = None,
+                          notes: str | None = None) -> Dict[str, Any]:
+    rec = {
+        "run_id": run_id,
+        "role": role,
+        "model": {"name": model_name},
+        "prompt_id": prompt_id,
+        "temperature": None,
+        "top_p": None,
+        "seed": (params or {}).get("seed"),
+        "tools": {},
+        "artifacts": artifacts or [],
+        "hashes": hashes or {},
+        "cost_estimate": None,
+        "started": started or now_iso(),
+        "ended": ended or now_iso(),
+        "notes": notes,
+    }
+    if provider:
+        rec["model"]["provider"] = provider
+    if version:
+        rec["model"]["version"] = version
+    return rec
+
 # --------------------------------- main --------------------------------------
+def update_index(run_dir: Path, *, started_at: str, status: str, finished_at: str | None = None) -> None:
+    idx = {"run_id": run_dir.name, "started_at": started_at, "status": status}
+    if finished_at:
+        idx["finished_at"] = finished_at
+    write_json(run_dir / "index.json", idx)
+
 def run(workflow_path: str) -> int:
     # 1) Create run dir + breadcrumb FIRST so CI can always find it.
     run_dir = ensure_run_dir()
     breadcrumb(run_dir)
     started_at = now_iso()
-    update_index(run_dir, started_at=started_at, status="running")
+
+    # Initialize manifest + provenance
+    manifest = _init_run_manifest(run_dir, workflow_path, started_at)
+    provenance: List[Dict[str, Any]] = _init_provenance(run_dir)
 
     _debug(f"Repo root: {REPO_ROOT}")
     _debug(f"Runs root: {RUNS_ROOT}")
@@ -202,10 +287,13 @@ def run(workflow_path: str) -> int:
         from awo.models.alt_backend import LocalUpper  # type: ignore
         BACKENDS.update({"echo": LocalEcho(), "upper": LocalUpper()})
     except Exception as e:
+        step_idx += 1
+        step_id = "backend_info"
+        _append_manifest_op(run_dir, manifest, step_idx, step_id, "backend_info")
         record_step(
             run_dir,
             step_idx,
-            "backend_info",
+            step_id,
             {"note": "using_fallback_backends", "detail": str(e), "ts": now_iso()},
         )
 
@@ -213,9 +301,13 @@ def run(workflow_path: str) -> int:
     wf_path = (REPO_ROOT / workflow_path).resolve()
     if not wf_path.exists():
         msg = f"Workflow file not found: {wf_path}"
-        record_step(run_dir, step_idx, "init_error", {"error": "workflow_missing", "message": msg, "ts": now_iso()})
+        step_idx += 1
+        step_id = "init_error"
+        _append_manifest_op(run_dir, manifest, step_idx, step_id, "init_error")
+        record_step(run_dir, step_idx, step_id, {"error": "workflow_missing", "message": msg, "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
+        _finalize_manifest(run_dir, manifest, "error")
         update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
         print(f"[AWO] {msg}", file=sys.stderr)
         return 2
@@ -224,9 +316,13 @@ def run(workflow_path: str) -> int:
         wf = json.loads(wf_path.read_text(encoding="utf-8"))
     except Exception as e:
         msg = f"Failed to parse workflow JSON: {e}"
-        record_step(run_dir, step_idx, "init_error", {"error": "json_parse", "message": str(e), "ts": now_iso()})
+        step_idx += 1
+        step_id = "init_error"
+        _append_manifest_op(run_dir, manifest, step_idx, step_id, "init_error")
+        record_step(run_dir, step_idx, step_id, {"error": "json_parse", "message": str(e), "ts": now_iso()})
         report += ["## Error", "", msg, ""]
         finalize_report(run_dir, report)
+        _finalize_manifest(run_dir, manifest, "error")
         update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
         print(f"[AWO] {msg}", file=sys.stderr)
         return 2
@@ -239,6 +335,8 @@ def run(workflow_path: str) -> int:
         step_idx += 1
         op = step.get("op")
         step_id = step.get("id", f"step_{step_idx}")
+        _append_manifest_op(run_dir, manifest, step_idx, step_id, op or "unknown")
+
         rec: Dict[str, Any] = {"ts": now_iso(), "id": step_id, "op": op}
 
         # ------------------------- scope_validate ----------------------------
@@ -267,18 +365,28 @@ def run(workflow_path: str) -> int:
             }
             write_json(scope_dir / "summary.json", summary)
 
-            md = [f"# Scope Check — {run_dir.name}", ""]
-            if not claims:
-                md += ["**No claims found.** Gate will likely block.", ""]
-            for r in results:
-                md += [f"## {r['id']} — {'OK' if r['ok'] else 'PROBLEMS'}", ""]
-                if r["problems"]:
-                    md += [f"- {p}" for p in r["problems"]] + [""]
-            md += [f"**OVERALL:** {'OK' if overall_ok else 'NOT OK'}"]
-            write_text(scope_dir / "README.md", "\n".join(md))
+            # Provenance (treat scope check as Auditor role, local model)
+            prov = _prov_record_template(
+                manifest["run_id"],
+                role="Auditor",
+                model_name="scope-validator",
+                provider="local",
+                prompt_id=None,
+                params=None,
+                artifacts=[
+                    str(scope_dir / "summary.json"),
+                ],
+                hashes={
+                    str(scope_dir / "summary.json"): f"sha256:{sha256_hex((scope_dir / 'summary.json').read_bytes())}"
+                },
+                notes="Scope/testability validation",
+            )
+            provenance.append(prov)
+            _write_provenance(run_dir, provenance)
 
             rec.update({"args": args, "summary": summary})
             record_step(run_dir, step_idx, step_id, rec)
+            # report
             report += [
                 f"## {step_idx}. scope_validate — {step_id}",
                 f"- claims_checked: {summary['claims_checked']}",
@@ -299,6 +407,7 @@ def run(workflow_path: str) -> int:
                 record_step(run_dir, step_idx, step_id, rec)
                 report += ["## Error", "", msg, ""]
                 finalize_report(run_dir, report)
+                _finalize_manifest(run_dir, manifest, "error")
                 update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                 print(f"[AWO] {msg}", file=sys.stderr)
                 return 2
@@ -307,7 +416,7 @@ def run(workflow_path: str) -> int:
             hay = ""
             if isinstance(source, dict) and field in source:
                 hay = str(source[field])
-            elif isinstance(source, list):  # e.g., fanout outputs
+            elif isinstance(source, list):
                 hay = "\n".join([str(o.get("text", "")) for o in source])
             elif source is not None:
                 hay = json.dumps(source, ensure_ascii=False)
@@ -320,10 +429,23 @@ def run(workflow_path: str) -> int:
             )
             record_step(run_dir, step_idx, step_id, rec)
 
+            # Provenance record (Auditor)
+            prov = _prov_record_template(
+                manifest["run_id"],
+                role="Auditor",
+                model_name="assert-contains",
+                provider="local",
+                params=None,
+                notes=f"must_include={musts}; missing={missing}",
+            )
+            provenance.append(prov)
+            _write_provenance(run_dir, provenance)
+
             if not ok:
                 msg = f"assert_contains failed; missing: {missing}"
                 report += ["## Error", "", msg, ""]
                 finalize_report(run_dir, report)
+                _finalize_manifest(run_dir, manifest, "error")
                 update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                 print(f"[AWO] {msg}", file=sys.stderr)
                 return 2
@@ -345,11 +467,33 @@ def run(workflow_path: str) -> int:
                     record_step(run_dir, step_idx, step_id, rec)
                     report += ["## Error", "", msg, ""]
                     finalize_report(run_dir, report)
+                    _finalize_manifest(run_dir, manifest, "error")
                     update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                     print(f"[AWO] {msg}", file=sys.stderr)
                     return 2
+                step_started = now_iso()
                 out = BACKENDS[m].generate(prompt, params=params)
+                step_ended = now_iso()
                 outs.append({"model": m, "text": out["text"], "meta": out["meta"]})
+
+                # Provenance per model generation (Proposer)
+                prov = _prov_record_template(
+                    manifest["run_id"],
+                    role="Proposer",
+                    model_name=m,
+                    provider="local",
+                    version="fallback",
+                    prompt_id=f"sha256:{sha12(prompt)}",
+                    params=params,
+                    artifacts=[],
+                    hashes={},
+                    started=step_started,
+                    ended=step_ended,
+                    notes="fanout_generate",
+                )
+                provenance.append(prov)
+
+            _write_provenance(run_dir, provenance)
 
             rec.update({"prompt": prompt, "models": models, "params": params, "outputs": outs})
             ctx[step_id] = outs
@@ -378,6 +522,7 @@ def run(workflow_path: str) -> int:
                 record_step(run_dir, step_idx, step_id, rec)
                 report += ["## Error", "", msg, ""]
                 finalize_report(run_dir, report)
+                _finalize_manifest(run_dir, manifest, "error")
                 update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                 print(f"[AWO] {msg}", file=sys.stderr)
                 return 2
@@ -408,6 +553,21 @@ def run(workflow_path: str) -> int:
             ctx[step_id] = rec
             record_step(run_dir, step_idx, step_id, rec)
 
+            # Provenance (Consensus)
+            prov = _prov_record_template(
+                manifest["run_id"],
+                role="Consensus",
+                model_name="majority-vote",
+                provider="local",
+                prompt_id=None,
+                params=None,
+                artifacts=[],
+                hashes={},
+                notes=f"voters={voters}, agreement_ratio={rec['agreement_ratio']:.2f}",
+            )
+            provenance.append(prov)
+            _write_provenance(run_dir, provenance)
+
             report += [
                 f"## {step_idx}. consensus_vote — {step_id}",
                 f"- inputs_from: {src}",
@@ -435,6 +595,7 @@ def run(workflow_path: str) -> int:
                     record_step(run_dir, step_idx, step_id, rec)
                     report += ["## Error", "", msg, ""]
                     finalize_report(run_dir, report)
+                    _finalize_manifest(run_dir, manifest, "error")
                     update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
                     print(f"[AWO] {msg}", file=sys.stderr)
                     return 2
@@ -451,9 +612,26 @@ def run(workflow_path: str) -> int:
 
             out_path = run_dir / "artifacts" / path
             write_text(out_path, text)
+
+            # Compute file hash for provenance
+            h = f"sha256:{sha256_hex(out_path.read_bytes())}"
+
             rec.update({"wrote": str(out_path), "from_step": from_step, "field": field if from_step else None})
             record_step(run_dir, step_idx, step_id, rec)
             report += [f"## {step_idx}. write_text — {step_id}", f"- wrote: {out_path}", ""]
+
+            # Provenance (Editor)
+            prov = _prov_record_template(
+                manifest["run_id"],
+                role="Editor",
+                model_name="write-text",
+                provider="local",
+                artifacts=[str(out_path)],
+                hashes={str(out_path): h},
+                notes="emit artifact",
+            )
+            provenance.append(prov)
+            _write_provenance(run_dir, provenance)
 
         elif op == "audit_gate":
             checklist = step.get("args", {}).get("checklist", "templates/audit-checklist.md")
@@ -465,6 +643,17 @@ def run(workflow_path: str) -> int:
                 f"status: pending\nchecklist: {checklist}\ncreated_at: {now_iso()}\n",
             )
 
+            # Provenance (Auditor placeholder)
+            prov = _prov_record_template(
+                manifest["run_id"],
+                role="Auditor",
+                model_name="human-gate",
+                provider="local",
+                notes=f"checklist={checklist}",
+            )
+            provenance.append(prov)
+            _write_provenance(run_dir, provenance)
+
             report += [
                 f"## {step_idx}. audit_gate — {step_id}",
                 f"- checklist: {checklist}",
@@ -473,6 +662,7 @@ def run(workflow_path: str) -> int:
                 "",
             ]
             finalize_report(run_dir, report)
+            _finalize_manifest(run_dir, manifest, "pending_review")
             update_index(run_dir, started_at=started_at, status="pending_review")
             breadcrumb(run_dir)
             _debug(f"Run created at: {run_dir}")
@@ -484,12 +674,14 @@ def run(workflow_path: str) -> int:
             record_step(run_dir, step_idx, step_id, rec)
             report += ["## Error", "", msg, ""]
             finalize_report(run_dir, report)
+            _finalize_manifest(run_dir, manifest, "error")
             update_index(run_dir, started_at=started_at, status="error", finished_at=now_iso())
             print(f"[AWO] {msg}", file=sys.stderr)
             return 2
 
     # Finished without hitting the gate
     finalize_report(run_dir, report)
+    _finalize_manifest(run_dir, manifest, "succeeded")
     update_index(run_dir, started_at=started_at, status="succeeded", finished_at=now_iso())
     breadcrumb(run_dir)
     _debug(f"Run created at: {run_dir}")
@@ -512,6 +704,18 @@ if __name__ == "__main__":
         write_json(rd / "steps" / "00_unhandled_error.json",
                    {"error": "unhandled", "message": str(e), "ts": now_iso()})
         write_text(rd / "report.md", f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+        try:
+            # Ensure manifest exists and is marked error
+            _ensure_schemas_loaded()
+            m = {
+                "run_id": rd.name, "workflow": "(unknown)",
+                "started_at": now_iso(), "finished_at": now_iso(),
+                "status": "error", "ops": [], "notes": ["unhandled_error"]
+            }
+            _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
+            write_json(rd / RUN_MANIFEST_PATH, m)
+        except Exception:
+            pass
         update_index(rd, started_at=now_iso(), status="error", finished_at=now_iso())
         print(f"[AWO] ERROR: {e}", file=sys.stderr)
         sys.exit(1)
