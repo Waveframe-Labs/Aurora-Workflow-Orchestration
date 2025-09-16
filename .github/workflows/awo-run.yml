@@ -78,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > validate.py <<'PYCODE'
+          echo '
 import json, os, sys, pathlib
 from jsonschema import Draft202012Validator
 
@@ -96,12 +96,12 @@ prov_schema = load(schemas / "provenance.schema.json")
 
 Draft202012Validator(man_schema).validate(man)
 if not isinstance(prov, list):
-    print(f"::error file={run_dir/'provenance.json'},line=1::provenance.json must be a list")
+    print(f"::error file={run_dir}/provenance.json,line=1::provenance.json must be a list")
     sys.exit(2)
 for i, rec in enumerate(prov):
     Draft202012Validator(prov_schema).validate(rec)
 print("Schema validation OK")
-PYCODE
+' > validate.py
           python validate.py
 
       - name: Upload run artifacts
@@ -124,3 +124,4 @@ PYCODE
             echo "::notice::Run is pending human review (audit gate)."
             exit 0
           fi
+    
