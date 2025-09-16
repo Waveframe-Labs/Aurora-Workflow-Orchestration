@@ -54,7 +54,6 @@ jobs:
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           CODE=$?
           echo "RUNNER_EXIT_CODE=$CODE" >> "$GITHUB_ENV"
-          # continue so we can capture/validate even on 78
           exit 0
 
       - name: Capture LAST_RUN
@@ -62,35 +61,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ ! -f runs/LAST_RUN ]]; then
+          if [ ! -f runs/LAST_RUN ]; then
             echo "::error::runs/LAST_RUN not found (runner may have failed before creating a run)."
             exit 1
           fi
           RID="$(tr -d '\n\r' < runs/LAST_RUN)"
-          test -d "runs/${RID}" || { echo "::error::Run directory missing: runs/${RID}"; exit 1; }
-          echo "run_dir=runs/${RID}" >> "$GITHUB_OUTPUT"
-          echo "RID=${RID}" >> "$GITHUB_ENV"
-          echo "[AWO] RUN_ID=${RID}"
+          test -d "runs/$RID" || { echo "::error::Run directory missing: runs/$RID"; exit 1; }
+          echo "run_dir=runs/$RID" >> "$GITHUB_OUTPUT"
+          echo "RID=$RID" >> "$GITHUB_ENV"
+          echo "[AWO] RUN_ID=$RID"
 
-      - name: Validate run_manifest.json and provenance.json
-        env:
-          RUN_DIR: ${{ steps.cap.outputs.run_dir }}
+      - name: Validate artifacts against schemas
         shell: bash
         run: |
           set -euo pipefail
-          python -c "import json,os,sys,pathlib; \
-from jsonschema import Draft202012Validator as V; \
-run_dir=pathlib.Path(os.environ['RUN_DIR']).resolve(); \
-schemas=pathlib.Path('schemas').resolve(); \
-load=lambda p: json.load(open(p,'r',encoding='utf-8')); \
-man=load(run_dir/'run_manifest.json'); \
-prov=load(run_dir/'provenance.json'); \
-man_schema=load(schemas/'run_manifest.schema.json'); \
-prov_schema=load(schemas/'provenance.schema.json'); \
-V(man_schema).validate(man); \
-assert isinstance(prov,list), 'provenance.json must be a list'; \
-[V(prov_schema).validate(rec) for rec in prov]; \
-print('Schema validation OK')"
+          python scripts/validate_run.py "${{ steps.cap.outputs.run_dir }}"
 
       - name: Upload run artifacts
         if: always()
@@ -108,7 +93,7 @@ print('Schema validation OK')"
       - name: Exit with pending when gate triggered
         shell: bash
         run: |
-          if [[ "${RUNNER_EXIT_CODE:-0}" == "78" ]]; then
+          if [ "${RUNNER_EXIT_CODE:-0}" = "78" ]; then
             echo "::notice::Run is pending human review (audit gate)."
             exit 0
           fi
