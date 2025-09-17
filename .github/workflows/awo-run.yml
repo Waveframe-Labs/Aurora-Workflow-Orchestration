@@ -16,12 +16,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # -------------------- Execute runner and capture payload -------------------
   run_awo:
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ steps.capture.outputs.run_id }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
       - name: Execute AWO workflow
@@ -31,41 +33,72 @@ jobs:
           set +e
           python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
           code=$?
-          echo "runner_exit_code=$code" >> $GITHUB_ENV
+          echo "runner_exit_code=$code" >> "$GITHUB_ENV"
           if [ "$code" = "78" ]; then
-            echo "Audit: PENDING (human approval will be required)" >> "$GITHUB_STEP_SUMMARY"
+            echo "Audit: PENDING (human approval required)" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$code" = "0" ]; then
+            echo "Audit: PASSED (no audit gate hit)" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Audit: PASSED (this workflow still requires manual approval)" >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::AWO runner exited with code $code"
           fi
+          # Always continue so we can capture payload / gate properly
           exit 0
-      - name: Capture Run-ID (from breadcrumb)
+
+      - name: Capture Run-ID (breadcrumb)
         id: capture
         shell: bash
         run: |
           set -e
-          test -f runs/LAST_RUN || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
-          RID="$(cat runs/LAST_RUN)"
-          test -d "runs/$RID" || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 1; }
+          if [ ! -f runs/LAST_RUN ]; then
+            echo "::error::runs/LAST_RUN not found"
+            echo "run_id=none" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          RID="$(cat runs/LAST_RUN | tr -d '\n\r')"
+          if [ -z "$RID" ] || [ ! -d "runs/$RID" ]; then
+            echo "::error::Run directory runs/$RID not found"
+            echo "run_id=none" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
+
       - name: Create payload
+        if: ${{ steps.capture.outputs.run_id != 'none' && steps.capture.outputs.run_id != '' }}
         shell: bash
-        run: tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
+        run: |
+          set -e
+          tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
+        if: ${{ steps.capture.outputs.run_id != 'none' && steps.capture.outputs.run_id != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: awo-run-${{ env.RUN_ID }}
           path: awo-run-${{ env.RUN_ID }}.tar.gz
           if-no-files-found: error
 
-  # Renders a human-readable summary BEFORE approval, inside the job summary
-  render_summary:
+  # -------------------- First manual gate (Scope) ----------------------------
+  scope_gate:
     needs: run_awo
     runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
+    environment:
+      name: awo-scope
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Await scope approval
+        run: echo "Scope Gate — approve this environment to continue."
+
+  # -------------------- Render summary (runs ONLY after scope approval) ------
+  render_summary:
+    needs: [run_awo, scope_gate]
+    runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
+    steps:
+      - name: Download payload
+        uses: actions/download-artifact@v4
         with:
           name: awo-run-${{ needs.run_awo.outputs.run_id }}
           path: artifacts
@@ -74,73 +107,74 @@ jobs:
         id: locate
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
           mkdir -p extracted && tar -xzf "$TAR" -C extracted
           RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
           echo "rd=$RD" >> "$GITHUB_OUTPUT"
           echo "### Files" >> "$GITHUB_STEP_SUMMARY"
           find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Show scope summary (if present)
         shell: bash
         run: |
+          set -euo pipefail
           RD="${{ steps.locate.outputs.rd }}"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
           if [ -f "$RD/scope/summary.json" ]; then
             OVERALL="$(jq -r '.overall_ok' "$RD/scope/summary.json" 2>/dev/null || echo null)"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
             echo "**overall_ok:** \`$OVERALL\`" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo '```json' >> "$GITHUB_STEP_SUMMARY"
             cat "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
             echo "_No scope/summary.json found (scope_validate may be missing)._" >> "$GITHUB_STEP_SUMMARY"
           fi
+
       - name: Show run report excerpt
         shell: bash
         run: |
+          set -euo pipefail
           RD="${{ steps.locate.outputs.rd }}"
           if [ -f "$RD/report.md" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
             head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "_Full report committed after approval._" >> "$GITHUB_STEP_SUMMARY"
+            echo "_Full run is committed after final approval._" >> "$GITHUB_STEP_SUMMARY"
           fi
-  # Early gate (Scope)
-  scope_gate:
-    needs: [run_awo, render_summary]
-    runs-on: ubuntu-latest
-    environment:
-      name: awo-scope
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    steps:
-      - run: echo "Scope Gate — review the 'render_summary' job summary above, then approve."
 
-  # Final merge gate
+  # -------------------- Final manual gate (Merge) ----------------------------
   human_approval:
-    needs: [run_awo, scope_gate]
+    needs: [run_awo, scope_gate, render_summary]
     runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
       name: awo-audit
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
-      - run: echo "Merge Gate — Approve in Environment 'awo-audit' to commit run to the repo."
+      - name: Await merge approval
+        run: echo "Merge Gate — approve this environment to commit the run."
 
+  # -------------------- Commit artifacts after approval ----------------------
   finalize:
-    needs: [run_awo, human_approval]
+    needs: [run_awo, scope_gate, human_approval]
     runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0, persist-credentials: true }
+      - name: Checkout (with credentials)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
-      - uses: actions/download-artifact@v4
+      - name: Download payload
+        uses: actions/download-artifact@v4
         with:
           name: awo-run-${{ needs.run_awo.outputs.run_id }}
           path: artifacts
@@ -148,16 +182,17 @@ jobs:
       - name: Extract run folder
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
           mkdir -p extracted && tar -xzf "$TAR" -C extracted
           rsync -a extracted/runs/ runs/
           echo "RUN_ID=${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_ENV"
           echo "Finalizing ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Write approval record
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           mkdir -p "runs/${RUN_ID}"
           cat > "runs/${RUN_ID}/approval.json" <<EOF
           {
@@ -167,10 +202,29 @@ jobs:
             "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
           EOF
+
+      - name: Mark manifest as succeeded
+        shell: bash
+        run: |
+          set -euo pipefail
+          MF="runs/${RUN_ID}/run_manifest.json"
+          test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; exit 1; }
+          python - "$MF" <<'PY'
+import json, sys, datetime
+p = sys.argv[1]
+with open(p, "r", encoding="utf-8") as f:
+    m = json.load(f)
+m["status"] = "succeeded"
+m["finished_at"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+with open(p, "w", encoding="utf-8") as f:
+    json.dump(m, f, indent=2, ensure_ascii=False)
+print("updated:", p)
+PY
+
       - name: Commit run to branch
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           BR="${GITHUB_REF_NAME:-main}"
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
