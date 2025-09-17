@@ -209,7 +209,7 @@ jobs:
           set -euo pipefail
           MF="runs/${RUN_ID}/run_manifest.json"
           test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; exit 1; }
-          python - "$MF" <<'PY'
+          python "$MF" <<'PY'
 import json, sys, datetime
 p = sys.argv[1]
 with open(p, "r", encoding="utf-8") as f:
