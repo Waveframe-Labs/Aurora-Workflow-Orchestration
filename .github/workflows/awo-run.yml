@@ -209,7 +209,7 @@ jobs:
         run: |
           set -euo pipefail
           MF="runs/${RUN_ID}/run_manifest.json"
-          test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; exit 1; }
+          test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; ls -R runs; exit 1; }
           cat > .github/update_manifest.py <<'PY'
           import json, datetime, sys, pathlib
 
