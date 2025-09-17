@@ -2,7 +2,7 @@
 """
 AWO multi-model runner (CI/Actions safe).
 
-North Star:
+North Star (echo):
   1) AWO = methodology for transparent, auditable AI–human work.
   2) CRI = tooling that enforces AWO (CI/CD for research).
   3) Falsifiability first, reproducibility by default, human-in-the-loop gates.
@@ -12,7 +12,7 @@ North Star:
 This runner:
 - Emits schema-compliant run_manifest.json (start/update/finalize)
 - Emits schema-compliant provenance.json (per step + artifacts)
-- Validates both with jsonschema (fail-fast)
+- Validates with jsonschema (fail-fast)
 - Uses deterministic local backends (echo/upper/reverse) by default
 """
 
@@ -21,7 +21,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import platform
 import re
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -65,11 +67,11 @@ class _Reverse:
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
-def sha256_hex(b: bytes) -> str:
+def sha256_hex_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
-def sha12(s: str) -> str:
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
+def sha256_hex_str(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 def norm_text(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip().lower())
@@ -119,6 +121,19 @@ def record_step(run_dir: Path, idx: int, step_id: str, payload: Dict[str, Any]) 
 
 def finalize_report(run_dir: Path, report_lines: List[str]) -> None:
     write_text(run_dir / "report.md", "\n".join(report_lines))
+
+def rel(p: Path) -> str:
+    """Relative path from repo root (fallback to absolute string)."""
+    try:
+        return str(p.resolve().relative_to(REPO_ROOT))
+    except Exception:
+        return str(p)
+
+def _git_sha() -> str:
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT).decode().strip()
+    except Exception:
+        return "unknown"
 
 # ------------------------------ schema helpers -------------------------------
 def _load_schema(name: str) -> Dict[str, Any]:
@@ -183,14 +198,22 @@ def _load_claims(args: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[str]]
 
 # --------------------------- manifest/provenance ------------------------------
 def _init_run_manifest(run_dir: Path, workflow_path: str, started_at: str) -> Dict[str, Any]:
+    # Reproducibility stamp placed under notes to avoid schema breakage.
+    env_note = {
+        "env": {
+            "python": sys.version.split()[0],
+            "platform": platform.platform(),
+            "git_sha": _git_sha(),
+        }
+    }
     m = {
         "run_id": run_dir.name,
         "workflow": workflow_path,
         "started_at": started_at,
-        "finished_at": None,          # left None at gate; set later on success/error
+        "finished_at": None,          # None at gate; set later on success/error
         "status": "running",
         "ops": [],
-        "notes": [],
+        "notes": [env_note],
     }
     _ensure_schemas_loaded()
     _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
@@ -242,7 +265,11 @@ def _prov_record_template(
     rec = {
         "run_id": run_id,
         "role": role,
-        "model": {"name": model_name, **({"provider": provider} if provider else {}), **({"version": version} if version else {})},
+        "model": {
+            "name": model_name,
+            **({"provider": provider} if provider else {}),
+            **({"version": version} if version else {}),
+        },
         **({"prompt_id": prompt_id} if prompt_id else {}),
         **({"seed": (params or {}).get("seed")} if (params or {}).get("seed") is not None else {}),
         "tools": {},  # placeholder for future adapters
@@ -347,7 +374,7 @@ def run(workflow_path: str) -> int:
                 problems = _problems_for_claim(c)
                 ok = len(problems) == 0
                 overall_ok = overall_ok and ok
-                cid = c.get("id") or f"claim-{sha12(json.dumps(c, ensure_ascii=False))}"
+                cid = c.get("id") or f"claim-{sha256_hex_str(json.dumps(c, ensure_ascii=False))[:12]}"
                 write_json(scope_dir / "claims" / f"{cid}.json", c)
                 results.append({"id": cid, "ok": ok, "problems": problems})
 
@@ -360,14 +387,15 @@ def run(workflow_path: str) -> int:
             }
             write_json(scope_dir / "summary.json", summary)
 
-            # Provenance (Auditor role)
+            # Provenance (Auditor role) with relative paths
+            summary_p = scope_dir / "summary.json"
             prov = _prov_record_template(
                 manifest["run_id"],
                 role="Auditor",
                 model_name="scope-validator",
                 provider="local",
-                artifacts=[str(scope_dir / "summary.json")],
-                hashes={str(scope_dir / "summary.json"): f"sha256:{sha256_hex((scope_dir / 'summary.json').read_bytes())}"},
+                artifacts=[rel(summary_p)],
+                hashes={rel(summary_p): f"sha256:{sha256_hex_bytes(summary_p.read_bytes())}"},
                 notes="Scope/testability validation",
             )
             provenance.append(prov)
@@ -453,10 +481,18 @@ def run(workflow_path: str) -> int:
                 step_ended = now_iso()
                 outs.append({"model": m, "text": out["text"], "meta": out["meta"]})
 
-                # Provenance per model generation (Proposer)
+                # Provenance per model generation (Proposer) with full prompt hash
                 prov = _prov_record_template(
-                    manifest["run_id"], role="Proposer", model_name=m, provider="local", version="fallback",
-                    prompt_id=f"sha256:{sha12(prompt)}", params=params, started=step_started, ended=step_ended, notes="fanout_generate",
+                    manifest["run_id"],
+                    role="Proposer",
+                    model_name=m,
+                    provider="local",
+                    version="fallback",
+                    prompt_id=f"sha256:{sha256_hex_str(prompt)}",
+                    params=params,
+                    started=step_started,
+                    ended=step_ended,
+                    notes="fanout_generate",
                 )
                 provenance.append(prov)
 
@@ -468,7 +504,7 @@ def run(workflow_path: str) -> int:
 
             report += [
                 f"## {step_idx}. fanout_generate — {step_id}",
-                f"Prompt (sha12={sha12(prompt)}):",
+                f"Prompt (sha256={sha256_hex_str(prompt)}):",
                 "",
                 "```",
                 prompt,
@@ -522,7 +558,10 @@ def run(workflow_path: str) -> int:
 
             # Provenance (Consensus)
             prov = _prov_record_template(
-                manifest["run_id"], role="Consensus", model_name="majority-vote", provider="local",
+                manifest["run_id"],
+                role="Consensus",
+                model_name="majority-vote",
+                provider="local",
                 notes=f"voters={voters}, agreement_ratio={rec['agreement_ratio']:.2f}",
             )
             provenance.append(prov)
@@ -572,16 +611,21 @@ def run(workflow_path: str) -> int:
 
             out_path = run_dir / "artifacts" / path
             write_text(out_path, text)
-            file_hash = f"sha256:{sha256_hex(out_path.read_bytes())}"
+            file_hash = f"sha256:{sha256_hex_bytes(out_path.read_bytes())}"
 
             rec.update({"wrote": str(out_path), "from_step": from_step, "field": field if from_step else None})
             record_step(run_dir, step_idx, step_id, rec)
             report += [f"## {step_idx}. write_text — {step_id}", f"- wrote: {out_path}", ""]
 
-            # Provenance (Editor)
+            # Provenance (Editor) with relative path
             prov = _prov_record_template(
-                manifest["run_id"], role="Editor", model_name="write-text", provider="local",
-                artifacts=[str(out_path)], hashes={str(out_path): file_hash}, notes="emit artifact",
+                manifest["run_id"],
+                role="Editor",
+                model_name="write-text",
+                provider="local",
+                artifacts=[rel(out_path)],
+                hashes={rel(out_path): file_hash},
+                notes="emit artifact",
             )
             provenance.append(prov)
             _write_provenance(run_dir, provenance)
@@ -595,7 +639,10 @@ def run(workflow_path: str) -> int:
 
             # Provenance (Auditor placeholder)
             prov = _prov_record_template(
-                manifest["run_id"], role="Auditor", model_name="human-gate", provider="local",
+                manifest["run_id"],
+                role="Auditor",
+                model_name="human-gate",
+                provider="local",
                 notes=f"checklist={checklist}",
             )
             provenance.append(prov)
@@ -661,7 +708,7 @@ if __name__ == "__main__":
                 "finished_at": now_iso(),
                 "status": "error",
                 "ops": [],
-                "notes": ["unhandled_error"],
+                "notes": [{"unhandled_error": True}],
             }
             _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
             write_json(rd / RUN_MANIFEST_PATH, m)
