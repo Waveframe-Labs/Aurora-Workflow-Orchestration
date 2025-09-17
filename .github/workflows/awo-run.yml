@@ -24,7 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
 
       - name: Execute AWO workflow
         id: runstep
@@ -41,7 +42,6 @@ jobs:
           else
             echo "::warning::AWO runner exited with code $code"
           fi
-          # Always continue so we can capture payload / gate properly
           exit 0
 
       - name: Capture Run-ID (breadcrumb)
@@ -54,7 +54,7 @@ jobs:
             echo "run_id=none" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          RID="$(cat runs/LAST_RUN | tr -d '\n\r')"
+          RID="$(tr -d '\n\r' < runs/LAST_RUN)"
           if [ -z "$RID" ] || [ ! -d "runs/$RID" ]; then
             echo "::error::Run directory runs/$RID not found"
             echo "run_id=none" >> "$GITHUB_OUTPUT"
@@ -91,7 +91,7 @@ jobs:
       - name: Await scope approval
         run: echo "Scope Gate — approve this environment to continue."
 
-  # -------------------- Render summary (runs ONLY after scope approval) ------
+  # -------------------- Render summary (after scope approval) ----------------
   render_summary:
     needs: [run_awo, scope_gate]
     runs-on: ubuntu-latest
@@ -166,6 +166,8 @@ jobs:
     needs: [run_awo, scope_gate, human_approval]
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
+    env:
+      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
     steps:
       - name: Checkout (with credentials)
         uses: actions/checkout@v4
@@ -176,18 +178,17 @@ jobs:
       - name: Download payload
         uses: actions/download-artifact@v4
         with:
-          name: awo-run-${{ needs.run_awo.outputs.run_id }}
+          name: awo-run-${{ env.RUN_ID }}
           path: artifacts
 
       - name: Extract run folder
         shell: bash
         run: |
           set -euo pipefail
-          TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
+          TAR="artifacts/awo-run-${RUN_ID}.tar.gz"
           mkdir -p extracted && tar -xzf "$TAR" -C extracted
           rsync -a extracted/runs/ runs/
-          echo "RUN_ID=${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_ENV"
-          echo "Finalizing ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Finalizing ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Write approval record
         shell: bash
@@ -209,17 +210,18 @@ jobs:
           set -euo pipefail
           MF="runs/${RUN_ID}/run_manifest.json"
           test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; exit 1; }
-          python "$MF" <<'PY'
-import json, sys, datetime
-p = sys.argv[1]
-with open(p, "r", encoding="utf-8") as f:
+          cat > .github/update_manifest.py <<'PY'
+import json, datetime, sys, pathlib
+p = pathlib.Path(sys.argv[1])
+with p.open("r", encoding="utf-8") as f:
     m = json.load(f)
 m["status"] = "succeeded"
 m["finished_at"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-with open(p, "w", encoding="utf-8") as f:
+with p.open("w", encoding="utf-8") as f:
     json.dump(m, f, indent=2, ensure_ascii=False)
 print("updated:", p)
 PY
+          python .github/update_manifest.py "$MF"
 
       - name: Commit run to branch
         shell: bash
