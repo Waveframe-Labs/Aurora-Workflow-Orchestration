@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/environment.schema.json",
+  "title": "AWO Environment Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["python", "platform"],
+  "properties": {
+    "python": { "type": "string" },
+    "platform": { "type": "string" },
+    "runner": { "type": "string" },
+    "git_sha": { "type": "string" },
+    "packages": { 
+      "type": "array", 
+      "items": { "type": "string" }
+    }
+  }
+}
