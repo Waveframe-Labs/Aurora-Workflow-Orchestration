@@ -39,6 +39,10 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Optional human notes."
+   },
+    "env_ref": {
+      "type": "string",
+      "description": "Reference to environment snapshot file."
     }
   },
   "examples": [
