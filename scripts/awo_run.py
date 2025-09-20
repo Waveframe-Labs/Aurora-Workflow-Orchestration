@@ -198,14 +198,7 @@ def _load_claims(args: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], List[str]]
 
 # --------------------------- manifest/provenance ------------------------------
 def _init_run_manifest(run_dir: Path, workflow_path: str, started_at: str) -> Dict[str, Any]:
-    # Reproducibility stamp placed under notes to avoid schema breakage.
-    env_note = {
-        "env": {
-            "python": sys.version.split()[0],
-            "platform": platform.platform(),
-            "git_sha": _git_sha(),
-        }
-    }
+    # base manifest (keep notes list as strings only to satisfy strict schemas)
     m = {
         "run_id": run_dir.name,
         "workflow": workflow_path,
@@ -213,8 +206,24 @@ def _init_run_manifest(run_dir: Path, workflow_path: str, started_at: str) -> Di
         "finished_at": None,          # None at gate; set later on success/error
         "status": "running",
         "ops": [],
-        "notes": [env_note],
+        "notes": [],
     }
+
+    # Create environment snapshot (separate file) and reference it
+    env_data = {
+        "python": sys.version.split()[0],
+        "platform": platform.platform(),
+        "git_sha": _git_sha(),
+        "runner": {
+            "gh_run_id": os.getenv("GITHUB_RUN_ID"),
+            "gh_sha": os.getenv("GITHUB_SHA"),
+            "gh_actor": os.getenv("GITHUB_ACTOR"),
+        },
+    }
+    env_path = run_dir / "environment.json"
+    write_json(env_path, env_data)
+    m["env_ref"] = "environment.json"  # relative to run root
+
     _ensure_schemas_loaded()
     _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
     write_json(run_dir / RUN_MANIFEST_PATH, m)
@@ -708,8 +717,15 @@ if __name__ == "__main__":
                 "finished_at": now_iso(),
                 "status": "error",
                 "ops": [],
-                "notes": [{"unhandled_error": True}],
+                "notes": ["unhandled_error"],
+                "env_ref": "environment.json",
             }
+            # ensure env snapshot even in last-ditch path
+            write_json(rd / "environment.json", {
+                "python": sys.version.split()[0],
+                "platform": platform.platform(),
+                "git_sha": _git_sha(),
+            })
             _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
             write_json(rd / RUN_MANIFEST_PATH, m)
         except Exception:
