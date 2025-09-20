@@ -1,0 +1,10 @@
+{
+  "python": "3.12.3",
+  "platform": "Linux-6.11.0-1018-azure-x86_64-with-glibc2.39",
+  "git_sha": "436520e08495a06520d8e7832443f3a19bf0c12b",
+  "runner": {
+    "gh_run_id": "17884753498",
+    "gh_sha": "436520e08495a06520d8e7832443f3a19bf0c12b",
+    "gh_actor": "Wright-Shawn"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "claims_checked": 1,
+  "overall_ok": true,
+  "details": [
+    {
+      "id": "claim-hello-001",
+      "ok": true,
+      "problems": []
+    }
+  ],
+  "notes": [],
+  "ts": "2025-09-20T20-59-49Z"
+}
