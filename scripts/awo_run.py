@@ -588,13 +588,14 @@ def run(workflow_path: str) -> int:
                 "",
             ]
 
-        elif op == "write_text":
+                elif op == "write_text":
             args = step.get("args", {})
             path = args["path"]
             text: Union[str, None] = args.get("text")
             from_step = args.get("from_step")
             field = args.get("field", "consensus_text")
 
+            source = None
             if text is None and from_step:
                 source = ctx.get(from_step)
                 if source is None:
@@ -608,23 +609,64 @@ def run(workflow_path: str) -> int:
                     print(f"[AWO] {msg}", file=sys.stderr)
                     return 2
 
+                # Extract field from source, but keep original type if possible
                 if isinstance(source, list):
+                    # fanout outputs → join texts
                     text = "\n\n".join([str(o.get("text", "")) for o in source])
                 elif isinstance(source, dict) and field in source:
-                    text = str(source[field])
+                    text = source[field]  # could be str OR dict/list
                 else:
+                    # fallback: stringify complex types
                     text = json.dumps(source, indent=2, ensure_ascii=False)
 
             if text is None:
                 text = ""
 
             out_path = run_dir / "artifacts" / path
-            write_text(out_path, text)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # --- NEW: JSON-aware writing ---
+            wrote_as_json = False
+            if str(out_path).lower().endswith(".json"):
+                try:
+                    # If text is already a dict/list, write directly
+                    if isinstance(text, (dict, list)):
+                        write_json(out_path, text)
+                        wrote_as_json = True
+                    else:
+                        # If it's a string that parses as JSON, write parsed
+                        if isinstance(text, str):
+                            parsed = json.loads(text)
+                            write_json(out_path, parsed)
+                            wrote_as_json = True
+                        else:
+                            wrote_as_json = False
+                except Exception:
+                    wrote_as_json = False
+
+                if not wrote_as_json:
+                    # Wrap raw text into a JSON envelope
+                    write_json(out_path, {"summary": str(text)})
+                    wrote_as_json = True
+            else:
+                # Not a .json target → plain text
+                write_text(out_path, str(text))
+
             file_hash = f"sha256:{sha256_hex_bytes(out_path.read_bytes())}"
 
-            rec.update({"wrote": str(out_path), "from_step": from_step, "field": field if from_step else None})
+            rec.update({
+                "wrote": str(out_path),
+                "from_step": from_step,
+                "field": field if from_step else None,
+                "json_mode": wrote_as_json if str(out_path).lower().endswith(".json") else False
+            })
             record_step(run_dir, step_idx, step_id, rec)
-            report += [f"## {step_idx}. write_text — {step_id}", f"- wrote: {out_path}", ""]
+            report += [
+                f"## {step_idx}. write_text — {step_id}",
+                f"- wrote: {out_path}",
+                f"- json_mode: {wrote_as_json}" if str(out_path).lower().endswith(".json") else "",
+                ""
+            ]
 
             # Provenance (Editor) with relative path
             prov = _prov_record_template(
@@ -638,7 +680,6 @@ def run(workflow_path: str) -> int:
             )
             provenance.append(prov)
             _write_provenance(run_dir, provenance)
-
         elif op == "audit_gate":
             checklist = step.get("args", {}).get("checklist", "templates/audit-checklist.md")
             rec.update({"gate": {"status": "pending", "checklist": checklist, "ts": now_iso()}})
