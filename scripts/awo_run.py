@@ -587,8 +587,7 @@ def run(workflow_path: str) -> int:
                 "```",
                 "",
             ]
-
-                elif op == "write_text":
+            elif op == "write_text":
             args = step.get("args", {})
             path = args["path"]
             text: Union[str, None] = args.get("text")
