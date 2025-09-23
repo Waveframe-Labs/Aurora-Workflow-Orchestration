@@ -37,9 +37,14 @@
     },
     "notes": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Optional human notes."
-   },
+      "description": "Optional human or machine notes (free-form).",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "object" }
+        ]
+      }
+    },
     "env_ref": {
       "type": "string",
       "description": "Reference to environment snapshot file."
@@ -54,7 +59,13 @@
       "status": "running",
       "ops": [
         { "idx": 1, "id": "fanout_1", "op": "fanout_generate" }
-      ]
+      ],
+      "notes": [
+        {
+          "env": { "python": "3.12.3", "platform": "Linux-...", "git_sha": "abc123" }
+        }
+      ],
+      "env_ref": "environment.json"
     }
   ]
 }
