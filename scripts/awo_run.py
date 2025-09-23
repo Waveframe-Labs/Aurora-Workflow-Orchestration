@@ -784,10 +784,39 @@ def run(workflow_path: str) -> int:
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python scripts/awo_run.py <workflow.json>", file=sys.stderr)
-        sys.exit(ExitCode.ERROR)
+        sys.exit(2)
     try:
         sys.exit(run(sys.argv[1]))
     except Exception as e:
-        # Keep this tiny; run() owns state and error paths.
-        print(f"[AWO] Unhandled ERROR: {e}", file=sys.stderr)
-        sys.exit(ExitCode.ERROR)
+        # Leave a breadcrumb + minimal artifacts so CI can still find and package the run
+        rd = ensure_run_dir()
+        try:
+            breadcrumb(rd)
+        except Exception:
+            pass
+
+        write_json(rd / "steps" / "00_unhandled_error.json",
+                   {"error": "unhandled", "message": str(e), "ts": now_iso()})
+        write_text(rd / "report.md",
+                   f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+
+        # Minimal manifest so downstream steps don’t break
+        try:
+            _ensure_schemas_loaded()
+            m = {
+                "run_id": rd.name,
+                "workflow": "(unknown)",
+                "started_at": now_iso(),
+                "finished_at": now_iso(),
+                "status": "error",
+                "ops": [],
+                "notes": []    # keep schema-happy; no objects here
+            }
+            _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
+            write_json(rd / RUN_MANIFEST_PATH, m)
+        except Exception:
+            pass
+
+        update_index(rd, started_at=now_iso(), status="error", finished_at=now_iso())
+        print(f"[AWO] ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
