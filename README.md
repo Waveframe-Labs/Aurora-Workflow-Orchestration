@@ -1,4 +1,4 @@
-# AI Workflow Orchestration (AWO)
+# Aurora Workflow Orchestration (AWO)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
@@ -16,7 +16,7 @@
 ## What This Is
 
 AI is moving fast, but most projects lack **reproducible workflows**.  
-The **AI Workflow Orchestration (AWO)** framework makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
+The **Aurora Workflow Orchestration (AWO)** framework makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
 
 AWO is not a coding library — it’s a **methodological framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains. 
 This repository is intentionally built in public with AI assistance.  
