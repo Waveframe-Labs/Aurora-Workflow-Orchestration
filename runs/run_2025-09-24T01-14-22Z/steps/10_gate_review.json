@@ -1,0 +1,10 @@
+{
+  "ts": "2025-09-24T01:14:22Z",
+  "id": "gate_review",
+  "op": "audit_gate",
+  "gate": {
+    "status": "pending",
+    "checklist": "templates/audit-checklist.md",
+    "ts": "2025-09-24T01:14:22Z"
+  }
+}

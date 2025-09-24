@@ -1,0 +1,20 @@
+{
+  "id": "claim-hello-001",
+  "statement": "A demo claim asserting the summary mentions battery life and confusing UI.",
+  "predictions": [
+    {
+      "name": "mentions-battery",
+      "function": "text-contains('battery lasts all day')",
+      "tolerance": {
+        "metric": "boolean",
+        "max": 1
+      }
+    }
+  ],
+  "falsification_tests": [
+    {
+      "name": "mentions-ui-confusing",
+      "must_pass": true
+    }
+  ]
+}
