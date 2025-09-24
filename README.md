@@ -46,8 +46,7 @@ AI isn’t just a tool — it’s part of the workflow itself. That raises new c
 
 ### Current Focus  
 - **Method Whitepaper v1.0** — citable, stable reference in `docs/`.  
-- **Case Study: Waveframe v4.0** — demonstration of AWO in a hard-science domain (cosmology).  
-- **Case Study: Customer Review Analytics** — end-to-end example of AWO applied to business data.  
+- **Case Study: Waveframe v4.0** — demonstration of AWO in a hard-science domain (cosmology). 
 
 ### Upcoming Priorities  
 - **Societal Progress Simulator** — interactive demonstration of AWO in applied social science.  
