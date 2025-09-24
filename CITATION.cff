@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: Wright
     given-names: Shawn C.
-repository-code: "https://github.com/Wright-Shawn/AI-Workflow-Orchestration"
-url: "https://github.com/Wright-Shawn/AI-Workflow-Orchestration"
+repository-code: "https://github.com/Wright-Shawn/Aurora-Workflow-Orchestration"
+url: "https://github.com/Wright-Shawn/Aurora-Workflow-Orchestration"
 keywords:
   - AI orchestration
   - reproducibility
