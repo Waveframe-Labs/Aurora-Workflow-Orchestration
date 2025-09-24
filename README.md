@@ -7,9 +7,8 @@
 
 ---
 
-<p align="center">
-  <img src="figures/AI-Workflow-Orchestration-Banner.PNG" alt="AI Workflow Orchestration banner" width="100%">
-</p>
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/bda9e9fb-8df9-4db1-abfa-4a670d7eca73" />
+
 
 ---
 
