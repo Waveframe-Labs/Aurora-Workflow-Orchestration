@@ -590,20 +590,19 @@ def run(workflow_path: str) -> int:
             record_step(run_dir, step_idx, step_id, rec)
 
             report += [
-                f"## {step_idx}. fanout_generate — {step_id}",
-                f"Prompt (sha256={sha256_hex_str(prompt)}):",
-                "",
-                "```",
-                prompt,
-                "```",
-                "",
-                "Outputs:",
-            ]
-             for o in outs:
-                # Store the cleaned text in a temporary variable first.
-                cleaned_text = o['text'].replace('\n', ' ')[:200]
-                # Then use the f-string without the backslash in the expression.
-                report.append(f"- **{o['model']}** → {cleaned_text}")
+    f"## {step_idx}. fanout_generate — {step_id}",
+    f"Prompt (sha256={sha256_hex_str(prompt)}):",
+    "",
+    "```",
+    prompt,
+    "```",
+    "",
+    "Outputs:",
+]
+for o in outs:
+    cleaned_text = o["text"].replace("\n", " ")[:200]
+    report.append(f"- **{o['model']}** → {cleaned_text}")
+report.append("")
 
 
         elif op == "consensus_vote":
@@ -798,28 +797,21 @@ if __name__ == "__main__":
         except Exception:
             pass
 
-        write_json(rd / "steps" / "00_unhandled_error.json",
-                   {"error": "unhandled", "message": str(e), "ts": now_iso()})
-        write_text(rd / "report.md",
-                   f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
+      write_json(rd / "steps" / "00_unhandled_error.json",
+           {"error": "unhandled", "message": str(e), "ts": ts_rfc3339()})
+write_text(rd / "report.md",
+           f"# AWO Run Report — {rd.name}\n\n## Error\n\n{e}\n")
 
-        # Minimal manifest so downstream steps don’t break
-        try:
-            _ensure_schemas_loaded()
-            m = {
-                "run_id": rd.name,
-                "workflow": "(unknown)",
-                "started_at": now_iso(),
-                "finished_at": now_iso(),
-                "status": "error",
-                "ops": [],
-                "notes": []    # keep schema-happy; no objects here
-            }
-            _validate_or_die(m, RUN_MANIFEST_SCHEMA, "run_manifest")
-            write_json(rd / RUN_MANIFEST_PATH, m)
-        except Exception:
-            pass
+m = {
+    "run_id": rd.name,
+    "workflow": "(unknown)",
+    "started_at": ts_rfc3339(),
+    "finished_at": ts_rfc3339(),
+    "status": "error",
+    "ops": [],
+    "notes": []
+}
 
-        update_index(rd, started_at=now_iso(), status="error", finished_at=now_iso())
+update_index(rd, started_at=ts_rfc3339(), status="error", finished_at=ts_rfc3339()) t=now_iso())
         print(f"[AWO] ERROR: {e}", file=sys.stderr)
         sys.exit(1)
