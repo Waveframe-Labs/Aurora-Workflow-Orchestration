@@ -1,4 +1,4 @@
-# AI Workflow Orchestration (AWO) — Method Specification v1.1
+# Aurora Workflow Orchestration (AWO) — Method Specification v1.1
 
 **Purpose:** Define a repeatable, auditable method for AI‑assisted work so that a third party can reproduce the process and outcomes.
 
@@ -63,7 +63,4 @@ AWO governs how to structure AI‑assisted research/analysis into falsifiable cl
 - Waveframe v4.0.5: case study showing AWO artifacts and an archived, citable release.
 
 ## File/Folder Conventions
-- `/templates/*.md|yaml` — reusable scaffolds
-- `/logs/YYYY-MM-DD.md` — daily/cluster logs
-- `/logs/dialogue/ITERATION-XX.md` — curated excerpts
-- Claim IDs formatted as `CLM-001`, `CLM-002`, ...
+- `/templates/*.md|yaml` — reusable 
