@@ -3,7 +3,7 @@
 **Author:** Shawn C. Wright  
 **License:** CC BY 4.0 (text) · Apache‑2.0 (code in this repo)  
 **Version:** 1.0 · **Date:** 2025‑08‑27  
-**DOI:** _TBD (link to latest tagged release/Zenodo once minted)_
+**DOI:** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612)
 
 ## Abstract
 AWO is a lightweight, citable research‑and‑build method for human–AI teams. It formalizes roles, artifacts, and governance so outsiders can audit what was claimed, how it was produced, and how to reproduce it. AWO is domain‑agnostic: the same scaffolding drives a cosmology case study, a customer analytics pipeline, or an interactive simulator. The goal is not to be “right” on day one but to be **inspectable, falsifiable, and improvable** from day one.
@@ -50,15 +50,15 @@ AWO is a lightweight, citable research‑and‑build method for human–AI teams
 ## Citation
 If you use or extend AWO, please cite:
 
-> Wright, S. C. (2025). **Aurora Workflow Orchestration (AWO): A One‑Page Method Whitepaper (v1.0).** GitHub repository: AI‑Workflow‑Orchestration. DOI: _TBD_.
+> Wright, S. C. (2025). **Aurora Workflow Orchestration (AWO): A One‑Page Method Whitepaper (v1.0).** GitHub repository: Aurora‑Workflow‑Orchestration. DOI: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612).
 
 ### BibTeX
 ```
 @misc{wright2025awo,
-  title        = {AI Workflow Orchestration (AWO): A One-Page Method Whitepaper (v1.0)},
+  title        = {Aurora Workflow Orchestration (AWO): A One-Page Method Whitepaper (v1.0)},
   author       = {Wright, Shawn C.},
   year         = {2025},
-  howpublished = {GitHub: AI-Workflow-Orchestration},
+  howpublished = {GitHub: Aurora-Workflow-Orchestration},
   doi          = {TBD},
   note         = {CC BY 4.0 (text), Apache-2.0 (code)}
 }
