@@ -1,4 +1,4 @@
-# AI Workflow Orchestration (AWO): A One‑Page Method Whitepaper (v1.0)
+# Aurora Workflow Orchestration (AWO): A One‑Page Method Whitepaper (v1.0)
 
 **Author:** Shawn C. Wright  
 **License:** CC BY 4.0 (text) · Apache‑2.0 (code in this repo)  
@@ -38,8 +38,7 @@ AWO is a lightweight, citable research‑and‑build method for human–AI teams
 - **Citations:** CITATION.cff + `docs/citation.bib`. All figures link back to build scripts.
 
 ## Reference Implementations (living case studies)
-- **Waveframe v4.0 (cosmology):** Stress‑tests AWO on speculative theory under strict reproducibility.  
-- **Customer Review Analytics:** End‑to‑end pipeline from raw text to decision‑grade insights with annotation standards.  
+- **Waveframe v4.0 (cosmology):** Stress‑tests AWO on speculative theory under strict reproducibility.    
 - **Societal Progress Simulator (planned):** Interactive model demonstrating AWO for simulation and UX.
 
 ## How to Use This Repo as a Template
@@ -51,7 +50,7 @@ AWO is a lightweight, citable research‑and‑build method for human–AI teams
 ## Citation
 If you use or extend AWO, please cite:
 
-> Wright, S. C. (2025). **AI Workflow Orchestration (AWO): A One‑Page Method Whitepaper (v1.0).** GitHub repository: AI‑Workflow‑Orchestration. DOI: _TBD_.
+> Wright, S. C. (2025). **Aurora Workflow Orchestration (AWO): A One‑Page Method Whitepaper (v1.0).** GitHub repository: AI‑Workflow‑Orchestration. DOI: _TBD_.
 
 ### BibTeX
 ```
