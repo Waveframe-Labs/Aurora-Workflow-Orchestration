@@ -599,9 +599,12 @@ def run(workflow_path: str) -> int:
                 "",
                 "Outputs:",
             ]
-            for o in outs:
-                report.append(f"- **{o['model']}** → {o['text'].replace('\\n',' ')[:200]}")
-            report.append("")
+             for o in outs:
+                # Store the cleaned text in a temporary variable first.
+                cleaned_text = o['text'].replace('\n', ' ')[:200]
+                # Then use the f-string without the backslash in the expression.
+                report.append(f"- **{o['model']}** → {cleaned_text}")
+
 
         elif op == "consensus_vote":
             src = step["inputs_from"]
