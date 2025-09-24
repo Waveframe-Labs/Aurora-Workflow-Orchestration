@@ -47,10 +47,26 @@ jobs:
         id: runstep
         shell: bash
         run: |
-          set +e
-          python scripts/awo_run.py "${{ github.event.inputs.workflow_file }}"
+         set +e
+
+         # Resolve workflow path with a safe default when the dispatch input is empty
+          WF="${{ github.event.inputs.workflow_file }}"
+          if [ -z "$WF" ]; then
+            WF="workflows/multimodel.json"
+            echo "::notice::workflow_file input was empty; defaulting to $WF"
+          fi
+
+          # Sanity check
+          if [ ! -f "$WF" ]; then
+            echo "::error::Workflow JSON not found at: $WF"
+            # still call the runner so its crash-guard writes a breadcrumb/manifest
+          fi
+
+          echo "Using workflow file: $WF"
+          python scripts/awo_run.py "$WF"
           code=$?
           echo "runner_exit_code=$code" >> "$GITHUB_ENV"
+
           if [ "$code" = "78" ]; then
             echo "Audit: PENDING (human approval required)" >> "$GITHUB_STEP_SUMMARY"
           elif [ "$code" = "0" ]; then
@@ -58,6 +74,8 @@ jobs:
           else
             echo "::warning::AWO runner exited with code $code"
           fi
+
+          # Do not fail the job here; later steps look for the breadcrumb
           exit 0
 
       - name: Capture Run-ID (breadcrumb)
