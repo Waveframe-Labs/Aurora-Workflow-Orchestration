@@ -68,7 +68,7 @@ jobs:
           echo "runner_exit_code=$code" >> "$GITHUB_ENV"
 
           if [ "$code" = "78" ]; then
-            echo "Audit: PENDING (human approval required)" >> "$GITHUB_STEP_SUMMARY"
+            echo "Audit: PENDING - waiting for environment approval (final status posted later)" >> "$GITHUB_STEP_SUMMARY"
           elif [ "$code" = "0" ]; then
             echo "Audit: PASSED (no audit gate hit)" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -273,3 +273,12 @@ jobs:
           fi
           git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
           git push origin "$BR"
+     
+      - name: Post final summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Audit: ✅ APPROVED & committed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Run-ID: ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Pushed to: ${GITHUB_REPOSITORY}@$(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
