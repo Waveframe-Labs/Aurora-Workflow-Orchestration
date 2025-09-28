@@ -194,6 +194,12 @@ jobs:
     steps:
       - name: Await merge approval
         run: echo "Merge Gate — approve this environment to commit the run."
+      - name: Mark audit approved
+        run: |
+          echo "## Audit APPROVED" >> "$GITHUB_STEP_SUMMARY"
+          echo "Reviewer: ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Run-ID: ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
+        
 
   # -------------------- Commit artifacts after approval ----------------------
   finalize:
