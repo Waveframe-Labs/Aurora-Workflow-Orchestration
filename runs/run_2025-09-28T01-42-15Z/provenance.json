@@ -1,0 +1,149 @@
+[
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Auditor",
+    "model": {
+      "name": "scope-validator",
+      "provider": "local"
+    },
+    "tools": {},
+    "artifacts": [
+      "runs/run_2025-09-28T01-42-15Z/scope/summary.json"
+    ],
+    "hashes": {
+      "runs/run_2025-09-28T01-42-15Z/scope/summary.json": "sha256:11eb892c368ca2930f2011264ed30b5f80ddeafa8ca3d3bc057d01f1da0021d3"
+    },
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "Scope/testability validation"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Proposer",
+    "model": {
+      "name": "echo",
+      "provider": "local",
+      "version": "fallback"
+    },
+    "prompt_id": "sha256:578a2f6520898bbcfc36430440a50f606b68502af89726d17856206c853138dd",
+    "seed": 123,
+    "tools": {},
+    "artifacts": [],
+    "hashes": {},
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "fanout_generate"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Proposer",
+    "model": {
+      "name": "upper",
+      "provider": "local",
+      "version": "fallback"
+    },
+    "prompt_id": "sha256:578a2f6520898bbcfc36430440a50f606b68502af89726d17856206c853138dd",
+    "seed": 123,
+    "tools": {},
+    "artifacts": [],
+    "hashes": {},
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "fanout_generate"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Proposer",
+    "model": {
+      "name": "reverse",
+      "provider": "local",
+      "version": "fallback"
+    },
+    "prompt_id": "sha256:578a2f6520898bbcfc36430440a50f606b68502af89726d17856206c853138dd",
+    "seed": 123,
+    "tools": {},
+    "artifacts": [],
+    "hashes": {},
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "fanout_generate"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Editor",
+    "model": {
+      "name": "write-text",
+      "provider": "local"
+    },
+    "tools": {},
+    "artifacts": [
+      "runs/run_2025-09-28T01-42-15Z/artifacts/notes/fanout.txt"
+    ],
+    "hashes": {
+      "runs/run_2025-09-28T01-42-15Z/artifacts/notes/fanout.txt": "sha256:8277c13ce99bbd390be14fb97dd9dd4c01b58a25ac4a851c4334aa4904abfbad"
+    },
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "emit artifact"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Consensus",
+    "model": {
+      "name": "majority-vote",
+      "provider": "local"
+    },
+    "tools": {},
+    "artifacts": [],
+    "hashes": {},
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "voters=['echo', 'upper'], agreement_ratio=0.67"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Editor",
+    "model": {
+      "name": "write-text",
+      "provider": "local"
+    },
+    "tools": {},
+    "artifacts": [
+      "runs/run_2025-09-28T01-42-15Z/artifacts/notes/consensus.json"
+    ],
+    "hashes": {
+      "runs/run_2025-09-28T01-42-15Z/artifacts/notes/consensus.json": "sha256:578a2f6520898bbcfc36430440a50f606b68502af89726d17856206c853138dd"
+    },
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "emit artifact"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Auditor",
+    "model": {
+      "name": "assert-contains",
+      "provider": "local"
+    },
+    "tools": {},
+    "artifacts": [],
+    "hashes": {},
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "must_include=['battery lasts all day', 'ui is confusing']; missing=[]"
+  },
+  {
+    "run_id": "run_2025-09-28T01-42-15Z",
+    "role": "Auditor",
+    "model": {
+      "name": "human-gate",
+      "provider": "local"
+    },
+    "tools": {},
+    "artifacts": [],
+    "hashes": {},
+    "started": "2025-09-28T01:42:15Z",
+    "ended": "2025-09-28T01:42:15Z",
+    "notes": "checklist=templates/audit-checklist.md"
+  }
+]

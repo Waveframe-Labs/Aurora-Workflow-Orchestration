@@ -1,0 +1,95 @@
+{
+  "name": "Multi-model consensus demo (CRI)",
+  "version": "1.0",
+  "description": "Demo workflow: scope validation -> multi-model fanout -> consensus -> content check -> gate -> emit artifacts.",
+  "steps": [
+    {
+      "id": "scope_1",
+      "op": "scope_validate",
+      "args": {
+        "claim": {
+          "id": "claim-hello-001",
+          "statement": "A demo claim asserting the summary mentions battery life and confusing UI.",
+          "predictions": [
+            {
+              "name": "mentions-battery",
+              "function": "text-contains('battery lasts all day')",
+              "tolerance": {
+                "metric": "boolean",
+                "max": 1
+              }
+            }
+          ],
+          "falsification_tests": [
+            {
+              "name": "mentions-ui-confusing",
+              "must_pass": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fanout_1",
+      "op": "fanout_generate",
+      "prompt": "Summarize: The battery lasts all day but the UI is confusing.",
+      "models": [
+        "echo",
+        "upper",
+        "reverse"
+      ],
+      "params": {
+        "seed": 123
+      }
+    },
+    {
+      "id": "emit_fanout_texts",
+      "op": "write_text",
+      "args": {
+        "path": "notes/fanout.txt",
+        "from_step": "fanout_1"
+      }
+    },
+    {
+      "id": "consensus_1",
+      "op": "consensus_vote",
+      "inputs_from": "fanout_1"
+    },
+    {
+      "id": "emit_consensus_record",
+      "op": "write_text",
+      "args": {
+        "path": "notes/consensus.json",
+        "from_step": "consensus_1"
+      }
+    },
+    {
+      "id": "assert_consensus_quality",
+      "op": "assert_contains",
+      "args": {
+        "from_step": "consensus_1",
+        "field": "consensus_text",
+        "must_include": [
+          "battery lasts all day",
+          "ui is confusing"
+        ]
+      }
+    },
+    {
+      "id": "gate_review",
+      "op": "audit_gate",
+      "args": {
+        "checklist": "templates/audit-checklist.md"
+      }
+    },
+    {
+      "id": "emit_consensus_text",
+      "op": "write_text",
+      "args": {
+        "path": "notes/consensus.txt",
+        "from_step": "consensus_1",
+        "field": "consensus_text"
+      }
+    }
+  ]
+}

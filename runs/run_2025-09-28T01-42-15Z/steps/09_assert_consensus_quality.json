@@ -1,0 +1,14 @@
+{
+  "ts": "2025-09-28T01:42:15Z",
+  "id": "assert_consensus_quality",
+  "op": "assert_contains",
+  "from_step": "consensus_1",
+  "field": "consensus_text",
+  "must_include": [
+    "battery lasts all day",
+    "ui is confusing"
+  ],
+  "missing": [],
+  "ok": true,
+  "sample": "Summarize: The battery lasts all day but the UI is confusing."
+}
