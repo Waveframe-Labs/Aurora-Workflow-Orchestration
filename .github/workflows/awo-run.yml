@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       workflow_file:
-        description: "Workflow JSON path"
+        description: "Path to workflow JSON"
         required: true
         default: "workflows/multimodel.json"
 
@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: awo-run
+  group: awo-run-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
   cancel-in-progress: false
 
 jobs:
@@ -24,94 +24,92 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Install Python deps
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          pip install jsonschema
-
-      - name: Setup Python & deps
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install runner deps
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            scripts/requirements.txt
+
+      - name: Install deps
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
-          pip install jsonschema
-      
+          test -f requirements.txt || { echo "::error::requirements.txt missing"; exit 1; }
+          pip install -r requirements.txt
+          pip install jsonschema cyclonedx-bom
+
+      - name: Resolve & validate workflow file
+        id: wf
+        run: |
+          set -euo pipefail
+          WF="${{ github.event.inputs.workflow_file || 'workflows/multimodel.json' }}"
+          echo "wf=$WF" >> "$GITHUB_OUTPUT"
+          test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
+          if [ -f schemas/workflow.schema.json ]; then
+            python - <<'PY' "$WF"
+import json,sys
+from jsonschema import Draft202012Validator
+sch=json.load(open("schemas/workflow.schema.json"))
+doc=json.load(open(sys.argv[1]))
+Draft202012Validator(sch).validate(doc)
+print("workflow.json: schema OK")
+PY
+          fi
+
       - name: Execute AWO workflow
         id: runstep
-        shell: bash
+        continue-on-error: true
         run: |
-         set +e
-
-         # Resolve workflow path with a safe default when the dispatch input is empty
-          WF="${{ github.event.inputs.workflow_file }}"
-          if [ -z "$WF" ]; then
-            WF="workflows/multimodel.json"
-            echo "::notice::workflow_file input was empty; defaulting to $WF"
-          fi
-
-          # Sanity check
-          if [ ! -f "$WF" ]; then
-            echo "::error::Workflow JSON not found at: $WF"
-            # still call the runner so its crash-guard writes a breadcrumb/manifest
-          fi
-
-          echo "Using workflow file: $WF"
-          python scripts/awo_run.py "$WF"
-          code=$?
-          echo "runner_exit_code=$code" >> "$GITHUB_ENV"
-
-          if [ "$code" = "78" ]; then
-            echo "Audit: PENDING - waiting for environment approval (final status posted later)" >> "$GITHUB_STEP_SUMMARY"
-          elif [ "$code" = "0" ]; then
-            echo "Audit: PASSED (no audit gate hit)" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "::warning::AWO runner exited with code $code"
-          fi
-
-          # Do not fail the job here; later steps look for the breadcrumb
-          exit 0
+          set -euo pipefail
+          python scripts/awo_run.py "${{ steps.wf.outputs.wf }}"
+          echo "runner_exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Capture Run-ID (breadcrumb)
         id: capture
-        shell: bash
         run: |
-          set -e
+          set -euo pipefail
           if [ ! -f runs/LAST_RUN ]; then
-            echo "::warning::runs/LAST_RUN not found (runner may have failed before creating it)"
-            echo "run_id=none" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::warning::runs/LAST_RUN missing"
+            echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          RID="$(tr -d '\n\r' < runs/LAST_RUN)"
-          if [ -z "$RID" ] || [ ! -d "runs/$RID" ]; then
-            echo "::warning::Run directory runs/$RID not found"
-            echo "run_id=none" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "Run-ID: $RID" >> "$GITHUB_STEP_SUMMARY"
-          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
+          RID="$(tr -d '\r' < runs/LAST_RUN | head -n1)"
+          case "$RID" in
+            (*[!A-Za-z0-9._-]*|'')
+              echo "Invalid RID: '$RID'"
+              echo "::error::Invalid RUN_ID"
+              echo "run_id=none" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+          [ -d "runs/$RID" ] || { echo "::warning::runs/$RID not found"; echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0; }
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
+          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
 
-      - name: Create payload
-        if: ${{ steps.capture.outputs.run_id != 'none' && steps.capture.outputs.run_id != '' }}
-        shell: bash
+      - name: Hash run folder & emit SBOM
+        if: ${{ steps.capture.outputs.run_id != 'none' }}
         run: |
-          set -e
+          set -euo pipefail
+          find "runs/${RUN_ID}" -type f -print0 | sort -z | xargs -0 sha256sum > "runs/${RUN_ID}/SHA256SUMS.txt"
+          cyclonedx-py -o "runs/${RUN_ID}/sbom-cyclonedx.json" || true
+
+      - name: Create payload (always)
+        if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
+        run: |
+          set -euo pipefail
           tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
-        if: ${{ steps.capture.outputs.run_id != 'none' && steps.capture.outputs.run_id != '' }}
+        if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
         uses: actions/upload-artifact@v4
         with:
           name: awo-run-${{ env.RUN_ID }}
           path: awo-run-${{ env.RUN_ID }}.tar.gz
           if-no-files-found: error
+          retention-days: 14
 
   # -------------------- First manual gate (Scope) ----------------------------
   scope_gate:
@@ -119,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
-      name: awo-scope
+      name: awo-scope           # protect in repo settings with required reviewers
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Await scope approval
@@ -131,6 +129,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     steps:
+      - name: Install jq CLI
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Download payload
         uses: actions/download-artifact@v4
         with:
@@ -139,7 +140,6 @@ jobs:
 
       - name: Extract run
         id: locate
-        shell: bash
         run: |
           set -euo pipefail
           TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
@@ -149,29 +149,21 @@ jobs:
           echo "### Files" >> "$GITHUB_STEP_SUMMARY"
           find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Show scope summary (if present)
-        shell: bash
         run: |
           set -euo pipefail
           RD="${{ steps.locate.outputs.rd }}"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
           if [ -f "$RD/scope/summary.json" ]; then
-            OVERALL="$(jq -r '.overall_ok' "$RD/scope/summary.json" 2>/dev/null || echo null)"
-            echo "**overall_ok:** \`$OVERALL\`" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
             echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            cat "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
+            jq . "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "_No scope/summary.json found (scope_validate may be missing)._" >> "$GITHUB_STEP_SUMMARY"
+            echo "_No scope/summary.json found._" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Show run report excerpt
-        shell: bash
         run: |
           set -euo pipefail
           RD="${{ steps.locate.outputs.rd }}"
@@ -189,17 +181,15 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
-      name: awo-audit
+      name: awo-audit          # protect with required reviewers
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Await merge approval
-        run: echo "Merge Gate — approve this environment to commit the run."
-      - name: Mark audit approved
         run: |
+          echo "Merge Gate — approve this environment to commit the run."
           echo "## Audit APPROVED" >> "$GITHUB_STEP_SUMMARY"
           echo "Reviewer: ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Run-ID: ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
-        
 
   # -------------------- Commit artifacts after approval ----------------------
   finalize:
@@ -222,7 +212,6 @@ jobs:
           path: artifacts
 
       - name: Extract run folder
-        shell: bash
         run: |
           set -euo pipefail
           TAR="artifacts/awo-run-${RUN_ID}.tar.gz"
@@ -231,60 +220,50 @@ jobs:
           echo "Finalizing ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Write approval record
-        shell: bash
         run: |
           set -euo pipefail
           mkdir -p "runs/${RUN_ID}"
           cat > "runs/${RUN_ID}/approval.json" <<EOF
-          {
-            "run_id": "${RUN_ID}",
-            "approved_by": "${{ github.actor }}",
-            "approved_at": "$(date -u +%FT%TZ)",
-            "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          }
+          {"run_id":"${RUN_ID}","approved_by":"${{ github.actor }}",
+           "approved_at":"$(date -u +%FT%TZ)",
+           "workflow_run_url":"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
           EOF
 
       - name: Mark manifest as succeeded
-        shell: bash
         run: |
           set -euo pipefail
           MF="runs/${RUN_ID}/run_manifest.json"
           test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; ls -R runs || true; exit 1; }
-          cat > .github/update_manifest.py <<'PY'
-          import json, datetime, sys, pathlib
-          p = pathlib.Path(sys.argv[1])
-          with p.open("r", encoding="utf-8") as f:
-              m = json.load(f)
-          m["status"] = "succeeded"
-          m["finished_at"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-          with p.open("w", encoding="utf-8") as f:
-              json.dump(m, f, indent=2, ensure_ascii=False)
-          print("updated:", p)
-          PY
-          python .github/update_manifest.py "$MF"
+          python - <<'PY' "$MF"
+import json,sys,datetime
+p=sys.argv[1]
+m=json.load(open(p))
+m["status"]="succeeded"
+m["finished_at"]=datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+json.dump(m,open(p,"w"),indent=2)
+print("updated:",p)
+PY
 
       - name: Commit run to branch
-        shell: bash
         run: |
           set -euo pipefail
-          BR="${GITHUB_REF_NAME:-main}"
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin "$BR" --depth=1
-          git switch "$BR"
-          git add "runs/${RUN_ID}" || true
+          git add "runs/${RUN_ID}"
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
-          git push origin "$BR"
-     
+          git push
+
       - name: Post final summary
-        shell: bash
         run: |
           set -euo pipefail
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Audit: ✅ APPROVED & committed" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Run-ID: ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Pushed to: ${GITHUB_REPOSITORY}@$(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          COMMIT_SHA="$(git rev-parse --short HEAD)"
+          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${COMMIT_SHA}"
+          {
+            echo "## Audit: ✅ APPROVED & committed"
+            echo "- Run-ID: ${RUN_ID}"
+            echo "- Commit: [${COMMIT_SHA}](${COMMIT_URL})"
+          } >> "$GITHUB_STEP_SUMMARY"
