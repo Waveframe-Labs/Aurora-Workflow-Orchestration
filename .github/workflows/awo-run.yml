@@ -24,7 +24,7 @@ runs-on: ubuntu-latest
 outputs:
 run_id: ${{ steps.capture.outputs.run_id }}
 steps:
-- name: Checkout
+  - name: Checkout
 uses: actions/checkout@v4
 
   - name: Setup Python
