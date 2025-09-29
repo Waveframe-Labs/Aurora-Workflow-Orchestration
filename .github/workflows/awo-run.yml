@@ -53,17 +53,15 @@ steps:
       test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
       if [ -f schemas/workflow.schema.json ]; then
         python - <<'PY' "$WF"
+      import json,sys
+      from jsonschema import Draft202012Validator
+      sch=json.load(open("schemas/workflow.schema.json"))
+      doc=json.load(open(sys.argv[1]))
+      Draft202012Validator(sch).validate(doc)
+      print("workflow.json: schema OK")
+      PY
+      fi
 
-import json,sys
-from jsonschema import Draft202012Validator
-sch=json.load(open(“schemas/workflow.schema.json”))
-doc=json.load(open(sys.argv[1]))
-Draft202012Validator(sch).validate(doc)
-print(“workflow.json: schema OK”)
-PY
-fi
-
-```
   - name: Execute AWO workflow
     id: runstep
     continue-on-error: true
@@ -114,7 +112,6 @@ fi
       path: awo-run-${{ env.RUN_ID }}.tar.gz
       if-no-files-found: error
       retention-days: 14
-```
 
 # –––––––––– First manual gate (Scope) ––––––––––––––
 
@@ -123,7 +120,7 @@ needs: run_awo
 runs-on: ubuntu-latest
 if: ${{ needs.run_awo.outputs.run_id != ‘’ && needs.run_awo.outputs.run_id != ‘none’ }}
 environment:
-name: awo-scope           # protect in repo settings with required reviewers
+name: awo-scope
 url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 steps:
 - name: Await scope approval
@@ -139,7 +136,6 @@ steps:
 - name: Install jq CLI
 run: sudo apt-get update && sudo apt-get install -y jq
 
-```
   - name: Download payload
     uses: actions/download-artifact@v4
     with:
@@ -182,7 +178,6 @@ run: sudo apt-get update && sudo apt-get install -y jq
         echo "" >> "$GITHUB_STEP_SUMMARY"
         echo "_Full run is committed after final approval._" >> "$GITHUB_STEP_SUMMARY"
       fi
-```
 
 # –––––––––– Final manual gate (Merge) ––––––––––––––
 
@@ -191,7 +186,7 @@ needs: [run_awo, scope_gate, render_summary]
 runs-on: ubuntu-latest
 if: ${{ needs.run_awo.outputs.run_id != ‘’ && needs.run_awo.outputs.run_id != ‘none’ }}
 environment:
-name: awo-audit          # protect with required reviewers
+name: awo-audit
 url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 steps:
 - name: Await merge approval
@@ -216,7 +211,6 @@ with:
 fetch-depth: 0
 persist-credentials: true
 
-```
   - name: Download payload
     uses: actions/download-artifact@v4
     with:
@@ -247,18 +241,15 @@ persist-credentials: true
       MF="runs/${RUN_ID}/run_manifest.json"
       test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; ls -R runs || true; exit 1; }
       python - <<'PY' "$MF"
-```
+      import json,sys,datetime
+      p=sys.argv[1]
+      m=json.load(open(p))
+      m["status"]="succeeded"
+      m["finished_at"]=datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+      json.dump(m,open(p,"w"),indent=2)
+      print("updated:",p)
+      PY
 
-import json,sys,datetime
-p=sys.argv[1]
-m=json.load(open(p))
-m[“status”]=“succeeded”
-m[“finished_at”]=datetime.datetime.utcnow().strftime(”%Y-%m-%dT%H:%M:%SZ”)
-json.dump(m,open(p,“w”),indent=2)
-print(“updated:”,p)
-PY
-
-```
   - name: Commit run to branch
     run: |
       set -euo pipefail
@@ -282,4 +273,3 @@ PY
         echo "- Run-ID: ${RUN_ID}"
         echo "- Commit: [${COMMIT_SHA}](${COMMIT_URL})"
       } >> "$GITHUB_STEP_SUMMARY"
-```
