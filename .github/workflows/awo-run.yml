@@ -53,7 +53,6 @@ steps:
       test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
       if [ -f schemas/workflow.schema.json ]; then
         python - <<'PY' "$WF"
-```
 
 import json,sys
 from jsonschema import Draft202012Validator
