@@ -123,8 +123,8 @@ environment:
 name: awo-scope
 url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 steps:
-- name: Await scope approval
-run: echo “Scope Gate — approve this environment to continue.”
+  - name: Await scope approval
+    run: echo “Scope Gate — approve this environment to continue.”
 
 # –––––––––– Render summary (after scope approval) ––––––––
 
