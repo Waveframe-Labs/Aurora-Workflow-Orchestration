@@ -257,7 +257,7 @@ jobs:
             "approved_at": "$(date -u +%FT%TZ)",
             "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }
-EOF
+          EOF
 
       - name: Mark manifest as succeeded
         shell: bash
@@ -266,14 +266,14 @@ EOF
           MF="runs/${RUN_ID}/run_manifest.json"
           test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; ls -R runs || true; exit 1; }
           python - <<'PY' "$MF"
-import json, sys, datetime as dt, pathlib
-p = pathlib.Path(sys.argv[1])
-m = json.loads(p.read_text())
-m["status"] = "succeeded"
-m["finished_at"] = dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-p.write_text(json.dumps(m, indent=2), encoding="utf-8")
-print("updated:", p)
-PY
+          import json, sys, datetime as dt, pathlib
+          p = pathlib.Path(sys.argv[1])
+          m = json.loads(p.read_text())
+          m["status"] = "succeeded"
+          m["finished_at"] = dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+          p.write_text(json.dumps(m, indent=2), encoding="utf-8")
+          print("updated:", p)
+          PY
 
       - name: Commit run to branch
         shell: bash
