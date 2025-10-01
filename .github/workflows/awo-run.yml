@@ -51,22 +51,28 @@ jobs:
           WF="${{ github.event.inputs.workflow_file }}"
           if [ -z "$WF" ]; then
             WF="workflows/multimodel.json"
-            echo "::notice::workflow_file input empty; defaulting to $WF"
+            echo "::notice::workflow_file empty; defaulting to $WF"
           fi
-          test -f "$WF" || { echo "::error::Workflow JSON not found at: $WF"; exit 1; }
+
+          # expose for later steps
           echo "wf=$WF" >> "$GITHUB_OUTPUT"
-          # Optional schema validation if repo provides schemas/workflow.schema.json
+
+          # must exist
+          if [ ! -f "$WF" ]; then
+            echo "::error::Workflow JSON not found at $WF"
+            exit 1
+          fi
+
+          # optional: validate against schema if present
           if [ -f schemas/workflow.schema.json ]; then
-            python - <<'PY'
-            import json, sys
-            from jsonschema import Draft202012Validator as V
-            sch = json.load(open("schemas/workflow.schema.json"))
-            doc = json.load(open(sys.argv[1]))
-            V(sch).validate(doc)
-            print("workflow.json: schema OK")
-            PY
-             "$WF"
-              fi
+            PYCODE='import json, os
+          from jsonschema import Draft202012Validator as V
+          sch=json.load(open("schemas/workflow.schema.json"))
+          doc=json.load(open(os.environ["WF"]))
+          V(sch).validate(doc)
+          print("workflow.json: schema OK")'
+             WF="$WF" python -c "$PYCODE"
+           fi
 
       - name: Execute AWO workflow
         id: runstep
