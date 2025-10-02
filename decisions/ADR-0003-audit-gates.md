@@ -4,10 +4,7 @@
 Proposed — 2025-09
 
 ## Context
-One of AWO’s five core requirements (DL-001) is the **Rejection Loop**: failed audits must trigger revision, not defense without evidence.  
-Dialogue Logs DL-001 and DL-005 both reinforce this:  
-- DL-001 framed independent audits and rejection as non-negotiable.  
-- DL-005 confirmed that trust in AI-assisted science depends on logging, validation, and human oversight.  
+One of AWO’s five core requirements is the **Rejection Loop**: failed audits must trigger revision, not defense without evidence.    
 
 Without explicit audit gates, AWO risks collapsing into the same ad-hoc practices it aims to replace.
 
@@ -28,8 +25,4 @@ Without explicit audit gates, AWO risks collapsing into the same ad-hoc practice
 - Guarantees that audits are a **release blocker**, not optional feedback.  
 - Strengthens the audit trail: every accepted artifact has at least one explicit independent check.  
 - Prevents defensive reasoning — forces iteration or withdrawal when evidence is lacking.  
-- Adds overhead: each release requires independent audit steps before publication.
-
-## References
-- Dialogue Log DL-001 — “5 Requirements” framing (LinkedIn draft → method spec)  
-- Dialogue Log DL-005 — “Does AWO have scientific value?” (Consensus AI)  
+- Adds overhead: each release requires independent audit steps before publication. 
