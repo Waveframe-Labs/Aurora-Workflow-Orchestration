@@ -4,10 +4,10 @@
 Proposed — 2025-09
 
 ## Context
-One of the five core requirements of AWO (DL-001) is **Portability**:  
+One of the five core requirements of AWO is **Portability**:  
 > Everything you produce should be template-driven so the method applies in any domain.  
 
-Without explicit portability guarantees, AWO risks being seen as a one-off documentation project tied to a single case study (Waveframe). Dialogue Logs DL-001 through DL-005 show repeated emphasis on reusability and generality as what makes AWO scientifically valuable.
+Without explicit portability guarantees, AWO risks being seen as a one-off documentation project tied to a single case study (Waveframe).
 
 ## Decision
 - All AWO artifacts must be **domain-agnostic by design**.  
@@ -28,6 +28,4 @@ Without explicit portability guarantees, AWO risks being seen as a one-off docum
 - Adds initial overhead to maintain high-quality templates, but lowers adoption friction for others.
 
 ## References
-- Dialogue Log DL-001 — “5 Requirements” framing (LinkedIn draft → method spec)  
-- Dialogue Log DL-005 — “Does AWO have scientific value?” (Consensus AI)  
 - ADR-0001 — Flagship Positioning & Case-Study Policy  
