@@ -12,7 +12,7 @@ External feedback (see Dialogue Log DL-003 and DL-004) highlighted the need for 
 At the same time, Waveframe and other projects were being developed. The risk was confusion over what the “main contribution” is: the cosmology case study, or the orchestration method itself.
 
 ## Decision
-- The flagship repository is **AI Workflow Orchestration (AWO)**.  
+- The flagship repository is **Aurora Workflow Orchestration (AWO)**.  
 - Case studies (Waveframe, Customer Review Analysis, Societal Progress Simulator, etc.) serve as **demonstrations of AWO’s portability and generality**, not as standalone flagships.  
 - README and metadata must always position AWO as the **methodological layer** and case studies as **applications**.  
 - Dialogue logs and workflow logs must explicitly link back to AWO when case study work influences or validates the method.
@@ -22,7 +22,3 @@ At the same time, Waveframe and other projects were being developed. The risk wa
 - Prevents dilution of AWO’s identity as “just documentation of Waveframe.”  
 - Case studies remain valuable, but their role is scoped: they validate AWO across domains.  
 - Future ADRs (e.g., ADR-0005: Portability Guarantees) will formalize how case studies must log orchestration steps to remain compliant with AWO.
-
-## References
-- Dialogue Log DL-003 — “Is AWO ad-hoc?” (Consensus AI)  
-- Dialogue Log DL-004 — “Is this new?” (Consensus AI)  
