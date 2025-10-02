@@ -5,9 +5,8 @@ Proposed — 2025-08
 
 ## Context
 One of AWO’s non-negotiable requirements is **falsifiability backed by evidence**.  
-User created `citations/REPRODUCIBILITY_CONTEXT.md` to document real (non-AI-generated) sources addressing reproducibility failures in AI, workflow systems, and auditability.  
-Dialogue Log DL-002 confirmed this file anchors AWO in scholarship, bridges domains, and provides credibility against the “just documentation of Waveframe” critique.  
-Dialogue Log DL-005 validated that AWO aligns with research directions (Reis 2022; Goble 2020; Chirigati 2016; Amershi 2019).
+User created `citations/REPRODUCIBILITY_CONTEXT.md` to document real (non-AI-generated) sources addressing reproducibility failures in AI, workflow systems, and auditability.    
+Dialogue validated that AWO aligns with research directions (Reis 2022; Goble 2020; Chirigati 2016; Amershi 2019).
 
 To maintain credibility, AWO needs a consistent policy for handling citations across repos and outputs.
 
@@ -23,9 +22,6 @@ To maintain credibility, AWO needs a consistent policy for handling citations ac
 ## Consequences
 - Guarantees reproducibility of scholarly grounding for AWO.  
 - Prevents future critiques that AWO relies on unverifiable or fabricated references.  
-- Makes the audit trail stronger by linking Dialogue Logs → Citations → README/Spec.  
+- Makes the audit trail stronger by linking Decisions Logs → Citations → README/Spec.  
 - Adds maintenance overhead: new case studies must keep `citation.bib` synced.
-
-## References
-- Dialogue Log DL-002 — Citations/REPRODUCIBILITY_CONTEXT.md validation  
-- Dialogue Log DL-005 — “Does AWO have scientific value?” (Consensus AI)  
+  
