@@ -4,8 +4,7 @@
 Proposed — 2025-09
 
 ## Context
-AWO’s reproducibility depends on consistent logging. Dialogue Logs DL-001 through DL-005 have already demonstrated the need to distinguish between:
-- **Dialogue logs** → external model/human input shaping decisions.  
+AWO’s reproducibility depends on consistent logging. We scaffold logging as:  
 - **Workflow logs** → factual timeline of what was done, when, and why.  
 - **Audit logs** → independent validation, critiques, and rejection events.  
 
@@ -16,7 +15,7 @@ Without a clear schema and folder layout, logs risk becoming fragmented or incon
   - `/logs/dialogue/` → curated external feedback.  
   - `/logs/workflow/` → factual project steps and internal decisions.  
   - `/logs/audits/` → independent validation and rejection reports.  
-- A rolling summary file (`DIALOGUE_LOG.md`, `WORKFLOW_LOG.md`) may exist at the root of each folder for convenience, but individual entries must be timestamped Markdown files.  
+- A rolling summary file (`WORKFLOW_LOG.md`) may exist at the root of each folder for convenience, but individual entries must be timestamped Markdown files.  
 - **Minimum fields per log entry**:  
   - **Date**  
   - **Context**  
@@ -24,16 +23,14 @@ Without a clear schema and folder layout, logs risk becoming fragmented or incon
   - **Artifacts touched**  
   - **Impact/Decision**  
   - **Status** (accepted, revised, rejected, pending)  
-- ADRs must reference relevant Dialogue, Workflow, or Audit Log IDs.  
-- Long raw transcripts may be stored in `/logs/dialogue/raw/`, but curated excerpts are mandatory in the main log.
+- ADRs must reference relevant Workflow or Audit Log IDs.  
 
 ## Consequences
 - Guarantees that anyone auditing AWO can trace every decision to a log entry.  
-- Maintains separation of influence (dialogue), action (workflow), and verification (audit).  
+- Maintains separation of action (workflow), and verification (audit).  
 - Reduces ambiguity when linking ADRs to their origins.  
 - Adds process discipline: contributors must use the schema and cannot bypass logs.
 
-## References
-- Dialogue Logs DL-001 to DL-005 (framing requirements, evidence, ad-hoc clarification, novelty, scientific value)  
+## References 
 - ADR-0001 — Flagship Positioning & Case-Study Policy  
 - ADR-0003 — Audit Gates & Rejection Loop  
