@@ -5,9 +5,9 @@ Accepted — 2025-08
 
 ## Context
 Early drafts of this repository used multiple names (“EOM,” “AOM,” “AWO”).  
-External feedback (see Dialogue Log DL-003 and DL-004) highlighted the need for clarity:  
-- AWO is **not ad-hoc** (DL-003, Consensus AI).  
-- AWO is **novel and scientifically relevant** (DL-004, Consensus AI).  
+External feedback highlighted the need for clarity:  
+- AWO is **not ad-hoc**  
+- AWO is **novel and scientifically relevant**  
 
 At the same time, Waveframe and other projects were being developed. The risk was confusion over what the “main contribution” is: the cosmology case study, or the orchestration method itself.
 
