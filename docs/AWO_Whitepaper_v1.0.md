@@ -1,10 +1,10 @@
 # Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Human Collaboration
 **Author:** Shawn C. Wright  
-**ORCID:** 0009-0006-6043-9295   
+**Affiliation:** Aurora Research Initiative (Independent Researcher)  
+**ORCID:** [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)   
 **License:** CC BY 4.0 (text) · Apache-2.0 (code)  
 **Version:** 1.0 · **Date:** 2025-10-07  
-**DOI:** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612)
-
+**DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 ---
 
 ## Abstract
