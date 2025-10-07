@@ -41,6 +41,15 @@ AI’s rapid adoption has exposed a reproducibility and provenance crisis. AWO p
 **Weaknesses:** reproducibility gap, provenance crisis, audit opacity.  
 **Objectives:** formalize falsifiability, enforce schema-validated traceability, democratize reproducibility outside institutions.
 
+## 2.5 Conceptual Foundations
+
+AI-assisted work introduces a paradox of knowledge: it expands what humans can create while obscuring how that knowledge is produced. Traditional research relies on explicit methods and implicit trust; the reputation of the investigator substitutes for full transparency. In AI-mediated inquiry, that social contract fails. Models can produce plausible results without accountability, and the act of reasoning becomes distributed across a hybrid network of human and synthetic agents.
+
+Aurora Workflow Orchestration (AWO) reframes reproducibility as a structural property rather than a behavioral one. Instead of trusting individuals or models, it embeds verification directly into the workflow through governance artifacts—manifests, audits, and decision records that make every claim falsifiable and traceable to its source.
+
+Each stage of inquiry functions as a contract between intent and execution, between hypothesis and evidence, between automation and accountability. By encoding falsifiability and auditability within the method itself, AWO converts reproducibility from a retrospective check into an active, continuous property of the research process.
+
+In essence, AWO does not merely document workflows; it enforces epistemic discipline, ensuring that even when reasoning is automated, inquiry remains human-governed, transparent, and inspectable.
 ---
 
 ## 3. Methodology
