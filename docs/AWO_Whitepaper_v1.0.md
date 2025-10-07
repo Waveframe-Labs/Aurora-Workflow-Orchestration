@@ -14,7 +14,7 @@ CC BY 4.0 (text) · Apache-2.0 (code)
 **Version:**  
 1.0 · **Date:** 2025-10-07  
 
-**DOI:**   
+**DOI:**     
 [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 ---
 <picture>
