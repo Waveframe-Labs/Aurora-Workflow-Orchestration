@@ -17,9 +17,13 @@ CC BY 4.0 (text) · Apache-2.0 (code)
 **DOI:**   
 [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 ---
-![Figure 1: The AI Governance Gap](../figures/AI_Governance_Gap_Diagram.svg)
+<picture>
+  <source type="image/svg+xml" srcset="../figures/AI_Governance_Gap_Diagram.svg">
+  <img src="../figures/AI_Governance_Gap_Diagram.png" alt="The AI Governance Gap: AWO (methodology) bridges reproducibility/provenance gaps; CRI-CORE provides automated execution and archival.">
+</picture>
 
-*Figure 1. AWO bridges the governance gap between rapid AI iteration and reproducible science. CRI-CORE extends this into a continuous execution layer.*
+*Figure 1. AWO addresses reproducibility and provenance gaps at the methodological layer; CRI-CORE supplies automated execution and archival.*   
+
 ## Abstract
 
 The **Aurora Workflow Orchestration (AWO)** framework defines a reproducible governance system for AI–human collaboration. It formalizes falsifiability, auditability, and provenance within iterative research cycles. AWO enforces role separation, schema validation, and standardized decision records (ADRs) to make AI-driven work transparent and inspectable. Its operational layer, **CRI-CORE** (Continuous Research Integration), extends this methodology into automation—rendering every run reproducible, logged, and citable.
