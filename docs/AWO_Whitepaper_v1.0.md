@@ -58,7 +58,7 @@ Audit gates enforce schema validation, human approval, and logged critique befor
 
 Artifacts define reproducibility guarantees; ADRs define governance structure through release, audit, and future meta-governance (ADR-0011–0013).
 
-### 3.8 Reproducibility verification
+### 3.7 Reproducibility verification
 
 Schema validation, SHA-256 hashing, and environment capture ensure traceable, self-verifying runs.
 
