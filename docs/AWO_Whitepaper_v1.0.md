@@ -127,7 +127,7 @@ Each limitation is tracked through open ADRs and targeted in CRI-CORE milestones
 
 ## 7  Roadmap
 
-# Strategic Horizon
+### Strategic Horizon
 
 AWO now stands as a stable methodological framework. Future development will focus on integration, scalability, and institutional adoption.   
 	•	Integration with CRI-CORE (Continuous Research Integration):
