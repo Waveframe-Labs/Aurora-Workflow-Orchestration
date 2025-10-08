@@ -127,9 +127,26 @@ Each limitation is tracked through open ADRs and targeted in CRI-CORE milestones
 
 ## 7  Roadmap
 
-**Near-term:** Finalize whitepaper and release v1.0.  
-**Medium-term:** Develop new case studies and publish CRI-CORE public repository.  
-**Long-term:** Evolve AWO into a *minimum viable paper* standard — a reproducible unit of knowledge.
+# Strategic Horizon
+
+AWO now stands as a stable methodological framework. Future development will focus on integration, scalability, and institutional adoption.   
+	•	Integration with CRI-CORE (Continuous Research Integration):
+Extend AWO’s governance layer into a full execution environment that automates validation, archival, and reproducibility checks across projects.  
+	•	Expansion through Waveframe Labs:
+Establish Waveframe Labs as the organizational backbone for open, reproducible AI research — hosting AWO, CRI-CORE, and applied case studies under one ecosystem.  
+	•	CRI-CORE Enterprise (planned):
+Explore a deployable variant of the CRI-CORE platform designed for organizations requiring compliance-grade reproducibility, audit logging, and research traceability.  
+	•	Ecosystem growth:
+Encourage adoption of AWO-based templates and governance standards across scientific, technical, and creative research domains.
+Promote the concept of the “minimum viable paper” — a modular, auditable unit of published knowledge.
+
+---
+
+# Summary
+
+AWO defines the method.
+CRI-CORE operationalizes it.
+Waveframe Labs ensures continuity, stewardship, and scale.
 
 ---
 
