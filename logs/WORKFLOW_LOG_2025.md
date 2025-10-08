@@ -1,3 +1,10 @@
+---
+filetype: workflow_log
+version: 1.3.0
+updated: 2025-10-08
+maintainer: Waveframe Labs
+contact: swright@waveframelabs.org
+---
 <details>
 <summary><strong> Updated WORKFLOW_LOG.md (v1.3.0)</strong></summary>   
 
