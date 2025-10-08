@@ -132,7 +132,7 @@ Researcher developing reproducible workflows for AI–human collaboration.
 Focused on orchestration methods, documentation, and applied analysis across science and business domains.  
 
 - ORCID: [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-brightgreen.svg)](https://orcid.org/0009-0006-6043-9295)  
-- Email: **shawnkardin@gmail.com**  
+- Email: **swright@waveframelabs.org**  
 - GitHub: [Wright-Shawn](https://github.com/Wright-Shawn)  
 
 ---
