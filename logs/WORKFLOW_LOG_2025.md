@@ -52,6 +52,7 @@ This file functions as a historical record of how AWO evolved from concept to a 
 - **What I learned:** AWO now operates as the *methodological backbone* of the Waveframe Labs ecosystem. CRI-CORE will assume the role of its automation and scaling layer.  
 - **Next step:** Prepare v1.3.1 release for Zenodo archival, revise README and citation metadata, and update the changelog to reflect audit directory deprecation and organizational transfer.
 
+*This log serves as AWO’s provenance ledger; each entry corresponds to verifiable repository states and tagged releases.*
 ---
 
 </details>
