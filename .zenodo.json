@@ -1,5 +1,5 @@
 {
-  "title": "AI Workflow Orchestration (AWO)",
+  "title": "Aurora Workflow Orchestration (AWO)",
   "upload_type": "software",
   "description": "A reproducible, documented orchestration method for human\u2013AI research and build cycles. AWO defines roles (Primary Engine, Supporting Models, Human-in-the-Loop), critique loops, mock peer review, and workflow logging designed for transparency and independent verification.",
   "creators": [
@@ -17,7 +17,7 @@
   ],
   "related_identifiers": [
     {
-      "identifier": "https://github.com/Wright-Shawn/AI-Workflow-Orchestration",
+      "identifier": "https://github.com/Wright-Shawn/Aurora-Workflow-Orchestration",
       "relation": "isSupplementTo",
       "scheme": "url",
       "resource_type": "software"
