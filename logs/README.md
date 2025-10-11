@@ -1,38 +1,50 @@
-# Logs — AI Workflow Orchestration (AWO)
+---
+filetype: logs_index
+version: 1.0.0
+updated: 2025-10-08
+maintainer: Waveframe Labs
+contact: swright@waveframelabs.org
+---
 
-This folder contains the logging artifacts that make AWO auditable and reproducible.  
-Logs are a **first-class artifact** of the workflow — if it isn’t logged here, it didn’t shape AWO.
+# Logs — Aurora Workflow Orchestration (AWO)
+
+**Purpose**  
+This directory stores official workflow and provenance logs for Aurora Workflow Orchestration (AWO).  
+Logs capture the project’s chronological evolution, including structural changes, governance decisions, and release milestones — providing an immutable record of how the framework developed and matured.
 
 ---
 
 ## Contents
-- **dialogue-log.md** — Rolling record of influential external dialogues (LLM feedback, peer review, third-party critique).  
-  - Each entry has a DL ID (`DL-YYYY-MM-DD-NNN`) and cross-links to related ADRs and commits.  
-  - Purpose: show how outside input shaped decisions, claims, and repo artifacts.  
 
-- **workflow-log.md** — Factual chronological record of internal steps.  
-  - Covers repo creation, renames, releases, README revisions, file generation, and other procedural moves.  
-  - Purpose: preserve the audit trail of what happened and when.
+| File | Description |
+|------|--------------|
+| **WORKFLOW_LOG.md** | Primary development log tracking the repository’s progression from concept to reproducible framework. Each entry documents *what was done, what was learned, and next steps* using timestamped release milestones. |
 
 ---
 
-## Logging principles
-1. **Completeness** → If a dialogue or action influenced AWO, it belongs here.  
-2. **Cross-linking** → Each entry ties back to ADRs, commits, or claims.  
-3. **Minimalism** → Keep excerpts short; link or reference full threads/files elsewhere if needed.  
-4. **Falsifiability** → Every logged claim or decision must be testable or rejectable.  
-5. **Traceability** → Logs must allow anyone to reconstruct not only what was decided, but why.
+## Log Policy
+
+- All updates to the repository or governance structure must be reflected in `WORKFLOW_LOG.md`.  
+- Each new section should correspond to a **semantic version update** or major methodological milestone.  
+- Edits are additive only — prior entries must never be altered or rewritten.  
+- All log entries must include:  
+  - Date and version identifier  
+  - Summary of actions taken  
+  - Key lessons or insights  
+  - Planned next steps  
+
+This ensures the log functions as a verifiable **provenance ledger**, consistent with AWO’s reproducibility standard.
 
 ---
 
-## Protocol
-- Dialogue logs → Prefix with **DL-YYYY-MM-DD-NNN**. Store long transcripts under `/logs/dialogue/raw/` if needed.  
-- Workflow logs → Record factual changes with version tags, timestamps, and rationale.  
-- Always update ADRs to point back to relevant log entries.  
-- When a log entry leads to a commit, add the commit/PR link in the **Links** field.
+## Integration & Archival
+
+- Each log update is automatically linked to version tags and Zenodo DOIs during archival.  
+- The log supplements `/decisions/` (ADRs) by providing narrative context to design choices.  
+- During **audit-gate** validation, log entries are checked for correspondence with repository diffs and ADR indices.
 
 ---
 
-### Maintainer note
-Logs are **not optional**. They are the evidence backbone of AWO.  
-Without logs, orchestration reduces to undocumented prompting — exactly what AWO exists to avoid.
+## Contact  
+Waveframe Labs  
+swright@waveframelabs.org
