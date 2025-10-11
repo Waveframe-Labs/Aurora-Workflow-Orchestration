@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.1 — Repository Hardening & Org Transfer (2025-10-11)
+- Added standardized `README.md` files for all core folders (`/core`, `/schemas`, `/scripts`, `/templates`, `/docs`, `/workflows`, and `/.github`).
+- Unified metadata headers across all folder-level readmes (`filetype`, `version`, `updated`, `maintainer`, `contact`).
+- Transferred repository ownership to **Waveframe Labs** organization for long-term stewardship.
+- Corrected `.github/README.md` overriding issue by re-establishing root `README.md` as canonical entry point.
+- Initiated next documentation phase: workflow log revision, changelog synchronization, and ADR updates.
+- Designated this release as the **final structural patch** before functional validation and CRI-CORE alignment.
 ## v1.1.0 — Whitepaper + Audit Framework (2025-09-02)
 - Added **AWO Whitepaper v1.0** in `/docs/` (Markdown + PDF).
 - Introduced `/decisions/` folder with Architecture Decision Records (ADRs).
