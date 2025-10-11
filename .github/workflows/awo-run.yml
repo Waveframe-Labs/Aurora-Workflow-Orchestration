@@ -218,7 +218,16 @@ jobs:
           echo "## Audit APPROVED" >> "$GITHUB_STEP_SUMMARY"
           echo "Reviewer: ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Run-ID: ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
-
+      - name: Hash run folder & verify
+        shell: bash
+        working-directory: ${{ env.AWO_RUN_DIR }}
+        run: |
+         set -euo pipefail
+         find . -type f ! -name 'SHA256SUMS.txt' -print0 \
+         | xargs -0 sha256sum \
+         | sort > SHA256SUMS.txt
+         sha256sum -c SHA256SUMS.txt  
+    
   # -------------------- Commit artifacts after approval ----------------------
   finalize:
     needs: [run_awo, scope_gate, human_approval]
