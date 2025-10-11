@@ -39,6 +39,7 @@ Each file follows the format `ADR-####-<topic>.md` and includes:
 | ADR-0011 | Template Usage | Standardizes folder templates and audit forms. |
 | ADR-0012 | Human-in-Loop Validation | Ensures human oversight in each critical merge decision. |
 | ADR-0013 | Audit Types Expansion | Defines multi-layer audit logic: logic, data, and peer review. |
+| ADR-0014 | Repository Hardening and Organizational Transfer | Standardized folder documentation, unified metadata and contact info, resolved .github override, and formalized AWO’s migration under Waveframe Labs for long-term reproducibility governance. |   
 
 ---
 
