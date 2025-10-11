@@ -1,27 +1,49 @@
 {
   "title": "Aurora Workflow Orchestration (AWO)",
   "upload_type": "software",
-  "description": "A reproducible, documented orchestration method for human\u2013AI research and build cycles. AWO defines roles (Primary Engine, Supporting Models, Human-in-the-Loop), critique loops, mock peer review, and workflow logging designed for transparency and independent verification.",
+  "publication_date": "2025-10-11",
+  "description": "AWO is a methodology for reproducible AI–human collaboration. It embeds falsifiability, audit trails, and provenance via standardized artifacts (ADRs, manifests, schemas, logs). CRI-CORE provides the automated execution layer that turns each run into a citable evidence package.",
   "creators": [
     {
-      "name": "Wright, Shawn"
+      "name": "Wright, Shawn C.",
+      "affiliation": "Waveframe Labs",
+      "orcid": "0009-0006-6043-9295",
+      "email": "swright@waveframelabs.org"
     }
   ],
   "license": "Apache-2.0",
+  "access_right": "open",
   "keywords": [
-    "AI orchestration",
     "reproducibility",
-    "workflow",
-    "research",
-    "human-in-the-loop"
+    "provenance",
+    "auditability",
+    "workflow orchestration",
+    "human-in-the-loop",
+    "AWO",
+    "Waveframe Labs"
   ],
   "related_identifiers": [
     {
-      "identifier": "https://github.com/Wright-Shawn/Aurora-Workflow-Orchestration",
       "relation": "isSupplementTo",
-      "scheme": "url",
-      "resource_type": "software"
+      "identifier": "https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration",
+      "scheme": "url"
+    },
+    {
+      "relation": "isDocumentedBy",
+      "identifier": "https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/blob/main/docs/AWO_Whitepaper_v1.0.md",
+      "scheme": "url"
+    },
+    {
+      "relation": "isAlternateIdentifier",
+      "identifier": "10.5281/zenodo.17041921",
+      "scheme": "doi"
     }
   ],
-  "notes": "This record is the citable archive for release v1.0.2 of AWO."
+  "contributors": [
+    {
+      "name": "Waveframe Labs",
+      "type": "Other"
+    }
+  ],
+  "notes": "Code licensed Apache-2.0; documentation and logs are CC BY 4.0."
 }
