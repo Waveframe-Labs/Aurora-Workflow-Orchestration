@@ -1,22 +1,40 @@
 cff-version: 1.2.0
-message: "If you use this, please cite it."
-title: Aurora Workflow Orchestration (AWO)
-type: software
+message: "If you use this work, please cite it as below."
+title: "Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Human Collaboration"
+version: "1.1.1"
+date-released: 2025-10-11
+doi: 10.5281/zenodo.17041921
 authors:
   - family-names: Wright
     given-names: Shawn C.
-repository-code: "https://github.com/Wright-Shawn/Aurora-Workflow-Orchestration"
-url: "https://github.com/Wright-Shawn/Aurora-Workflow-Orchestration"
+    affiliation: Waveframe Labs
+    email: swright@waveframelabs.org
+abstract: >
+  The Aurora Workflow Orchestration (AWO) framework defines a reproducible governance
+  system for AI–human collaboration. It formalizes falsifiability, auditability, and provenance
+  within iterative research cycles. AWO enforces role separation, schema validation, and
+  standardized decision records (ADRs) to make AI-driven work transparent and inspectable.
+  Its operational layer, CRI-CORE (Continuous Research Integration), extends this methodology
+  into automation—rendering every run reproducible, logged, and citable.
+repository-code: "https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration"
+license: "Apache-2.0"
 keywords:
-  - AI orchestration
-  - reproducibility
-  - research workflow
+  - AI reproducibility
+  - workflow orchestration
+  - falsifiability
+  - auditability
+  - provenance
   - human-in-the-loop
-license: Apache-2.0
-version: 1.0.2
-date-released: 2025-08-31
-doi: 10.5281/zenodo.17013613
-identifiers:
-  - type: doi
-    value: 10.5281/zenodo.17013612
-    description: Concept DOI for all versions
+  - Waveframe Labs
+preferred-citation:
+  type: article
+  title: "Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Human Collaboration"
+  authors:
+    - family-names: Wright
+      given-names: Shawn C.
+  year: 2025
+  doi: 10.5281/zenodo.17041921
+  journal: "Waveframe Labs Research Archives"
+  notes: >
+    Version 1.1.1 (Repository Hardening & Organizational Transfer).
+    Developed under the Aurora Research Initiative, maintained by Waveframe Labs.
