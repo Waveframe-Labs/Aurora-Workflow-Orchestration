@@ -1,0 +1,32 @@
+name: Backfill SHA256SUMS for a run
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Folder under /runs (e.g., run_2025-10-02T08-32-50Z)"
+        required: true
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rebuild checksums
+        shell: bash
+        working-directory: runs/${{ github.event.inputs.run_id }}
+        run: |
+          set -euo pipefail
+          find . -type f ! -name 'SHA256SUMS.txt' -print0 \
+          | xargs -0 sha256sum \
+          | sort > SHA256SUMS.txt
+      - name: Commit updated checksums
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add runs/${{ github.event.inputs.run_id }}/SHA256SUMS.txt
+          git commit -m "Backfill SHA256SUMS for ${{ github.event.inputs.run_id }}" || echo "No changes"
+          git push
