@@ -29,7 +29,7 @@ AWO extends this logic beyond data pipelines into reasoning workflows — logs, 
 - Meta-research consistently identifies transparency and open workflows as core remedies to the replication crisis [Ioannidis2005].  
 
 *Why it matters for AWO:*  
-AWO formalizes transparency by requiring dialogue logs, ADRs, and independent audits, ensuring that reasoning steps are inspectable.
+AWO formalizes transparency by requiring worflow logs, ADRs, and independent audits, ensuring that reasoning steps are inspectable.
 
 ---
 
