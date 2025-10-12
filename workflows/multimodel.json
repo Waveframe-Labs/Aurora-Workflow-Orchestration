@@ -55,8 +55,7 @@
       "id": "assert_consensus_quality",
       "op": "assert_contains",
       "args": {
-        "from_step": "consensus_1",
-        "field": "consensus_text",
+        "from_step": "consensus_1",  
         "must_include": [
           "battery lasts all day",
           "ui is confusing"
