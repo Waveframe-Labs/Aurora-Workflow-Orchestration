@@ -1,8 +1,7 @@
 # Audit Record Template
 
 **Claim ID:** CLM-XXX  
-**Date:** YYYY-MM-DD  
-**Source Dialogue:** /logs/DIALOGUE_LOG.md (Iteration ##, Excerpt #)  
+**Date:** YYYY-MM-DD     
 **Linked Decision:** /decisions/000X-<title>.md  
 
 ---
