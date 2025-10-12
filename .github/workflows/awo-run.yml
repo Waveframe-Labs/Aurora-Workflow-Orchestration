@@ -84,10 +84,21 @@ jobs:
 
       - name: Hash run folder & emit SBOM
         if: ${{ steps.capture.outputs.run_id != 'none' }}
+        shell: bash
         run: |
-          set -euo pipefail
-          find "runs/${RUN_ID}" -type f -print0 | sort -z | xargs -0 sha256sum > "runs/${RUN_ID}/SHA256SUMS.txt"
-          cyclonedx-py -o "runs/${RUN_ID}/sbom-cyclonedx.json" || true
+         set -euo pipefail
+         RD="runs/${RUN_ID}"
+         TMP="$(mktemp)"
+         (
+          cd "$RD"
+         # Exclude the file we are writing, then hash deterministically (sorted)
+         find . -type f ! -name 'SHA256SUMS.txt' -print0 \
+           | sort -z \
+           | xargs -0 sha256sum
+         ) > "$TMP"
+         mv "$TMP" "$RD/SHA256SUMS.txt"
+         # Optional SBOM
+         cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
 
       - name: Create payload (always)
         if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
