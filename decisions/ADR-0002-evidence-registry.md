@@ -6,7 +6,6 @@ Proposed — 2025-08
 ## Context
 One of AWO’s non-negotiable requirements is **falsifiability backed by evidence**.  
 User created `citations/REPRODUCIBILITY_CONTEXT.md` to document real (non-AI-generated) sources addressing reproducibility failures in AI, workflow systems, and auditability.    
-Dialogue validated that AWO aligns with research directions (Reis 2022; Goble 2020; Chirigati 2016; Amershi 2019).
 
 To maintain credibility, AWO needs a consistent policy for handling citations across repos and outputs.
 
