@@ -246,8 +246,7 @@ jobs:
           GIT_SHA="$(git rev-parse HEAD)"
 
           cat > "${RD}/ATTESTATION.txt" <<EOF
-AWO Run Attestation
-===================
+AWO Run Attestation:  
 
 Run-ID: ${RUN_ID}
 Repository: ${{ github.repository }}
@@ -256,19 +255,19 @@ Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ githu
 Actor: ${{ github.actor }}
 Timestamp (UTC): ${NOW}
 
-Bindings
---------
-run_manifest.json  sha256:${MANIFEST_SHA}
-SHA256SUMS.txt     sha256:${SUMS_SHA}
+Bindings:  
 
-Statement
----------
-This attestation binds the AWO run manifest to the file inventory recorded in
-SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
+    run_manifest.json  sha256:${MANIFEST_SHA}
+    SHA256SUMS.txt     sha256:${SUMS_SHA}
 
-EOF
+Statement:
 
-      - name: Sign tarball and attestation (keyless, OIDC)
+    This attestation binds the AWO run manifest to the file inventory recorded in
+    SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
+
+    EOF
+
+  - name: Sign tarball and attestation (keyless, OIDC)
         shell: bash
         env:
           RUN_ID: ${{ env.RUN_ID }}
