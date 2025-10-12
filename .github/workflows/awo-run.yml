@@ -267,7 +267,7 @@ Statement:
 
     EOF
 
-  - name: Sign tarball and attestation (keyless, OIDC)
+    - name: Sign tarball and attestation (keyless, OIDC)
         shell: bash
         env:
           RUN_ID: ${{ env.RUN_ID }}
