@@ -221,7 +221,6 @@ jobs:
           test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; ls -R runs || true; exit 1; }
           python -c "import json,sys,datetime as dt; p=sys.argv[1]; m=json.load(open(p)); m['status']='succeeded'; m['finished_at']=dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'); json.dump(m,open(p,'w'),indent=2,ensure_ascii=False); print('updated:',p)" "$MF"
 
-      # ---------- NEW: Attestation & keyless signatures ----------
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
         with:
@@ -246,28 +245,28 @@ jobs:
           GIT_SHA="$(git rev-parse HEAD)"
 
           cat > "${RD}/ATTESTATION.txt" <<EOF
-AWO Run Attestation:  
+          AWO Run Attestation:  
 
-Run-ID: ${RUN_ID}
-Repository: ${{ github.repository }}
-Commit: ${GIT_SHA}
-Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-Actor: ${{ github.actor }}
-Timestamp (UTC): ${NOW}
+          Run-ID: ${RUN_ID}
+          Repository: ${{ github.repository }}
+          Commit: ${GIT_SHA}
+          Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Actor: ${{ github.actor }}
+          Timestamp (UTC): ${NOW}
 
-Bindings:  
+          Bindings:  
 
-    run_manifest.json  sha256:${MANIFEST_SHA}
-    SHA256SUMS.txt     sha256:${SUMS_SHA}
+              run_manifest.json  sha256:${MANIFEST_SHA}
+              SHA256SUMS.txt     sha256:${SUMS_SHA}
 
-Statement:
+          Statement:
 
-    This attestation binds the AWO run manifest to the file inventory recorded in
-    SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
+              This attestation binds the AWO run manifest to the file inventory recorded in
+              SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
 
-    EOF
+          EOF
 
-    - name: Sign tarball and attestation (keyless, OIDC)
+      - name: Sign tarball and attestation (keyless, OIDC)
         shell: bash
         env:
           RUN_ID: ${{ env.RUN_ID }}
@@ -298,7 +297,6 @@ Statement:
             runs/${{ env.RUN_ID }}/ATTESTATION.txt.cert
           if-no-files-found: warn
           retention-days: 14
-      # ---------- END NEW ----------
 
       - name: Commit run to branch
         run: |
