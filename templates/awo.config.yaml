@@ -3,8 +3,7 @@ project: AI Workflow Orchestration (AWO)
 default_branch: main
 concept_doi: 10.5281/zenodo.17013612  # update when known
 artifacts:
-  logs_dir: logs
-  dialogue_dir: logs/dialogue
+  logs_dir: logs  
   decisions_dir: decisions
   figures_dir: figures
   notebooks_dir: notebooks
