@@ -4,7 +4,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
 [![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff) ![Last Commit](https://img.shields.io/github/last-commit/Wright-Shawn/Aurora-Workflow-Orchestration/main)
- <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/c8ba75e7-db02-4451-a2f3-25d88e637972" />
+![AURORA WORKFLOW ORCHESTRATION](figures/awo_banner_cri.PNG)
 
 ## What This Is
 
