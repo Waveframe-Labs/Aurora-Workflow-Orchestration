@@ -11,8 +11,7 @@ AWO’s reproducibility depends on consistent logging. We scaffold logging as:
 Without a clear schema and folder layout, logs risk becoming fragmented or inconsistent, undermining auditability.
 
 ## Decision
-- The repository must maintain the following log structure:  
-  - `/logs/dialogue/` → curated external feedback.  
+- The repository must maintain the following log structure:    
   - `/logs/workflow/` → factual project steps and internal decisions.  
   - `/logs/audits/` → independent validation and rejection reports.  
 - A rolling summary file (`WORKFLOW_LOG.md`) may exist at the root of each folder for convenience, but individual entries must be timestamped Markdown files.  
