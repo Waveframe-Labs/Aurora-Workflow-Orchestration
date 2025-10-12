@@ -1,0 +1,53 @@
+{
+  "run_id": "run_2025-10-12T14-29-03Z",
+  "workflow": "workflows/multimodel.json",
+  "started_at": "2025-10-12T14:29:03Z",
+  "finished_at": "2025-10-12T16:18:51Z",
+  "status": "succeeded",
+  "ops": [
+    {
+      "idx": 1,
+      "id": "backend_info",
+      "op": "backend_info"
+    },
+    {
+      "idx": 4,
+      "id": "scope_1",
+      "op": "scope_validate"
+    },
+    {
+      "idx": 5,
+      "id": "fanout_1",
+      "op": "fanout_generate"
+    },
+    {
+      "idx": 6,
+      "id": "emit_fanout_texts",
+      "op": "write_text"
+    },
+    {
+      "idx": 7,
+      "id": "consensus_1",
+      "op": "consensus_vote"
+    },
+    {
+      "idx": 8,
+      "id": "emit_consensus_record",
+      "op": "write_text"
+    },
+    {
+      "idx": 9,
+      "id": "assert_consensus_quality",
+      "op": "assert_contains"
+    },
+    {
+      "idx": 10,
+      "id": "gate_review",
+      "op": "audit_gate"
+    }
+  ],
+  "notes": [
+    "env:environment.json"
+  ],
+  "env_ref": "environment.json"
+}

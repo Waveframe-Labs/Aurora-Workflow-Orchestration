@@ -1,0 +1,8 @@
+{
+  "ts": "2025-10-12T14:29:03Z",
+  "id": "emit_fanout_texts",
+  "op": "write_text",
+  "wrote": "/home/runner/work/Aurora-Workflow-Orchestration/Aurora-Workflow-Orchestration/runs/run_2025-10-12T14-29-03Z/artifacts/notes/fanout.txt",
+  "from_step": "fanout_1",
+  "field": "consensus_text"
+}
