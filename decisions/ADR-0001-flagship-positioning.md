@@ -6,16 +6,14 @@ Accepted — 2025-08
 ## Context
 Early drafts of this repository used multiple names (“EOM,” “AOM,” “AWO”).  
 External feedback highlighted the need for clarity:  
-- AWO is **not ad-hoc**  
-- AWO is **novel and scientifically relevant**  
 
 At the same time, Waveframe and other projects were being developed. The risk was confusion over what the “main contribution” is: the cosmology case study, or the orchestration method itself.
 
 ## Decision
 - The flagship repository is **Aurora Workflow Orchestration (AWO)**.  
-- Case studies (Waveframe, Customer Review Analysis, Societal Progress Simulator, etc.) serve as **demonstrations of AWO’s portability and generality**, not as standalone flagships.  
+- Case studies (Waveframe, Societal Progress Simulator, etc.) serve as **demonstrations of AWO’s portability and generality**, not as standalone flagships.  
 - README and metadata must always position AWO as the **methodological layer** and case studies as **applications**.  
-- Dialogue logs and workflow logs must explicitly link back to AWO when case study work influences or validates the method.
+- Workflow logs must explicitly link back to AWO when case study work influences or validates the method.
 
 ## Consequences
 - Ensures recruiters, researchers, and auditors immediately recognize AWO as the primary contribution.  
