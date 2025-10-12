@@ -7,7 +7,7 @@ This repository uses a **dual-licensing model**:
   → See `LICENSE.Apache-2.0`
 
 - **Creative Commons Attribution 4.0 (CC BY 4.0)**  
-  Applies to: documentation, theory notes, dialogue logs, workflow logs, figures, and explanatory text.  
+  Applies to: documentation, theory notes, workflow logs, figures, and explanatory text.  
   → See `LICENSE.CC-BY-4.0`
 
 ## Why Dual License?
