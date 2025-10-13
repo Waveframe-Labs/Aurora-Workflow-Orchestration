@@ -1,6 +1,6 @@
 # Aurora Workflow Orchestration (AWO)
 
-[![DOI](https://zenodo.org/badge/1041786630.svg)](https://doi.org/10.5281/zenodo.17013612)
+[![DOI](https://zenodo.org/badge/1041786630.svg?v=2)](https://doi.org/10.5281/zenodo.17041921)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
 [![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff) ![Last Commit](https://img.shields.io/github/last-commit/Wright-Shawn/Aurora-Workflow-Orchestration/main)
