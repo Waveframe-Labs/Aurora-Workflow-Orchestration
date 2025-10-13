@@ -61,13 +61,7 @@ AWO closes that gap through four principles:
 ---
 
 ## Roadmap
-
-**Active Focus**
-- AWO Whitepaper v1.0 (stable reference)  
-- Case Study: *Waveframe v4.0* (applied entropic cosmology)  
-
-**Upcoming**
-- *Societal Progress Simulator* — applied social-science case  
+  
 - CRI-CORE integration for automated reproducibility  
 - Expansion into public reproducibility experiments  
 
