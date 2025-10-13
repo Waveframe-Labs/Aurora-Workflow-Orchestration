@@ -36,17 +36,36 @@ Format: **What I did, What I learned, Next step.**
 
 ---
 
-## 2025-10-11 — v1.1.1 Repository Hardening & Org Transfer Prep
-- **What I did:** Standardized `README.md` files across all primary folders. Unified metadata headers (filetype, version, updated, maintainer, contact). Resolved `.github` README override issue and re-established root README as canonical. Updated all references and contact details to `swright@waveframelabs.org`.  
-- **What I learned:** Structural clarity directly reinforces auditability. Clear metadata and separated CI documentation prevent governance confusion.  
-- **Next step:** Complete organizational migration to **Waveframe Labs** and prepare CRI-CORE integration as the operational execution layer.
+## 2025-10-12 — v1.1.1 Repository Hardening, Organizational Transfer & Attestation Integration
+- **What I did:** Completed full repository hardening and governance migration to **Waveframe Labs**.  
+  Standardized all folder-level `README.md` files with metadata headers (filetype, version, updated, maintainer, contact).  
+  Unified maintainer and contact identity under `swright@waveframelabs.org`.  
+  Implemented **cryptographic attestation** using Sigstore `cosign` for OIDC-based signing of AWO runs.  
+  Each run now produces verifiable artifacts (`ATTESTATION.txt`, `.sig`, `.cert`) linking manifests to checksums.  
+  Updated GitHub workflow to include attestation generation, signature upload, and verification gates.  
+  Deprecated manual `/audit/` procedures in favor of tamper-evident attestation.  
+  Verified integrity through successful attested run `run_2025-10-12T14-29-03Z`.
+
+- **What I learned:**  
+  AWO has reached maturity as a fully governed, cryptographically verifiable methodology.  
+  The addition of attestation bridges the last reproducibility gap—ensuring every run, manifest, and checksum is both auditable and tamper-evident.  
+  Institutional transfer under **Waveframe Labs** formally establishes AWO as part of a reproducible-research ecosystem with enterprise-grade trust guarantees.
+
+- **Next step:**  
+  1. Tag **v1.1.1** and archive the attested release on Zenodo.  
+  2. Begin **CRI-CORE** integration as the operational layer for continuous research verification.  
+  3. Document attestation verification instructions for external replicators.
+
+**Related ADRs:**  
+- ADR-0014 — *Repository Hardening and Organizational Transfer to Waveframe Labs*  
+- ADR-0015 — *Attestation Integration & Cryptographic Signing*
 
 ---
 
-## Current Status (as of 2025-10-11)
-- **What I did:** Finalized **AWO v1.1.1** as a structurally complete, auditable methodology under Waveframe Labs.  
-- **What I learned:** AWO has matured from a single-repo framework into the methodological backbone of a reproducible-research ecosystem.  
-- **Next step:** Initiate **CRI-CORE** implementation and define AWO–CRI interoperability specifications for enterprise reproducibility.
+## Current Status (as of 2025-10-12)
+- **What I did:** Finalized **AWO v1.1.1** as a hardened, cryptographically verifiable reproducibility framework under **Waveframe Labs** governance.  
+  Completed full repository audit, attestation pipeline integration, and organizational migration.  
+  Verified reproducibility integrity via attested run `run_2025-10-12T14-29-03Z` and corresponding signature artifacts.
 
 ---
 
