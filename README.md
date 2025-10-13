@@ -1,151 +1,91 @@
 # Aurora Workflow Orchestration (AWO)
 
-[![DOI](https://zenodo.org/badge/1041786630.svg?cachebust=2)](https://doi.org/10.5281/zenodo.17013612)
+[![DOI](https://zenodo.org/badge/1041786630.svg)](https://doi.org/10.5281/zenodo.17013612)  
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
-[![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff) ![Last Commit](https://img.shields.io/github/last-commit/Wright-Shawn/Aurora-Workflow-Orchestration/main)
+[![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff)  
+![Last Commit](https://img.shields.io/github/last-commit/Wright-Shawn/Aurora-Workflow-Orchestration/main)
+
 ![AURORA WORKFLOW ORCHESTRATION](figures/awo_banner_cri.PNG)
 
-## What This Is
-
-AI is moving fast, but most projects lack **reproducible workflows**.  
-The **Aurora Workflow Orchestration (AWO)** framework makes AI projects **transparent, auditable, and transferable** by combining structured human oversight with reproducible documentation.  
-
-AWO is not a coding library — it’s a **methodological framework**. Its goal is to turn AI-assisted work into something that can be trusted, traced, and reused across domains. 
-This repository is intentionally built in public with AI assistance.  
-The aim isn’t to hide AI involvement — it’s to show how AI can be audited,  
-structured, and trusted in real workflows.
-
-> **New:** AWO now integrates into a broader idea: **Continuous Research Integration (CRI-CORE)**.  
-> CRI-CORE is like CI/CD for research — every run is validated, logged, and archived,  
-> turning hypotheses into reproducible, continuously improving artifacts.
 ---
 
-## Why It Matters
+## Overview
 
-AI isn’t just a tool — it’s part of the workflow itself. That raises new challenges:  
+**Aurora Workflow Orchestration (AWO)** transforms AI-assisted projects into **auditable, reproducible research pipelines**.  
+Each run produces a **cryptographically signed provenance record** — binding code, logic, and decisions under verifiable governance.
 
-- How do we validate outputs without blind trust?  
-- How do we reproduce results across teams and contexts?  
-- How do we balance speed with rigor?  
+AWO isn’t a code library; it’s a **methodology** for turning discovery itself into an artifact.  
+Every tagged release is citable (via DOI) and fully inspectable through structured logs, manifests, and schema validation.
 
-**AWO addresses these questions** by transforming ad-hoc AI use into a structured, repeatable orchestration method.  
+> AWO now integrates with **CRI-CORE**, the “CI/CD for research” layer — automating validation, attestation, and archival for each workflow run.
+
+---
+
+## Why It Exists
+
+AI has changed how knowledge is produced — but verification hasn’t caught up.  
+AWO closes that gap through four principles:
+
+1. **Falsifiability first** — all claims must be disprovable, not just plausible.  
+2. **Human-in-the-loop rigor** — AI outputs are treated as hypotheses, not facts.  
+3. **Immutable provenance** — every run is signed, hashed, and logged.  
+4. **Transparent governance** — reproducibility replaces trust.
+
+---
+
+## In This Repository
+
+- **Whitepaper** → full method spec in [`/docs`](docs)  
+- **Templates** → falsifiability manifests, ADRs, audit checklists  
+- **Logs** → timestamped workflow and decision records  
+- **Workflows** → executable orchestration examples  
+- **Citations** → DOI, metadata, and licensing files  
+
+> If it can’t be audited, it doesn’t count.  
+> AWO prioritizes traceable rigor over presentation polish.
+
+---
+
+## Current Release — v1.1.1 (2025-10-12)
+
+- Repository hardening & organizational transfer to **Waveframe Labs**  
+- Cryptographic **attestation integration** (cosign + OIDC)  
+- Verified end-to-end reproducibility and provenance sealing  
+- Updated `CITATION.cff` and `.zenodo.json` with correct concept DOI  
+
+**Related ADRs:**  
+- ADR-0014 — Repository Hardening & Organizational Transfer  
+- ADR-0015 — Attestation Integration & Cryptographic Signing  
 
 ---
 
 ## Roadmap
 
-**This repository is alive.** AWO will continue to evolve through applied case studies and method refinements. Instead of fixed timelines, progress is tracked in phases — each tagged release reflects the latest stable state of the method.  
+**Active Focus**
+- AWO Whitepaper v1.0 (stable reference)  
+- Case Study: *Waveframe v4.0* (applied entropic cosmology)  
 
-### Current Focus  
-- **Method Whitepaper v1.0** — citable, stable reference in `docs/`.  
-- **Case Study: Waveframe v4.0** — demonstration of AWO in a hard-science domain (cosmology). 
-
-### Upcoming Priorities  
-- **Societal Progress Simulator** — interactive demonstration of AWO in applied social science.  
-- **Expanded case studies** — additional applications in diverse domains to stress-test and refine AWO.  
-- **Refined documentation standards** — tightening how logs, artifacts, and decisions are recorded.  
-
-### Long-Term Vision  
-- **Stable release cadence** — semantic versioning with DOIs for each tagged release.  
-- **Citable briefs** — lightweight, structured outputs (“minimum viable papers”) built from repo artifacts.  
-- **Community use** — opening AWO for external case studies and reproducibility experiments.  
+**Upcoming**
+- *Societal Progress Simulator* — applied social-science case  
+- CRI-CORE integration for automated reproducibility  
+- Expansion into public reproducibility experiments  
 
 ---
 
-## In-repo Guarantees (what to expect now)
-
-See the AWO method spec in [/docs/AWO_Method_Spec_v1.1.md](docs/AWO_Method_Spec_v1.1.md). 
-Templates live in [/templates](templates), including the falsifiability manifest, ADRs, and release/audit checklists.
-- **Method whitepaper** in `/docs`: a citable, stable reference for AWO.  
-- **Roadmap** in the README: clear direction for evolution.  
-- **Citation files** (`CITATION.cff`, `citation.bib`): proper referencing support.  
-- **Logs** in `/logs`: records of orchestration choices, critique loops, and design evolution.  
-- **Versioning**: tagged releases, DOIs, and semantic versioning.  
-
-> If it can’t be audited, it doesn’t count. AWO optimizes for honest, inspectable workflows over theatrics.  
-
----
-
-## Core Principles
-
-- **Falsifiability First** → outputs must be disprovable, not just impressive.  
-- **AI as Partner** → models act as collaborators, not opaque black boxes.  
-- **Process Over Outcome** → the rigor of inquiry matters as much as results.  
-
----
-
-## Workflow Cycle
-
-1. **Define Question** → Frame the inquiry clearly.  
-2. **Orchestrate AI** → Deploy models to explore possibilities.  
-3. **Validate** → Stress-test outputs with logic, data, or constraints.  
-4. **Document** → Capture decisions, failures, and results.  
-5. **Synthesize** → Distill findings into usable knowledge.  
-
-<p align="center">
-  <img src="figures/AOM-Workflow-Cycle.PNG" alt="AWO Workflow Cycle diagram" width="70%">
-</p>
-
----
-
-## Skills Demonstrated
-
-- **Workflow design & process engineering** → structuring projects for clarity and repeatability.  
-- **Human-in-the-loop oversight** → embedding falsifiability and validation in AI use.  
-- **Reproducibility practices** → logs, documentation templates, audit trails.  
-- **Applied analysis** → translating orchestration into science, business, and social domains.  
-- **Method development** → frameworks for scaling AI–human collaboration.  
-
----
-
-## Deliverables
-
-- **Workflow Logs** → timestamped records of project decisions.  
-- **Documentation Templates** → reusable structures for reproducible inquiry.  
-- **Case Studies** → applied demonstrations of AWO in practice.  
- 
-
----
-
-## Roles in AWO
-
-- **Orchestrator (Human):** Frames direction, applies falsifiability, validates outputs.  
-- **AI Models:** Generate alternatives, surface blind spots, accelerate iteration.  
-- **Orchestration Layer:** Captures logs, integrates outputs, ensures reproducibility.  
-
----
-
-## Logs
-
-Logs are stored in the [`logs/`](logs) directory.  
-Each file is timestamped for clarity and archival purposes.  
-
-Logs demonstrate how AWO tracks **decisions, alternatives, and validations** across the project lifecycle.  
-
----
-
-## Author
+## Maintainer
 
 **Shawn C. Wright**  
-Researcher developing reproducible workflows for AI–human collaboration.  
-Focused on orchestration methods, documentation, and applied analysis across science and business domains.  
-
-- ORCID: [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-brightgreen.svg)](https://orcid.org/0009-0006-6043-9295)  
-- Email: **swright@waveframelabs.org**  
-- GitHub: [Wright-Shawn](https://github.com/Wright-Shawn)  
+Researcher and developer of reproducible AI–human workflows  
+- ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
+- Email: swright@waveframelabs.org  
+- GitHub: [Waveframe-Labs](https://github.com/Waveframe-Labs)
 
 ---
 
 ## License
 
-This repository uses a dual license:
+- **Code:** [Apache 2.0](LICENSE)  
+- **Documentation:** [CC BY 4.0](LICENSE-CC-BY-4.0.md)
 
-- **Apache 2.0** → applies to source code, scripts, and automation.  
-- **CC BY 4.0** → applies to documentation, prose, logs, and workflow notes.  
-
-By using this repository, you agree to comply with both.  
-
-See:  
-- [LICENSE](LICENSE) (Apache 2.0)  
-- [LICENSE-CC-BY-4.0.md](LICENSE-CC-BY-4.0.md) (Creative Commons Attribution 4.0)  
+---
