@@ -3,7 +3,7 @@ message: "If you use this work, please cite it as below."
 title: "Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Human Collaboration"
 version: "1.1.1"
 date-released: 2025-10-11
-doi: 10.5281/zenodo.17041921
+doi: 10.5281/zenodo.17013612
 authors:
   - family-names: Wright
     given-names: Shawn C.
