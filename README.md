@@ -37,13 +37,14 @@ AWO closes that gap through four principles:
 ## In This Repository
 
 - **Whitepaper** → full method spec in [`/docs`](docs)  
+- **Documentation Index** → see [`/docs/README_TOC.md`](docs/README_TOC.md) for a structured, citable table of contents  
 - **Templates** → falsifiability manifests, ADRs, audit checklists  
 - **Logs** → timestamped workflow and decision records  
 - **Workflows** → executable orchestration examples  
 - **Citations** → DOI, metadata, and licensing files  
 
 > If it can’t be audited, it doesn’t count.  
-> AWO prioritizes traceable rigor over presentation polish.
+> AWO prioritizes traceable rigor over presentation polish.  
 
 ---
 
