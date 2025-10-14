@@ -84,3 +84,5 @@ Researcher and developer of reproducible AI–human workflows
 - **Documentation:** [CC BY 4.0](LICENSE-CC-BY-4.0.md)
 
 ---
+
+*This repository represents the verifiable, signed state of AWO v1.1.1 — archived under DOI 10.5281/zenodo.17013612.*
