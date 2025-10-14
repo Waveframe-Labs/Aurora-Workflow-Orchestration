@@ -10,6 +10,15 @@
 
 ---
 
+## Run AWO (GitHub Actions)
+
+1. Go to **Actions → AWO Run (Manual Approve to Commit)**.
+2. Click **Run workflow**, keep `workflows/multimodel.json` (or choose another).
+3. Approve the **Scope** and **Audit** gates when prompted.
+4. After finalize, the run is committed under `runs/<RUN_ID>/` with:
+   - `run_manifest.json`, `report.md`, `SHA256SUMS.txt`
+   - `ATTESTATION.txt` + `.sig/.cert` for both the tarball and attestation.  
+
 ## Overview
 
 **Aurora Workflow Orchestration (AWO)** transforms AI-assisted projects into **auditable, reproducible research pipelines**.  
