@@ -48,7 +48,7 @@ AWO closes that gap through four principles:
 
 ---
 
-## Current Release — v1.1.1 (2025-10-12)
+## Current Release — v1.1.1 (2025-10-13)
 
 - Repository hardening & organizational transfer to **Waveframe Labs**  
 - Cryptographic **attestation integration** (cosign + OIDC)  
