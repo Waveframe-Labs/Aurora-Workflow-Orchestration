@@ -42,7 +42,8 @@ AWO is a methodology, not a code library. Every tagged release is citable (via D
 
 ## Why It Exists
 
-AI accelerates discovery, but verification lags. AWO closes that gap through four principles:
+AI accelerates discovery faster than verification can follow.    
+AWO closes that gap through four governing principles:  
 
 1. Falsifiability first — every claim must be disprovable, not just plausible.  
 2. Human-in-the-loop rigor — AI outputs are treated as hypotheses, not truths.  
@@ -62,7 +63,7 @@ AI accelerates discovery, but verification lags. AWO closes that gap through fou
   
 - Docs Index → [`/docs/README_TOC.md`](docs/README_TOC.md)
 
-> If it can’t be audited, it doesn’t count.
+> If it can’t be audited, it doesn’t count - that's the rule, not the slogan.
 
 ---
 
@@ -108,5 +109,5 @@ Related ADRs:
 - Documentation: [CC BY 4.0](LICENSE-CC-BY-4.0.md)
 
 ---
-
-*This repository represents the signed, verifiable state of AWO v1.1.1. The concept DOI above always resolves to the latest version.*
+**This repository represents the signed, verifiable state of **Aurora Workflow Orchestration (AWO) v1.1.1**      
+*The concept DOI above will always resolve to the latest verifiable version.*
