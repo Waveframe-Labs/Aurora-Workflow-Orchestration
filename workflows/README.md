@@ -82,9 +82,9 @@ Each run produces:
 
 ## Policy
  •	Do not modify workflow YAMLs directly on main.  
-Submit changes via pull request to preserve the audit trail.
-	•	Once a run’s artifacts are cited in an ADR, they become immutable.
-	•	Example JSONs (reviews.json, multimodel.json) are maintained as reproducibility demos.
+Submit changes via pull request to preserve the audit trail.  
+ •	Once a run’s artifacts are cited in an ADR, they become immutable.  
+ •	Example JSONs (reviews.json, multimodel.json) are maintained as reproducibility demos.  
 
 ---
 
