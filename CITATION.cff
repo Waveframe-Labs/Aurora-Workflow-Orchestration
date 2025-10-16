@@ -4,6 +4,10 @@ title: "Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Hum
 version: "1.1.1"
 date-released: 2025-10-11
 doi: 10.5281/zenodo.17013612
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.17345552
+    description: Version DOI for AWO v1.1.1
 authors:
   - family-names: Wright
     given-names: Shawn C.
