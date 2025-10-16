@@ -36,7 +36,7 @@ Each run produces a cryptographically signed provenance record, binding logic, d
 
 AWO is a methodology, not a code library. Every tagged release is citable (via DOI) and inspectable through structured logs, manifests, and schema validation.
 
-> AWO integrates with CRI-CORE, the “CI/CD for research” layer—automating validation, attestation, and archival for each workflow run.
+> AWO integrates with **CRI-CORE**, a complementary execution layer that automates validation, attestation, and archival for every workflow run.
 
 ---
 
