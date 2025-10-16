@@ -31,8 +31,8 @@
 
 ## Overview
 
-Aurora Workflow Orchestration (AWO) turns AI-assisted projects into auditable, reproducible research pipelines.  
-Each run produces a cryptographically signed provenance record, binding logic, data, and human validation into one verifiable unit.
+Aurora Workflow Orchestration (AWO) transforms AI-assisted projects into auditable, reproducible research pipelines.  
+Each run produces a cryptographically signed provenance record, binding logic, data, and human oversight into one verifiable unit.
 
 AWO is a methodology, not a code library. Every tagged release is citable (via DOI) and inspectable through structured logs, manifests, and schema validation.
 
