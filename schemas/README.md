@@ -1,6 +1,6 @@
 ---
 filetype: schema_suite
-version: 1.0.1
+version: 1.1.1
 updated: 2025-10
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
