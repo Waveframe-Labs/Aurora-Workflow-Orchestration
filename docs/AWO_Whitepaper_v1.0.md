@@ -18,8 +18,14 @@ CC BY 4.0 (text) · Apache-2.0 (code)
 **Version:**  
 1.0  ·  **Date:** 2025-10-07  
 
-**DOI**: [10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.17345552)  
-**Canonical DOI**: [10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.17345552)   
+**DOI:**  
+[10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.17345552)  
+
+---
+
+### At a Glance  
+Aurora Workflow Orchestration (AWO) is a governance framework for reproducible AI–human collaboration.  
+It formalizes falsifiability, auditability, and provenance in hybrid workflows and integrates with CRI-CORE for automated archival and validation.
 
 ---
 
@@ -34,29 +40,33 @@ CC BY 4.0 (text) · Apache-2.0 (code)
 
 ## Abstract
 
-The **Aurora Workflow Orchestration (AWO)** framework defines a reproducible governance system for AI–human collaboration. It formalizes falsifiability, auditability, and provenance within iterative research cycles. AWO enforces role separation, schema validation, and standardized decision records (ADRs) to make AI-driven work transparent and inspectable. Its operational layer, **CRI-CORE** (Continuous Research Integration), extends this methodology into automation — rendering every run reproducible, logged, and citable.
+The **Aurora Workflow Orchestration (AWO)** framework defines a reproducible governance system for AI–human collaboration. It formalizes falsifiability, auditability, and provenance within iterative research cycles.  
+AWO enforces role separation, schema validation, and standardized decision records (ADRs) to make AI-driven work transparent and inspectable.  
+Its operational layer, **CRI-CORE** (Continuous Research Integration), extends this methodology into automation—rendering every run reproducible, logged, and citable.
 
 ---
 
-## 1  Background and motivation
+## 1. Background and Motivation
 
 AI’s rapid adoption has exposed a reproducibility and provenance crisis.  
-AWO provides structured version control, audit trails, and verification for AI-assisted inquiry. It is a **methodological framework** rather than a software package: structuring how humans and models co-orchestrate reproducible, auditable outputs.
+AWO provides structured version control, audit trails, and verification for AI-assisted inquiry.  
+It is a **methodological framework** rather than a software package—structuring how humans and models co-orchestrate reproducible, auditable outputs.
 
 **Maintained by Waveframe Labs** under the Aurora Research Initiative, AWO anchors independent research to transparent, citable workflows that can withstand institutional scrutiny.
 
 ---
 
-## 2  Problem statement and objectives
+## 2. Problem Statement and Objectives
 
 **Weaknesses:** reproducibility gap, provenance crisis, audit opacity.  
 **Objectives:** formalize falsifiability, enforce schema-validated traceability, democratize reproducibility outside traditional institutions.
 
 ---
 
-## 2.5  Conceptual foundations
+## 2.5. Conceptual Foundations
 
-AI-assisted work expands human capability while obscuring epistemic accountability. Traditional science depends on explicit method and implicit trust; in AI-mediated inquiry that trust collapses. Models generate plausible results without revealing reasoning, distributing cognition across hybrid human–machine systems.
+AI-assisted work expands human capability while obscuring epistemic accountability.  
+Traditional science depends on explicit method and implicit trust; in AI-mediated inquiry that trust collapses. Models generate plausible results without revealing reasoning, distributing cognition across hybrid human–machine systems.
 
 **AWO reframes reproducibility as a structural property, not a behavioral one.**  
 It embeds verification directly into the workflow via manifests, audits, and decision records that make each claim falsifiable and traceable to origin.
@@ -66,43 +76,43 @@ By encoding falsifiability and auditability within the process itself, AWO conve
 
 ---
 
-## 3  Methodology
+## 3. Methodology
 
-### 3.1  Workflow cycle  
+### 3.1. Workflow Cycle  
 Define → Orchestrate → Validate → Document → Synthesize.  
 Each cycle moves hypothesis → orchestration → audit → artifact.
 
-### 3.2  Roles  
+### 3.2. Roles  
 **Orchestrator:** sets scope and falsifiability.  
 **Implementer:** produces raw outputs.  
 **Refiner:** improves clarity and efficiency.  
 **Critic:** performs adversarial validation.
 
-### 3.3  Artifacts  
+### 3.3. Artifacts  
 Run manifest · claim schema · provenance schema · falsifiability manifest · audit record · ADRs · release checklist · logs.
 
-### 3.4  Governance mechanisms  
+### 3.4. Governance Mechanisms  
 Sequential ADRs (0001–0013) codify methodological decisions.  
 Audit gates require schema validation, human approval, and logged critique before merge.
 
-### 3.5  Tooling  
+### 3.5. Tooling  
 `awo_run.py` · `validate_run.py` · `.github/workflows/awo-run.yml` · `/schemas/*.json` · `/templates/*.md` · `/logs/`.
 
-### 3.6  Artifact and governance maps  
+### 3.6. Artifact and Governance Maps  
 Artifacts guarantee reproducibility; ADRs define governance—release, audit, and meta-governance (ADR 0011–0013).
 
-### 3.7  Reproducibility verification  
+### 3.7. Reproducibility Verification  
 Schema validation, SHA-256 hashing, and environment capture ensure traceable, self-verifying runs.
 
 ---
 
-## 4  Related work
+## 4. Related Work
 
 AWO extends the **FAIR Principles** to full workflows, mirrors **CI/CD** logic via continuous research validation, and generalizes the rigor of **MLFlow**, **Weights & Biases**, and **DVC** through governance rather than tooling.
 
 ---
 
-## 5  Governance framework
+## 5. Governance Framework
 
 ADRs define:  
  • Evidence registry (ADR-0002)  
@@ -115,7 +125,7 @@ These records form a living constitution for reproducibility, updated through fo
 
 ---
 
-## 6  Limitations and mitigations
+## 6. Limitations and Mitigations
 
 1. Minimal automation → addressed by CRI-CORE.  
 2. Human oversight friction → reduced through standardized templates and checklists.  
@@ -125,48 +135,44 @@ Each limitation is tracked through open ADRs and targeted in CRI-CORE milestones
 
 ---
 
-## 7  Roadmap
+## 7. Roadmap
 
 ### Strategic Horizon
 
-AWO now stands as a stable methodological framework. Future development will focus on integration, scalability, and institutional adoption.   
-	•	Integration with CRI-CORE (Continuous Research Integration):
-Extend AWO’s governance layer into a full execution environment that automates validation, archival, and reproducibility checks across projects.  
-	•	Expansion through Waveframe Labs:
-Establish Waveframe Labs as the organizational backbone for open, reproducible AI research — hosting AWO, CRI-CORE, and applied case studies under one ecosystem.  
-	•	CRI-CORE Enterprise (planned):
-Explore a deployable variant of the CRI-CORE platform designed for organizations requiring compliance-grade reproducibility, audit logging, and research traceability.  
-	•	Ecosystem growth:
-Encourage adoption of AWO-based templates and governance standards across scientific, technical, and creative research domains.
-Promote the concept of the “minimum viable paper” — a modular, auditable unit of published knowledge.
+AWO now stands as a stable methodological framework. Future development will focus on integration, scalability, and institutional adoption.  
+
+- **Integration with CRI-CORE (Continuous Research Integration):**  
+  Extend AWO’s governance layer into a full execution environment that automates validation, archival, and reproducibility checks across projects.  
+
+- **Expansion through Waveframe Labs:**  
+  Establish Waveframe Labs as the organizational backbone for open, reproducible AI research—hosting AWO, CRI-CORE, and applied case studies under one ecosystem.  
+
+- **CRI-CORE Enterprise (planned):**  
+  Explore a deployable variant of the CRI-CORE platform designed for organizations requiring compliance-grade reproducibility, audit logging, and research traceability.  
+
+- **Ecosystem Growth:**  
+  Encourage adoption of AWO-based templates and governance standards across scientific, technical, and creative research domains.  
+  Promote the concept of the “minimum viable paper”—a modular, auditable unit of published knowledge.
 
 ---
 
-# Summary
-
-AWO defines the method.
-CRI-CORE operationalizes it.
-Waveframe Labs ensures continuity, stewardship, and scale.
-
----
-
-## 8  Conclusion
+## 8. Conclusion
 
 AWO demonstrates that reproducibility in AI–human collaboration is achievable today.  
 It fuses ADRs, schemas, and logs into a verifiable framework, while CRI-CORE operationalizes it for scalable execution and continuous research integration.
 
 ---
 
-## 9  Legal and archival notes
+## 9. Legal and Archival Notes
 
 Dual license: Apache 2.0 (code) + CC BY 4.0 (documentation).  
-Canonical DOI: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612).  
+Canonical DOI: [10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.17345552).  
 Archival assets: `/docs/AWO_Whitepaper_v1.0.md`, `/schemas/`, `/decisions/`.  
 Maintained by **Waveframe Labs** as part of the Aurora Research Initiative.
 
 ---
 
-## Appendix A — AI collaboration record
+## Appendix A — AI Collaboration Record
 
 Developed under the Aurora Workflow Orchestration methodology.  
 **Model:** GPT-5  
