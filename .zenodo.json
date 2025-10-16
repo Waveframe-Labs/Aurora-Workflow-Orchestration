@@ -2,7 +2,7 @@
   "title": "Aurora Workflow Orchestration (AWO)",
   "upload_type": "software",
   "publication_date": "2025-10-11",
-  "description": "AWO is a methodology for reproducible AI–human collaboration. It embeds falsifiability, audit trails, and provenance via standardized artifacts (ADRs, manifests, schemas, logs). CRI-CORE provides the automated execution layer that turns each run into a citable evidence package.",
+  "description": "AWO is a methodology for reproducible AI–human collaboration. It embeds falsifiability, audit trails, and provenance via standardized artifacts (ADRs, manifests, schemas, and logs). CRI-CORE provides the automated execution layer that turns each run into a citable evidence package.",
   "creators": [
     {
       "name": "Wright, Shawn C.",
@@ -36,6 +36,11 @@
     {
       "relation": "isAlternateIdentifier",
       "identifier": "10.5281/zenodo.17013612",
+      "scheme": "doi"
+    },
+    {
+      "relation": "isVersionOf",
+      "identifier": "10.5281/zenodo.17345552",
       "scheme": "doi"
     }
   ],
