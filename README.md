@@ -108,6 +108,18 @@ Related ADRs:
 - Code: [Apache 2.0](LICENSE)  
 - Documentation: [CC BY 4.0](LICENSE-CC-BY-4.0.md)
 
+
+---
+
+## Maintenance and Scale Note
+
+This project is currently developed and maintained by a single independent researcher under the **Waveframe Labs** umbrella.
+Its architecture, complete with governance records, schema validation, and modular directory design, was deliberately structured for future scalability and collaboration.
+
+While this release represents an individual implementation, the framework itself is engineered for multi-contributor governance, reproducible pipelines, and integration with the upcoming **CRI-CORE** toolchain.
+
+In short: the structure reflects its trajectory, not just its current scale.  
+
 ---
 **This repository represents the signed, verifiable state of **Aurora Workflow Orchestration (AWO) v1.1.1**      
 *The concept DOI above will always resolve to the latest verifiable version.*
