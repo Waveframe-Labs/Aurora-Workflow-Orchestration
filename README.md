@@ -54,10 +54,12 @@ AI accelerates discovery, but verification lags. AWO closes that gap through fou
 ## Repository Structure
 
 - Whitepaper / Method Spec → see [`/docs`](docs)  
-- Templates → falsifiability manifests, ADRs, audit checklists  
+- Templates → falsifiability manifests, audit checklists  
 - Logs → timestamped workflow and decision records  
 - Workflows → executable orchestration examples  
-- Citations → metadata and licensing files  
+- Citations → metadata and licensing files
+- Decicions → ADRs 0001-0015 
+  
 - Docs Index → [`/docs/README_TOC.md`](docs/README_TOC.md)
 
 > If it can’t be audited, it doesn’t count.
