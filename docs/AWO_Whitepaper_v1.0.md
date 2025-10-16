@@ -18,8 +18,8 @@ CC BY 4.0 (text) · Apache-2.0 (code)
 **Version:**  
 1.0  ·  **Date:** 2025-10-07  
 
-**DOI:**  
-[10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)  
+**DOI**: [10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.17345552)  
+**Canonical DOI**: [10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.17345552)   
 
 ---
 
