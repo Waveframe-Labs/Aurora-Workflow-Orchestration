@@ -1,0 +1,14 @@
+name: "Docs update"
+description: Improve README, /docs, or templates
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: What needs updating?
+      placeholder: e.g., Link VERIFY_ATTESTATION from README and run report.
+    validations: { required: true }
+  - type: textarea
+    id: details
+    attributes:
+      label: Details / suggested text
