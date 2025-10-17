@@ -1,0 +1,25 @@
+name: "Feature request"
+description: Suggest an enhancement to AWO or its automation
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: Briefly describe the capability.
+    validations: { required: true }
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why
+      description: Problem this solves, user value, or governance need.
+  - type: textarea
+    id: design
+    attributes:
+      label: Proposal / design sketch
+      description: Pseudocode, YAML step, or ADR reference.
+  - type: input
+    id: adr
+    attributes:
+      label: Related ADR (optional)
+      placeholder: ADR-0014
