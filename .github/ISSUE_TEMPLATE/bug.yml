@@ -1,0 +1,28 @@
+name: "Bug report"
+description: Report a problem with AWO or a workflow run
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include errors, screenshots, or failing steps.
+      placeholder: e.g., Scope gate failed schema check on step 04…
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: Minimal steps / workflow file to reproduce.
+  - type: input
+    id: run-id
+    attributes:
+      label: Run ID (if applicable)
+      placeholder: run_YYYY-MM-DDThh-mm-ssZ
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-checks
+      options:
+        - label: I verified the workflow JSON against the schema.
+        - label: I checked the logs in runs/<id>/report.md.
