@@ -1,0 +1,8 @@
+# Default owner
+*                                   @Wright-Shawn
+
+# Guard high-signal areas
+/schemas/                           @Wright-Shawn
+/workflows/                         @Wright-Shawn
+/docs/                              @Wright-Shawn
+/decisions/                         @Wright-Shawn
