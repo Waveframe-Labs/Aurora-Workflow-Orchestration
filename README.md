@@ -25,7 +25,8 @@
 3. Approve the **Scope** and **Audit** gates when prompted.  
 4. After completion, the run is committed under `runs/<RUN_ID>/` with:
    - `run_manifest.json`, `report.md`, `SHA256SUMS.txt`  
-   - `ATTESTATION.txt` and `.sig` / `.cert` for the attested run
+   - `ATTESTATION.txt` and `.sig` / `.cert` for the attested run  
+See **[Verify signatures & attestations](docs/VERIFY_ATTESTATION.md)** for end-to-end validation.  
 
 ---
 
@@ -59,7 +60,7 @@ AWO closes that gap through four governing principles:
 - Logs → timestamped workflow and decision records  
 - Workflows → executable orchestration examples  
 - Citations → metadata and licensing files
-- Decicions → ADRs 0001-0015 
+- Decisions → ADRs 0001-0015 
   
 - Docs Index → [`/docs/README_TOC.md`](docs/README_TOC.md)
 
