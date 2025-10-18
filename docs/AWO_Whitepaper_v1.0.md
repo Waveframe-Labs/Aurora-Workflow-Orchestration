@@ -92,7 +92,7 @@ Each cycle moves hypothesis → orchestration → audit → artifact.
 Run manifest · claim schema · provenance schema · falsifiability manifest · audit record · ADRs · release checklist · logs.
 
 ### 3.4. Governance Mechanisms  
-Sequential ADRs (0001–0013) codify methodological decisions.  
+Sequential ADRs (0001–0015) codify methodological decisions.  
 Audit gates require schema validation, human approval, and logged critique before merge.
 
 ### 3.5. Tooling  
