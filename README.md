@@ -12,7 +12,7 @@
 
 ## Core Documents
 
-- Whitepaper: [`/docs/AWO_Whitepaper_v1.0.md`](docs/AWO_Whitepaper_v1.0.md)  
+- Whitepaper: [`/docs/AWO_Whitepaper_v1.1.md`](docs/AWO_Whitepaper_v1.1.md)  
 - Method Specification: [`/docs/AWO_Method_Spec_v1.2.md`](docs/AWO_Method_Spec_v1.2.md)  
 - Concept DOI (resolves to latest version): [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 
