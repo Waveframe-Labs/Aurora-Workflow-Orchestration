@@ -30,7 +30,14 @@ jobs:
             --metadata rights="© 2025 Aurora Research Initiative (CC BY 4.0 text · Apache-2.0 code)"
 
       - name: Commit and Push PDF
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Auto-build Method Spec v1.2 → PDF"
-          file_pattern: docs/AWO_Method_Spec_v1.2.pdf
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/AWO_Method_Spec_v1.2.pdf
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Auto-build Method Spec v1.2 → PDF"
+            git push
+          fi
+
