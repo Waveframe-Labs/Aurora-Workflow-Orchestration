@@ -1,5 +1,13 @@
 # Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Human Collaboration
-
+---
+title: Aurora Workflow Orchestration (AWO)
+version: 1.1
+maintainer: Waveframe Labs
+program: Aurora Research Initiative
+license: CC BY 4.0 (text), Apache 2.0 (code)
+doi: 10.5281/zenodo.TBD
+date: 2025-10-19
+---
 **Author:**  
 Shawn C. Wright  
 
