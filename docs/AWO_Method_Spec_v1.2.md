@@ -44,16 +44,6 @@ Define a **repeatable, falsifiable, and auditable** methodology for AI-assisted 
 
 ---
 
-### Figure 1 — AWO–CRI-CORE Relationship
-
-![Figure 1: AWO–CRI-CORE Relationship](../figures/awo_architecture_diagram.png)
-
-AWO defines the **methodological layer**—roles, artifacts, and falsifiability.  
-CRI-CORE implements the **operational layer**, handling deterministic execution, provenance capture, and attestation.  
-Together they form a continuous epistemic verification stack.
-
----
-
 ## Scope
 AWO governs the structure of AI-assisted research into falsifiable claims, audited iterations, and immutable, citable releases.  
 It defines the **methodological layer** that enforces reproducibility and auditability.  
