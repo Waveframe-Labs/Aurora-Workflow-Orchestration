@@ -10,13 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    container:
+      image: pandoc/latex:latest   # includes pandoc + xelatex
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Install Pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
 
       - name: Build PDF from Markdown
         working-directory: docs
@@ -29,7 +28,6 @@ jobs:
             --metadata author="Shawn C. Wright, Aurora Research Initiative / Waveframe Labs Division" \
             --metadata date="October 2025" \
             --metadata rights="© 2025 Aurora Research Initiative (CC BY 4.0 text · Apache-2.0 code)"
-
 
       - name: Commit and Push PDF
         uses: stefanzweifel/git-auto-commit-action@v5
