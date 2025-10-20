@@ -1,4 +1,21 @@
 # Aurora Workflow Orchestration (AWO) — Method Specification v1.2 (Final)
+---
+title: Aurora Workflow Orchestration (AWO)
+version: 1.2.0
+maintainer: Waveframe Labs
+program: Aurora Research Initiative
+license: CC BY 4.0 (text), Apache 2.0 (code)
+doi: 10.5281/zenodo.TBD
+date: 2025-10-19
+---
+
+## Abstract
+Aurora Workflow Orchestration (AWO) defines a structured, audit-first methodology for AI-assisted research.  
+It establishes deterministic roles, reproducible artifacts, and falsifiability gates to ensure transparent scientific progress.  
+This release (v1.2.0) finalizes automation for documentation builds and institutional alignment under Waveframe Labs’ Aurora Research Initiative,  
+setting the foundation for the CRI-CORE runtime layer that operationalizes continuous research verification.
+
+**Keywords:** reproducible research, AI orchestration, falsifiability, provenance, audit automation
 
 **Author:**  
 Shawn C. Wright  
@@ -23,6 +40,14 @@ CC BY 4.0 (text) · Apache-2.0 (code)
 Define a **repeatable, falsifiable, and auditable** method for AI‑assisted research and analysis so that a third party can independently reproduce both the process and the evidence supporting its outcomes.
 
 ---
+
+### Figure 1. AWO–CRI-CORE Relationship
+
+![Figure 1: AWO–CRI-CORE Relationship](../figures/awo_architecture_diagram.png)
+
+AWO defines the **methodological layer**—roles, artifacts, and falsifiability.  
+CRI-CORE implements the **operational layer**, handling deterministic execution, provenance capture, and attestation.  
+Together they form a continuous epistemic verification stack.
 
 ## Scope  
 AWO governs how to structure AI‑assisted research into falsifiable claims, audited iterations, and immutable, citable releases.  
