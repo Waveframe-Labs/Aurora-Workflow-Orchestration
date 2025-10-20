@@ -36,7 +36,17 @@ Unlike ad hoc prompting or model‑driven iteration, AWO transforms research int
 
 AWO is part of the **Aurora Research Initiative**—a multi‑project effort focused on reproducible, audit‑first science. Other projects under this initiative include **Waveframe v4.0 (cosmology)** and the **Societal Progress Simulator**.  
 
----
+---  
+
+### Figure 1. AWO–CRI-CORE Relationship
+
+![Figure 1: AWO–CRI-CORE Relationship](../figures/awo_architecture_diagram.png)
+
+AWO defines the **methodological layer**—roles, artifacts, and falsifiability.  
+CRI-CORE implements the **operational layer**, handling deterministic execution, provenance capture, and attestation.  
+Together they form a continuous epistemic verification stack.
+
+---  
 
 ## 2. Method Overview  
 
