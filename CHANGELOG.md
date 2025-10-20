@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.2.0 — Automated Documentation Builds & Finalization under Aurora Research Initiative (2025-10-19)
+
+### Summary
+This release finalizes AWO’s documentation framework under the **Aurora Research Initiative** and integrates fully automated build pipelines for Whitepaper and Method Specification files.  
+
+### Key Updates
+- Added GitHub Actions workflows for **automated Pandoc → XeLaTeX PDF generation**:
+  - `build-whitepaper-pdf.yml`
+  - `build-methodspec-pdf.yml`
+- Confirmed successful generation of:
+  - `/docs/AWO_Whitepaper_v1.1.pdf`
+  - `/docs/AWO_Method_Spec_v1.2.pdf`
+- Established end-to-end reproducibility for documentation artifacts (no manual export required).
+- Verified bot-based commits (`github-actions[bot]`) as traceable, signed provenance entries.
+- Synchronized repository identity with **Aurora Research Initiative** (Waveframe Labs Division).
+- Prepared repo for final **v1.2 tag** and Zenodo archival once integration resumes.
+
+### Why It Matters
+This closes AWO’s foundational phase: the method and whitepaper are now reproducible, verifiable, and institutionally aligned.  
+The next phase (CRI-CORE) will extend these guarantees to runtime and provenance automation.
+
+### Related ADRs
+- **ADR-0016** — Automated PDF Build Integration (2025-10-19)
+- **ADR-0017** — Documentation Governance under Aurora Research Initiative (2025-10-19)
+
+---
+
+
 ## v1.1.1 — Repository Hardening, Organizational Transfer & Attestation Integration (2025-10-12)
 
 ### Summary
