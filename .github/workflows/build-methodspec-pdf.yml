@@ -5,17 +5,11 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '**/AWO_*Method*Spec*1.2*.md'
-      - '**/AWO_*Method*Spec*v1.2*.md'
-      - 'docs/**'
+      - 'docs/AWO_Method_Spec_v1.2.md'
       - '.github/workflows/build-methodspec-pdf.yml'
 
 permissions:
   contents: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   pdf:
@@ -30,65 +24,27 @@ jobs:
         with:
           pandoc-version: '3.1.11'
 
-      - name: Setup TinyTeX (LaTeX)
-        uses: r-lib/actions/setup-tinytex@v2
-
-      - name: Ensure output directory
+      - name: Install Tectonic (LaTeX engine)
         run: |
-          mkdir -p docs/pdf
-          mkdir -p .ci
+          sudo apt-get update
+          sudo apt-get install -y tectonic
 
-      - name: Write Lua filter to drop images
+      - name: Ensure output dir + Lua filter
         run: |
+          mkdir -p docs/pdf .ci
           cat > .ci/drop-images.lua <<'EOF'
-          -- Pandoc Lua filter: remove all images (figures)
-          function Image(el)
-            return {}
-          end
+          function Image(el) return {} end
           EOF
 
-      - name: Resolve Method Spec path
-        id: resolve
-        shell: bash
+      - name: Build PDF (no images)
         run: |
-          set -euo pipefail
-          candidates=(
-            "AWO_Method_Spec_v1.2.md"
-            "docs/AWO_Method_Spec_v1.2.md"
-            "method/AWO_Method_Spec_v1.2.md"
-            "docs/method/AWO_Method_Spec_v1.2.md"
-          )
-          for f in "${candidates[@]}"; do
-            if [ -f "$f" ]; then
-              echo "src=$f" >> "$GITHUB_OUTPUT"
-              echo "Found: $f"
-              exit 0
-            fi
-          done
-          fallback="$(git ls-files | grep -Ei 'AWO_.*Method.*Spec.*v?1\.2.*\.md' | head -n1 || true)"
-          if [ -n "$fallback" ] && [ -f "$fallback" ]; then
-            echo "src=$fallback" >> "$GITHUB_OUTPUT"
-            echo "Found via grep: $fallback"
-            exit 0
-          fi
-          echo "No Method Spec file found. Listing files for debugging:"
-          git ls-files
-          exit 1
-
-      - name: Build Method Spec PDF with Pandoc (images removed)
-        run: |
-          set -euo pipefail
-          SRC="${{ steps.resolve.outputs.src }}"
-          echo "Building from $SRC (dropping images)"
-          pandoc "$SRC" \
-            --from=markdown+footnotes+pipe_tables+raw_html+link_attributes \
+          pandoc docs/AWO_Method_Spec_v1.2.md \
+            --from=commonmark_x+footnotes+pipe_tables \
             --lua-filter=.ci/drop-images.lua \
-            --pdf-engine=xelatex \
-            --metadata=link-citations=true \
-            --fail-if-warnings \
+            --pdf-engine=tectonic \
             --output=docs/pdf/AWO_Method_Spec_v1.2.pdf
 
-      - name: Upload artifact (Method Spec PDF)
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: AWO_Method_Spec_v1.2.pdf
