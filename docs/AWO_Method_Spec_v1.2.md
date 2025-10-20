@@ -1,5 +1,3 @@
-# Aurora Workflow Orchestration (AWO) — Method Specification v1.2 (Final)
-
 ---
 title: Aurora Workflow Orchestration (AWO)
 version: 1.2.0
@@ -8,7 +6,9 @@ program: Aurora Research Initiative
 license: CC BY 4.0 (text), Apache 2.0 (code)
 doi: 10.5281/zenodo.TBD
 date: 2025-10-19
----
+---  
+
+# Aurora Workflow Orchestration (AWO) — Method Specification v1.2 (Final)
 
 ## Abstract
 Aurora Workflow Orchestration (AWO) defines a structured, audit-first methodology for AI-assisted research.
