@@ -1,58 +1,40 @@
 name: Build and Commit Method Spec PDF
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
     paths:
       - 'docs/AWO_Method_Spec_v1.2.md'
-      - '.github/workflows/build-methodspec-pdf.yml'
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  pdf:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Pandoc
-        uses: r-lib/actions/setup-pandoc@v2
-        with:
-          pandoc-version: '3.1.11'
-
-      - name: Setup TinyTeX (LaTeX)
-        uses: r-lib/actions/setup-tinytex@v2
-
-      - name: Ensure output dir + Lua filter
+      - name: Install Pandoc + TeX engine
         run: |
-          mkdir -p docs/pdf .ci
-          cat > .ci/drop-images.lua <<'EOF'
-          function Image(el) return {} end
-          EOF
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
 
-      - name: Build PDF (images removed)
+      - name: Build PDF from Markdown
+        working-directory: docs
         run: |
-          set -euo pipefail
-          pandoc docs/AWO_Method_Spec_v1.2.md \
-            --from=commonmark_x+footnotes+pipe_tables+raw_html \
-            --lua-filter=.ci/drop-images.lua \
-            --resource-path=.:docs:figures \
+          pandoc AWO_Method_Spec_v1.2.md \
+            -o AWO_Method_Spec_v1.2.pdf \
+            --standalone \
             --pdf-engine=xelatex \
-            --output=docs/pdf/AWO_Method_Spec_v1.2.pdf
+            --metadata title="Aurora Workflow Orchestration — Method Specification v1.2" \
+            --metadata author="Shawn C. Wright, Aurora Research Initiative / Waveframe Labs Division" \
+            --metadata date="October 2025" \
+            --metadata rights="© 2025 Aurora Research Initiative (CC BY 4.0 text · Apache-2.0 code)"
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AWO_Method_Spec_v1.2.pdf
-          path: docs/pdf/AWO_Method_Spec_v1.2.pdf
-          if-no-files-found: error
-
-      - name: Commit PDF back to repo
+      - name: Commit and Push PDF
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(ci): update Method Spec PDF (auto, images removed)"
-          file_pattern: docs/pdf/AWO_Method_Spec_v1.2.pdf
+          commit_message: "Auto-build Method Spec v1.2 → PDF"
+          file_pattern: docs/AWO_Method_Spec_v1.2.pdf
