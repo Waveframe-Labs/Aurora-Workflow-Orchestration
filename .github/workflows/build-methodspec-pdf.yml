@@ -5,14 +5,11 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'AWO_Method_Spec_v1.2.md'
+      - '**/AWO_*Method*Spec*1.2*.md'
+      - '**/AWO_*Method*Spec*v1.2*.md'
       - 'docs/**'
       - '.github/workflows/build-methodspec-pdf.yml'
   pull_request:
-    paths:
-      - 'AWO_Method_Spec_v1.2.md'
-      - 'docs/**'
-      - '.github/workflows/build-methodspec-pdf.yml'
 
 permissions:
   contents: write
@@ -53,10 +50,40 @@ jobs:
           \setlist{topsep=4pt, partopsep=0pt, parsep=0pt}
           EOF
 
+      - name: Resolve Method Spec path
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidates=(
+            "AWO_Method_Spec_v1.2.md"
+            "docs/AWO_Method_Spec_v1.2.md"
+            "method/AWO_Method_Spec_v1.2.md"
+            "docs/method/AWO_Method_Spec_v1.2.md"
+          )
+          for f in "${candidates[@]}"; do
+            if [ -f "$f" ]; then
+              echo "src=$f" >> "$GITHUB_OUTPUT"
+              echo "Found: $f"
+              exit 0
+            fi
+          done
+          fallback="$(git ls-files | grep -Ei 'AWO_.*Method.*Spec.*v?1\.2.*\.md' | head -n1 || true)"
+          if [ -n "$fallback" ] && [ -f "$fallback" ]; then
+            echo "src=$fallback" >> "$GITHUB_OUTPUT"
+            echo "Found via grep: $fallback"
+            exit 0
+          fi
+          echo "No Method Spec file found. Listing files for debugging:"
+          git ls-files
+          exit 1
+
       - name: Build Method Spec PDF with Pandoc
         run: |
           set -euo pipefail
-          pandoc AWO_Method_Spec_v1.2.md \
+          SRC="${{ steps.resolve.outputs.src }}"
+          echo "Building from $SRC"
+          pandoc "$SRC" \
             --from=markdown+footnotes+pipe_tables+raw_html+link_attributes \
             --resource-path=.:docs:figures \
             --pdf-engine=xelatex \
