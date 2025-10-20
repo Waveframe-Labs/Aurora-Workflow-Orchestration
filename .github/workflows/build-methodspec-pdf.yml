@@ -37,4 +37,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto-build Method Spec v1.2 → PDF"
-          file_pattern: docs/AWO_Method_Spec_v1.2.pdf
+          file_pattern: docs/AWO_Method_Spec_v1.2.pdf  
+          push_options: '--force'  
+          
