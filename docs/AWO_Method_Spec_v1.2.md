@@ -1,13 +1,13 @@
 # Aurora Workflow Orchestration (AWO) — Method Specification v1.2 (Final)
 
 ---
-title: "Aurora Workflow Orchestration (AWO)"
-version: "1.2.0"
-maintainer: "Waveframe Labs"
-program: "Aurora Research Initiative"
-license: "CC BY 4.0 (text), Apache 2.0 (code)"
-doi: "10.5281/zenodo.TBD"
-date: "2025-10-19"
+title: Aurora Workflow Orchestration (AWO)
+version: 1.2.0
+maintainer: Waveframe Labs
+program: Aurora Research Initiative
+license: CC BY 4.0 (text), Apache 2.0 (code)
+doi: 10.5281/zenodo.TBD
+date: 2025-10-19
 ---
 
 ## Abstract
