@@ -41,9 +41,9 @@ Each file follows the format `ADR-####-<topic>.md` and includes:
 | ADR-0013 | Audit Types Expansion | Defines multi-layer audit logic: logic, data, and peer review. |
 | ADR-0014 | Repository Hardening and Organizational Transfer | Standardized folder documentation, unified metadata and contact info, resolved .github override, and formalized AWO’s migration under Waveframe Labs for long-term reproducibility governance. |   
 | ADR-0015 | Attestation Integration & Cryptographic Signing | Adds cryptographic attestation and OIDC signing to bind manifests and checksums, replacing manual audits. |  
-
----
-
+| ADR-0016 | Automated PDF Build Integration | Integrate automated PDF generation directly into the repository using GitHub Actions and Pandoc + XeLaTeX. |  
+| ADR-0017 | Documentation Governance under Aurora Research Initiative | All AWO documentation, specifications, and workflow outputs are now governed under the **Aurora Research Initiative (ARI)**. |  
+  
 ## Relation to AWO
 - ADRs ensure **traceable governance** — every methodological rule has an origin record.  
 - Whitepaper citations and schema updates must link to at least one ADR ID.  
