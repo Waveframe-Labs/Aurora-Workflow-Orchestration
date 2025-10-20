@@ -24,10 +24,8 @@ jobs:
         with:
           pandoc-version: '3.1.11'
 
-      - name: Install Tectonic (LaTeX engine)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tectonic
+      - name: Setup TinyTeX (LaTeX)
+        uses: r-lib/actions/setup-tinytex@v2
 
       - name: Ensure output dir + Lua filter
         run: |
@@ -36,12 +34,14 @@ jobs:
           function Image(el) return {} end
           EOF
 
-      - name: Build PDF (no images)
+      - name: Build PDF (images removed)
         run: |
+          set -euo pipefail
           pandoc docs/AWO_Method_Spec_v1.2.md \
-            --from=commonmark_x+footnotes+pipe_tables \
+            --from=commonmark_x+footnotes+pipe_tables+raw_html \
             --lua-filter=.ci/drop-images.lua \
-            --pdf-engine=tectonic \
+            --resource-path=.:docs:figures \
+            --pdf-engine=xelatex \
             --output=docs/pdf/AWO_Method_Spec_v1.2.pdf
 
       - name: Upload artifact
