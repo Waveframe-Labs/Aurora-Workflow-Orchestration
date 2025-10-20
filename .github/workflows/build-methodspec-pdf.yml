@@ -9,7 +9,6 @@ on:
       - '**/AWO_*Method*Spec*v1.2*.md'
       - 'docs/**'
       - '.github/workflows/build-methodspec-pdf.yml'
-  pull_request:
 
 permissions:
   contents: write
@@ -39,15 +38,13 @@ jobs:
           mkdir -p docs/pdf
           mkdir -p .ci
 
-      - name: Create LaTeX header to pin figure placement
+      - name: Write Lua filter to drop images
         run: |
-          cat > .ci/float-setup.tex <<'EOF'
-          % Force figures to appear exactly where they are declared (no floating)
-          \usepackage{float}
-          \floatplacement{figure}{H}
-          % Keep list/figure boundaries clean
-          \usepackage{enumitem}
-          \setlist{topsep=4pt, partopsep=0pt, parsep=0pt}
+          cat > .ci/drop-images.lua <<'EOF'
+          -- Pandoc Lua filter: remove all images (figures)
+          function Image(el)
+            return {}
+          end
           EOF
 
       - name: Resolve Method Spec path
@@ -78,16 +75,15 @@ jobs:
           git ls-files
           exit 1
 
-      - name: Build Method Spec PDF with Pandoc
+      - name: Build Method Spec PDF with Pandoc (images removed)
         run: |
           set -euo pipefail
           SRC="${{ steps.resolve.outputs.src }}"
-          echo "Building from $SRC"
+          echo "Building from $SRC (dropping images)"
           pandoc "$SRC" \
             --from=markdown+footnotes+pipe_tables+raw_html+link_attributes \
-            --resource-path=.:docs:figures \
+            --lua-filter=.ci/drop-images.lua \
             --pdf-engine=xelatex \
-            --include-in-header=.ci/float-setup.tex \
             --metadata=link-citations=true \
             --fail-if-warnings \
             --output=docs/pdf/AWO_Method_Spec_v1.2.pdf
@@ -102,5 +98,5 @@ jobs:
       - name: Commit PDF back to repo
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(ci): update Method Spec PDF (auto)"
+          commit_message: "chore(ci): update Method Spec PDF (auto, images removed)"
           file_pattern: docs/pdf/AWO_Method_Spec_v1.2.pdf
