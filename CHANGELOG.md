@@ -1,9 +1,9 @@
 # Changelog
 
-## v1.2.0 — Automated Documentation Builds & Finalization under Aurora Research Initiative (2025-10-19)
+## v1.2.0 — Automated Documentation Builds & Finalization within the Aurora Research Initiative (2025-10-19)  
 
 ### Summary
-This release finalizes AWO’s documentation framework under the **Aurora Research Initiative** and integrates fully automated build pipelines for Whitepaper and Method Specification files.  
+- This release finalizes AWO’s documentation framework within the **Aurora Research Initiative**, the flagship program published by **Waveframe Labs**, and integrates fully automated build pipelines for Whitepaper and Method Specification files.  
 
 ### Key Updates
 - Added GitHub Actions workflows for **automated Pandoc → XeLaTeX PDF generation**:
