@@ -74,8 +74,8 @@ Format: **What I did, What I learned, Next step.**
 - **What I did:**  
   Integrated automated PDF build pipelines for all core documentation artifacts (Whitepaper and Method Specification).  
   Implemented two GitHub Actions workflows (`build-whitepaper-pdf.yml` and `build-methodspec-pdf.yml`) to generate and commit reproducible `.pdf` outputs from Markdown sources using Pandoc + XeLaTeX.  
-  Verified successful bot-committed builds of `/docs/AWO_Whitepaper_v1.1.pdf` and `/docs/AWO_Method_Spec_v1.2.pdf`.  
-  Transitioned institutional governance from **Waveframe Labs** to the **Aurora Research Initiative**, aligning AWO with its broader reproducibility mandate.  
+  Verified successful bot-committed builds of `/docs/AWO_Whitepaper_v1.1.pdf` and `/docs/AWO_Method_Spec_v1.2.pdf`.    
+  Transitioned institutional governance of AWO into the **Aurora Research Initiative**, the flagship program published by **Waveframe Labs**, aligning it with the Initiative’s broader reproducibility mandate.   
   Prepared the repository for final `v1.2.0` tag and Zenodo archival once integration resumes.
 
 - **What I learned:**  
@@ -95,7 +95,7 @@ Format: **What I did, What I learned, Next step.**
 ---
 
 ## Current Status (as of 2025-10-19)
-- **What I did:** Finalized AWO v1.2.0 under Aurora Research Initiative governance.  
+- **What I did:** Finalized AWO v1.2.0 within the Aurora Research Initiative, under Waveframe Labs governance. 
   Established automated documentation workflows, verified build reproducibility, and validated repository readiness for archival.  
   The framework is now fully reproducible and institutionally aligned — marking AWO’s completion and handoff to the upcoming CRI-CORE operational phase.
 
