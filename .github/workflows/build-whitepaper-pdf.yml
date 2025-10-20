@@ -3,7 +3,7 @@ name: Build and Commit Whitepaper PDF
 on:
   push:
     paths:
-      - 'docs/AWO_Whitepaper_v1.1.md'   # <-- update if your file name differs
+      - 'docs/AWO_Whitepaper_v1.1.md'
   workflow_dispatch:
 
 jobs:
@@ -21,20 +21,50 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
 
-      - name: Build PDF from Markdown
-        working-directory: docs
+      - name: Sanity check — YAML front matter is closed
         run: |
-          pandoc AWO_Whitepaper_v1.1.md \
-            -o AWO_Whitepaper_v1.1.pdf \
-            --standalone \
+          set -euo pipefail
+          FILE="docs/AWO_Whitepaper_v1.1.md"
+          awk '
+            BEGIN{dashes=0}
+            NR<=200 && $0 ~ /^---[[:space:]]*$/ { dashes++ }
+            END {
+              if (dashes==0) { exit 0 }
+              else if (dashes<2) {
+                print "FATAL: YAML front matter not closed (need opening and closing ---) in " ARGV[1]
+                exit 2
+              }
+            }
+          ' "$FILE"
+
+      - name: Build PDF from Markdown (verbose, fail on warnings)
+        run: |
+          set -euo pipefail
+          mkdir -p docs/pdf .ci
+          # Optional: drop images. Uncomment to remove images for now.
+          # cat > .ci/drop-images.lua <<'EOF'
+          # function Image(el) return {} end
+          # EOF
+          pandoc docs/AWO_Whitepaper_v1.1.md \
+            --from=gfm+footnotes+pipe_tables+tex_math_dollars+link_attributes \
             --pdf-engine=xelatex \
-            --metadata title="Aurora Workflow Orchestration — Whitepaper v1.1" \
-            --metadata author="Shawn C. Wright, Waveframe Labs (Aurora Research Initiative)" \
-            --metadata date="October 2025" \
-            --metadata rights="© 2025 Waveframe Labs (CC BY 4.0 text · Apache-2.0 code)"
+            --standalone \
+            --resource-path=.:docs:figures \
+            --fail-if-warnings \
+            --verbose \
+            -o docs/pdf/AWO_Whitepaper_v1.1.pdf \
+            2> .ci/pandoc-whitepaper.log
+
+      - name: Upload Pandoc log
+        uses: actions/upload-artifact@v4
+        with:
+          name: pandoc-whitepaper-log
+          path: .ci/pandoc-whitepaper.log
+          if-no-files-found: warn
 
       - name: Commit and Push PDF
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto-build Whitepaper v1.1 → PDF"
-          file_pattern: docs/AWO_Whitepaper_v1.1.pdf
+          file_pattern: docs/pdf/AWO_Whitepaper_v1.1.pdf
+          push_options: '--force'
