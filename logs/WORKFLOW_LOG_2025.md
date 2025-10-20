@@ -69,4 +69,36 @@ Format: **What I did, What I learned, Next step.**
 
 ---
 
+## 2025-10-19 — v1.2.0 Automated Documentation Builds & Aurora Research Initiative Finalization
+
+- **What I did:**  
+  Integrated automated PDF build pipelines for all core documentation artifacts (Whitepaper and Method Specification).  
+  Implemented two GitHub Actions workflows (`build-whitepaper-pdf.yml` and `build-methodspec-pdf.yml`) to generate and commit reproducible `.pdf` outputs from Markdown sources using Pandoc + XeLaTeX.  
+  Verified successful bot-committed builds of `/docs/AWO_Whitepaper_v1.1.pdf` and `/docs/AWO_Method_Spec_v1.2.pdf`.  
+  Transitioned institutional governance from **Waveframe Labs** to the **Aurora Research Initiative**, aligning AWO with its broader reproducibility mandate.  
+  Prepared the repository for final `v1.2.0` tag and Zenodo archival once integration resumes.
+
+- **What I learned:**  
+  Automation is the final bridge between transparency and reproducibility.  
+  By removing human intervention from documentation builds, AWO now guarantees verifiable parity between Markdown and distributed PDFs — every artifact can be reproduced exactly from versioned source.  
+  Institutional continuity under the **Aurora Research Initiative** ensures AWO’s methodology remains transparent, citable, and evolution-ready.
+
+- **Next step:**  
+  1. Tag and publish `v1.2.0` on GitHub.  
+  2. Attach generated PDFs to the release for long-term archival and Zenodo DOI linking.  
+  3. Begin **CRI-CORE** phase: operationalize AWO’s orchestration logic into a continuous runtime for live epistemic verification.  
+
+**Related ADRs:**  
+- ADR-0016 — *Automated PDF Build Integration*  
+- ADR-0017 — *Documentation Governance under Aurora Research Initiative*
+
+---
+
+## Current Status (as of 2025-10-19)
+- **What I did:** Finalized AWO v1.2.0 under Aurora Research Initiative governance.  
+  Established automated documentation workflows, verified build reproducibility, and validated repository readiness for archival.  
+  The framework is now fully reproducible and institutionally aligned — marking AWO’s completion and handoff to the upcoming CRI-CORE operational phase.
+
+---
+
 *This workflow log serves as AWO’s provenance ledger; each entry corresponds to a verifiable tagged release and its Zenodo-archived state.*
