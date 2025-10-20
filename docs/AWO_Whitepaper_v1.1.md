@@ -46,15 +46,6 @@ AWO exists as part of the **Aurora Research Initiative**, a Waveframe Labs progr
 
 ---
 
-### Figure 1 — AWO–CRI-CORE Relationship
-![Figure 1: AWO–CRI-CORE Relationship](../figures/awo_architecture_diagram.png)
-
-AWO defines the **methodological layer**—roles, artifacts, and falsifiability.  
-CRI-CORE implements the **operational layer**, handling deterministic execution, provenance capture, and attestation.  
-Together they form a continuous epistemic verification stack linking methodology and runtime.
-
----
-
 ## 2. Method Overview
 AWO provides the **methodological layer** for reproducible AI-human research.  
 **CRI-CORE** serves as the **operational layer**, automating AWO-compliant runs and verifications.  
