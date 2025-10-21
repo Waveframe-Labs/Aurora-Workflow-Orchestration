@@ -1,7 +1,7 @@
 ---
 filetype: repo_meta
 version: 1.0.1
-updated: 2025-10
+updated: 2025-10-20
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 ---
