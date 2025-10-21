@@ -1,7 +1,7 @@
 ---
 filetype: figures
 version: 1.1.1
-updated: 2025-10-08
+updated: 2025-10-19
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 ---
