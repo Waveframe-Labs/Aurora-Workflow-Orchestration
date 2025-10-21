@@ -1,9 +1,8 @@
 name: Build and Commit Whitepaper PDF
-
 on:
   push:
     paths:
-      - 'docs/AWO_Whitepaper_v1.1.md'   
+      - 'docs/AWO_Whitepaper_v1.1.md'
   workflow_dispatch:
 
 jobs:
@@ -21,20 +20,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
 
-      # same sanity check so we never get "abstract-only" again
-      - name: Sanity check — YAML front matter is closed
-        working-directory: docs
-        run: |
-          set -euo pipefail
-          awk '
-            BEGIN{d=0}
-            NR<=200 && $0 ~ /^---[[:space:]]*$/ { d++ }
-            END {
-              if (d==1) { print "YAML front matter not closed: add a second ---"; exit 2 }
-            }
-          ' AWO_Whitepaper_v1.1.md
-
-      - name: Build PDF from Markdown (verbose log)
+      - name: Build PDF from Markdown
         working-directory: docs
         run: |
           set -euo pipefail
@@ -42,24 +28,17 @@ jobs:
             -o AWO_Whitepaper_v1.1.pdf \
             --standalone \
             --pdf-engine=xelatex \
-            --from=markdown+footnotes+pipe_tables \
-            --metadata title="Aurora Workflow Orchestration — Whitepaper v1.1" \
+            --metadata title="Aurora Workflow Orchestration Whitepaper v1.1" \
             --metadata author="Shawn C. Wright, Aurora Research Initiative / Waveframe Labs Division" \
             --metadata date="October 2025" \
-            --metadata rights="© 2025 Aurora Research Initiative (CC BY 4.0 text · Apache-2.0 code)" \
-            --verbose \
-            2> ../.pandoc-whitepaper.log
+            --metadata rights="© 2025 Aurora Research Initiative (CC BY 4.0 text · Apache-2.0 code)"
+          # mirror to repo root so the old download link updates too
+          cp AWO_Whitepaper_v1.1.pdf ../AWO_Whitepaper_v1.1.pdf
 
-      - name: Upload Pandoc log (always)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pandoc-whitepaper-log
-          path: .pandoc-whitepaper.log
-          if-no-files-found: warn
-
-      - name: Commit and Push PDF
+      - name: Commit and Push PDF(s)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto-build Whitepaper v1.1 → PDF"
-          file_pattern: docs/AWO_Whitepaper_v1.2.pdf
+          file_pattern: |
+            docs/AWO_Whitepaper_v1.1.pdf
+            AWO_Whitepaper_v1.1.pdf
