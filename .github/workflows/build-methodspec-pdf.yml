@@ -42,12 +42,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p docs/pdf .ci
-          # Optional: drop images. Uncomment the next 3 lines if you want text-only for now.
-          # cat > .ci/drop-images.lua <<'EOF'
-          # function Image(el) return {} end
-          # EOF
           pandoc docs/AWO_Method_Spec_v1.2.md \
-            --from=gfm+footnotes+pipe_tables+tex_math_dollars+link_attributes \
+            --from=markdown+footnotes+pipe_tables+tex_math_dollars+link_attributes \
             --pdf-engine=xelatex \
             --standalone \
             --resource-path=.:docs:figures \
@@ -57,11 +53,13 @@ jobs:
             2> .ci/pandoc-methodspec.log
 
       - name: Upload Pandoc log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pandoc-methodspec-log
           path: .ci/pandoc-methodspec.log
           if-no-files-found: warn
+
 
       - name: Commit and Push PDF
         uses: stefanzweifel/git-auto-commit-action@v5
