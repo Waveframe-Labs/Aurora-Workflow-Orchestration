@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.0 — Automated Documentation Builds & Finalization within the Aurora Research Initiative (2025-10-19)  
+## v1.2.0 — Automated Documentation Builds & Finalization within the Aurora Research Initiative (2025-10-20)  
 
 ### Summary
 - This release finalizes AWO’s documentation framework within the **Aurora Research Initiative**, the flagship program published by **Waveframe Labs**, and integrates fully automated build pipelines for Whitepaper and Method Specification files.  
