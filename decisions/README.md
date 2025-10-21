@@ -1,7 +1,7 @@
 ---
 filetype: decision_records
 version: 1.1.1
-updated: 2025-10-20
+updated: 2025-10-19
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 ---
