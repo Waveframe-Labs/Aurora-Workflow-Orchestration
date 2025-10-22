@@ -78,9 +78,10 @@ Key updates:
 - End-to-end provenance sealing  
 - `.zenodo.json` and `CITATION.cff` aligned with concept DOI
 
-**Version DOI for this release**: [10.5281/zenodo.17345552](https://doi.org/10.5281/zenodo.xxxxxxxx)    
-**Concept DOI (always latest)**: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+**Version DOI for this release**: [10.5281/zenodo.xxxxxxxx](https://doi.org/10.5281/zenodo.xxxxxxxx)  
 *DOI minting in progress*  
+**Concept DOI (always latest)**: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+  
 Related ADRs:
 - ADR-0014 — Repository Hardening & Organizational Transfer  
 - ADR-0015 — Attestation Integration & Cryptographic Signing
