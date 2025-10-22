@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.2.0 — CRI Handoff & Repository Finalization (2025-10-22)
+
+### Summary
+This release finalizes **Aurora Workflow Orchestration (AWO)** as the *methodological layer* within the Waveframe Labs ecosystem.  
+AWO v1.2.0 formally designates **CRI-CORE** as its successor project and concludes AWO’s functional development line.  
+All future runtime and verification tooling will continue under CRI-CORE, which operationalizes AWO’s reproducibility model in executable form.
+
+### Key Updates
+- Updated `README.md` to reflect AWO’s finalized status under Waveframe Labs governance.  
+- Added clear explanation of AWO’s role as the **methodological framework** defining reproducible, audit-first AI–human collaboration.  
+- Added **Successor Project** section linking to [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE).  
+- Clarified versioning boundary between AWO (methodology) and CRI (runtime implementation).  
+- Introduced `docs/CRI_HANDOFF.md` to record formal transfer of runtime scope from AWO → CRI-CORE.  
+- Updated DOI section to reference the **concept DOI (10.5281/zenodo.17013612)** while Zenodo account consolidation is pending.  
+- Declared AWO a stable, citation-grade artifact—no further feature changes beyond provenance updates.
+
+### Why It Matters
+This marks the **completion of AWO’s lifecycle** as a standalone research framework.  
+The repository now serves as the *canonical methodological reference* for reproducible AI–human collaboration.  
+Its principles—falsifiability, attestation, and provenance—remain active through CRI-CORE, ensuring continuity between theory and runtime verification.  
+
+---
+
+**Status:** Finalized under Waveframe Labs · Aurora Research Initiative  
+**Successor:** [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE) — Continuous Research Integration Toolchain  
+**Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+
+
 ## v1.2.0 — Automated Documentation Builds & Finalization within the Aurora Research Initiative (2025-10-20)  
 
 ### Summary
