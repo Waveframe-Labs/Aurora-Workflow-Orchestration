@@ -4,100 +4,102 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
 [![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff)  
-![Last Commit](https://img.shields.io/github/last-commit/Waveframe-Labs/Aurora-Workflow-Orchestration/main)  
+![Last Commit](https://img.shields.io/github/last-commit/Waveframe-Labs/Aurora-Workflow-Orchestration/main)
 
 ![AURORA WORKFLOW ORCHESTRATION](figures/awo_banner_cri.PNG)
 
 ---
 
-## Note: Two provisional DOIs (10.5281/zenodo.17401760 and 10.5281/zenodo.17402459) exist due to a Zenodo account linkage issue.
-The authoritative concept DOI for all AWO versions remains 10.5281/zenodo.17013612
-.
-Once Zenodo resolves the account merge, the canonical version DOI will be updated.
+## AWO v1.2 — Finalized Methodology under Waveframe Labs Governance
 
-## Core Documents
+**Aurora Workflow Orchestration (AWO)** defines the reproducible research and audit-first methodology now implemented in **CRI-CORE**.  
+AWO v1.2 formalized the method specification, attestation system, and documentation pipeline now extended under CRI-CORE, which operationalizes the methodology as executable governance infrastructure.
 
-- Whitepaper: [`/docs/AWO_Whitepaper_v1.1.md`](docs/AWO_Whitepaper_v1.1.md)  
-- Method Specification: [`/docs/AWO_Method_Spec_v1.2.md`](docs/AWO_Method_Spec_v1.2.md)  
-- Concept DOI (resolves to latest version): [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+> **AWO defines the rules. CRI enforces them.**
+
+This repository is now **complete and stable**.  
+Future functional development continues under [**CRI-CORE**](https://github.com/Waveframe-Labs/CRI-CORE), the runtime implementation of AWO’s epistemic reproducibility framework.
 
 ---
 
-## Run AWO (GitHub Actions)
+### DOI Clarification
 
-1. Go to **Actions → AWO Run (Manual Approve to Commit)**.  
-2. Click **Run workflow** and select a workflow file (default: `workflows/multimodel.json`).  
-3. Approve the **Scope** and **Audit** gates when prompted.  
-4. After completion, the run is committed under `runs/<RUN_ID>/` with:
-   - `run_manifest.json`, `report.md`, `SHA256SUMS.txt`  
-   - `ATTESTATION.txt` and `.sig` / `.cert` for the attested run  
-See **[Verify signatures & attestations](docs/VERIFY_ATTESTATION.md)** for end-to-end validation.  
+Two provisional DOIs (`10.5281/zenodo.17401760` and `10.5281/zenodo.17402459`) exist due to a Zenodo account linkage issue.  
+The authoritative concept DOI for all AWO versions remains:  
+**[10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)**  
+Once Zenodo merges the linked accounts, the canonical version DOI will be updated accordingly.
+
+---
+
+## Core Documents
+
+- Whitepaper — [`/docs/AWO_Whitepaper_v1.1.md`](docs/AWO_Whitepaper_v1.1.md)  
+- Method Specification — [`/docs/AWO_Method_Spec_v1.2.md`](docs/AWO_Method_Spec_v1.2.md)  
+- Concept DOI — [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 
 ---
 
 ## Overview
 
-Aurora Workflow Orchestration (AWO) transforms AI-assisted projects into auditable, reproducible research pipelines.  
-Each run produces a cryptographically signed provenance record, binding logic, data, and human oversight into one verifiable unit.
+Aurora Workflow Orchestration (AWO) transforms AI-assisted projects into **auditable, reproducible research pipelines**.  
+Each run produces a **cryptographically signed provenance record**, binding logic, data, and human oversight into one verifiable unit.
 
-AWO is a methodology, not a code library. Every tagged release is citable (via DOI) and inspectable through structured logs, manifests, and schema validation.
+AWO is a **methodology**, not a code library.  
+Every tagged release is citable (via DOI) and inspectable through structured logs, manifests, and schema validation.
 
-> AWO integrates with **CRI-CORE**, a complementary execution layer that automates validation, attestation, and archival for every workflow run.
+> AWO provides the governance method. CRI-CORE provides the runtime.
 
 ---
 
 ## Why It Exists
 
-AI accelerates discovery faster than verification can follow.    
-AWO closes that gap through four governing principles:  
+AI accelerates discovery faster than verification can follow.  
+**AWO** closes that gap through four governing principles:
 
-1. Falsifiability first — every claim must be disprovable, not just plausible.  
-2. Human-in-the-loop rigor — AI outputs are treated as hypotheses, not truths.  
-3. Immutable provenance — all runs are signed, hashed, and traceable.  
-4. Transparent governance — reproducibility replaces trust.
+1. **Falsifiability first** — every claim must be disprovable, not just plausible.  
+2. **Human-in-the-loop rigor** — AI outputs are treated as hypotheses, not truths.  
+3. **Immutable provenance** — all runs are signed, hashed, and traceable.  
+4. **Transparent governance** — reproducibility replaces trust.
 
 ---
 
 ## Repository Structure
 
-- Whitepaper / Method Spec → see [`/docs`](docs)  
-- Templates → falsifiability manifests, audit checklists  
-- Logs → timestamped workflow and decision records  
-- Workflows → executable orchestration examples  
-- Citations → metadata and licensing files
-- Decisions → ADRs 0001-0015 
-  
-- Docs Index → [`/docs/README_TOC.md`](docs/README_TOC.md)
+- `/docs/` → Whitepaper, Method Specification, and Handoff Records  
+- `/templates/` → falsifiability manifests, audit checklists  
+- `/logs/` → timestamped workflow and decision records  
+- `/workflows/` → executable orchestration examples  
+- `/decisions/` → Architecture Decision Records (ADRs 0001–0017)  
+- `/schemas/` → validation and reproducibility schemas  
+- `/runs/` → attested, immutable research runs  
 
-> If it can’t be audited, it doesn’t count - that's the rule, not the slogan.
-
----
-
-## Current Release — v1.1.1 (2025-10-13)
-
-Overview: finalizes AWO under Waveframe Labs governance with cryptographic attestation, repository hardening, and DOI traceability.
-
-Key updates:
-- Attestation integration (cosign + OIDC)  
-- Repository hardening and maintainer transfer  
-- End-to-end provenance sealing  
-- `.zenodo.json` and `CITATION.cff` aligned with concept DOI
-
-**Version DOI for this release**: [10.5281/zenodo.xxxxxxxx](https://doi.org/10.5281/zenodo.xxxxxxxx)  
-*DOI minting in progress*  
-**Concept DOI (always latest)**: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
-  
-Related ADRs:
-- ADR-0014 — Repository Hardening & Organizational Transfer  
-- ADR-0015 — Attestation Integration & Cryptographic Signing
+> “If it can’t be audited, it doesn’t count.” — Waveframe Labs
 
 ---
 
-## Roadmap
+## Successor Project
 
-- Integrate CRI-CORE for continuous reproducibility  
-- Expand into public reproducibility experiments  
-- Formalize the “minimum viable paper” standard
+### CRI-CORE — Continuous Research Integration
+
+The **CRI-CORE** repository builds directly on AWO v1.2, implementing:
+
+- Runtime provenance verification  
+- Schema validation and falsifiability gates  
+- Continuous research integration (CRI) automation  
+- Cryptographically sealed audit trails  
+
+[→ View CRI-CORE Repository](https://github.com/Waveframe-Labs/CRI-CORE)
+
+---
+
+## Version Boundary
+
+**AWO v1.2 (Final)** marks completion of the Aurora Workflow Orchestration framework.  
+This repository remains the **methodological reference artifact** for reproducible AI–human research.  
+All future development continues under **CRI-CORE**, which extends AWO’s logic into a living runtime.
+
+**Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)  
+(*Version-specific DOIs under merge review with Zenodo.*)
 
 ---
 
@@ -115,18 +117,19 @@ Related ADRs:
 - Code: [Apache 2.0](LICENSE)  
 - Documentation: [CC BY 4.0](LICENSE-CC-BY-4.0.md)
 
+---
+
+## Maintenance and Continuity
+
+This repository is maintained as a **finalized archival artifact** under the **Waveframe Labs** umbrella.  
+Its structure, governance model, and documentation pipeline have been deliberately preserved for verifiable citation and reuse.
+
+While AWO’s methodological phase concludes here, its logic continues through **CRI-CORE**, which operationalizes the same principles as a continuous, verifiable runtime system.
+
+In short:  
+**AWO is the standard. CRI is the system.**
 
 ---
 
-## Maintenance and Scale Note
-
-This project is currently developed and maintained by a single independent researcher under the **Waveframe Labs** umbrella.
-Its architecture, complete with governance records, schema validation, and modular directory design, was deliberately structured for future scalability and collaboration.
-
-While this release represents an individual implementation, the framework itself is engineered for multi-contributor governance, reproducible pipelines, and integration with the upcoming **CRI-CORE** toolchain.
-
-In short: the structure reflects its trajectory, not just its current scale.  
-
----
-**This repository represents the signed, verifiable state of **Aurora Workflow Orchestration (AWO) v1.1.1**      
-*The concept DOI above will always resolve to the latest verifiable version.*
+**Aurora Workflow Orchestration (AWO) v1.2.1 — CRI Handoff Edition**  
+The concept DOI above will always resolve to the latest verifiable version.
