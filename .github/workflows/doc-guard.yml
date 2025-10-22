@@ -1,0 +1,20 @@
+name: Doc Guard (non-blocking)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  doc-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run doc guard
+        env:
+          DOC_GUARD_STRICT: ${{ vars.DOC_GUARD_STRICT || '0' }} # override to '1' to fail on issues
+        run: |
+          python3 .github/scripts/validate_docs.py || true
+      # keep this job non-blocking
+      - name: Always succeed
+        if: always()
+        run: echo "Doc Guard completed (non-blocking)."
