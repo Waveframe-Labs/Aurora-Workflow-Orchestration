@@ -131,5 +131,7 @@ In short:
 
 ---
 
+## Documentation guard: README/CHANGELOG must use the concept DOI (10.5281/zenodo.17013612). ADR references must match files in /decisions/. The CI doc-guard warns by default; set DOC_GUARD_STRICT=1 to enforce.
+
 **Aurora Workflow Orchestration (AWO) v1.2.1 — CRI Handoff Edition**  
 The concept DOI above will always resolve to the latest verifiable version.
