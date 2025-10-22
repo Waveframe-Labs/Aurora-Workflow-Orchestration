@@ -4,11 +4,16 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE-CC-BY-4.0.md)  
 [![Cite this repo](https://img.shields.io/badge/Cite-CITATION.cff-important.svg)](CITATION.cff)  
-![Last Commit](https://img.shields.io/github/last-commit/Waveframe-Labs/Aurora-Workflow-Orchestration/main)
+![Last Commit](https://img.shields.io/github/last-commit/Waveframe-Labs/Aurora-Workflow-Orchestration/main)  
 
 ![AURORA WORKFLOW ORCHESTRATION](figures/awo_banner_cri.PNG)
 
 ---
+
+## Note: Two provisional DOIs (10.5281/zenodo.17401760 and 10.5281/zenodo.17402459) exist due to a Zenodo account linkage issue.
+The authoritative concept DOI for all AWO versions remains 10.5281/zenodo.17013612
+.
+Once Zenodo resolves the account merge, the canonical version DOI will be updated.
 
 ## Core Documents
 
