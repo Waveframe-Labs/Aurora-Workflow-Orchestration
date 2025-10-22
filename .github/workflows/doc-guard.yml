@@ -13,7 +13,7 @@ jobs:
         env:
           DOC_GUARD_STRICT: ${{ vars.DOC_GUARD_STRICT || '0' }} # override to '1' to fail on issues
         run: |
-          python3 .github/scripts/validate_docs.py || true
+          python3 scripts/validate_docs.py || true
       # keep this job non-blocking
       - name: Always succeed
         if: always()
