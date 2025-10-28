@@ -33,7 +33,7 @@ jobs:
               if (d==1) { print "YAML front matter not closed: add a second ---"; exit 2 }
               # d==0 or d>=2 is fine
             }
-          ' AWO_Method_Spec_v1.2.md
+          ' AWO_Method_Spec_v1.2.1.md
 
       - name: Build PDF from Markdown (verbose log)
         working-directory: docs
