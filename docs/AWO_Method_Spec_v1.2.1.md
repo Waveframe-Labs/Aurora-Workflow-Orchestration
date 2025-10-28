@@ -78,17 +78,72 @@ Future revisions may clarify or extend definitions for CRI-CORE compatibility bu
 ---
 
 ## 2. Definitions
-Define key entities and concepts used throughout the AWO standard.
 
-**Core Terms:**
-- **Run:** A discrete, traceable research execution instance.  
-- **Provenance:** The recorded lineage of all data, logic, and decisions that produced a result.  
-- **Artifact:** Any persistent output (report, manifest, ADR, checksum, dataset).  
-- **Attestation:** Human or automated confirmation that artifacts are complete, correct, and verified.  
-- **ADR:** Architecture Decision Record documenting the reasoning behind changes.  
-- **Manifest:** A falsifiability declaration defining disproof conditions before execution.  
+This section defines the key entities and concepts used throughout the Aurora Workflow Orchestration (AWO) standard.  
+All terms are **normative** unless otherwise specified.
 
-**TODO:** Refine definitions list and cross-link to CRI-CORE schema references later.
+Wherever applicable, definitions align with terminology used in the AWO Whitepaper and will later be cross-referenced to CRI-CORE schema identifiers.
+
+---
+
+### 2.1 Core Entities
+
+**Run**  
+A discrete, traceable research execution instance.  
+Each Run represents a bounded reasoning process that produces one or more verifiable artifacts and is identified by a unique timestamp or run ID.  
+All Runs must be immutable once attested.
+
+**Provenance**  
+The complete, chronological lineage of data, logic, parameters, and decisions leading to a result.  
+Provenance includes all intermediate steps, transformations, and validations necessary to reproduce a Run.  
+In CRI-CORE, this concept maps to the `provenance-ledger` schema.
+
+**Artifact**  
+Any persistent output generated within an AWO process.  
+Artifacts include reports, manifests, ADRs, checksums, datasets, logs, or schema validation results.  
+Artifacts must be versioned, hashable, and linkable to a Run.
+
+**Attestation**  
+A confirmation—human, automated, or hybrid—that artifacts produced during a Run are complete, correct, and verified against defined falsifiability criteria.  
+Attestations are recorded in `approval.json` and form the evidentiary basis for repository integrity.
+
+**ADR (Architecture Decision Record)**  
+A structured document that records a significant reasoning or design choice, the context in which it was made, and its consequences.  
+ADRs form the canonical log of epistemic evolution and are numbered sequentially (`ADR-0001` to `ADR-NNNN`).  
+Each Run must reference at least one ADR.
+
+**Manifest (Falsifiability Manifest)**  
+A declaration of the hypothesis, predicted outcomes, and explicit disproof conditions for a Run.  
+The Manifest defines what constitutes falsification before execution.  
+It serves as the precondition for attestation and must be stored under `/docs/`.
+
+---
+
+### 2.2 Secondary Concepts
+
+**Repository**  
+The complete version-controlled environment in which all AWO artifacts are stored.  
+Every AWO-compliant Repository must maintain a standard directory structure defined in Section 4.
+
+**Role**  
+A functional agent—human or synthetic—responsible for a specific epistemic operation within the reasoning lifecycle (see Section 3).  
+Roles are procedural, not hierarchical.
+
+**Conformance**  
+The degree to which an AWO repository satisfies all mandatory requirements defined in this specification.  
+Conformance is binary (pass/fail) for each clause but may include graded compliance levels (“Minimum,” “Standard,” “Full”) as defined in the Adoption Guide.
+
+**Attestation Record**  
+The recorded output of a completed review or validation step, stored as a structured file (`approval.json`) under the corresponding Run directory.  
+It includes participant identity, timestamp, and signature or digital hash.
+
+---
+
+### 2.3 Future Schema Alignment
+All defined entities in this section will be mapped to corresponding CRI-CORE schema classes in later versions.  
+Cross-references will be introduced once the enforcement layer is finalized.
+
+**TODO:** Refine definitions list and cross-link to CRI-CORE schema references after CRI draft publication.
 
 ---
 
