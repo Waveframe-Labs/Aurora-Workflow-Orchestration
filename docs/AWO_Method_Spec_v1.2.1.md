@@ -18,13 +18,62 @@ All future automation layers (e.g., CRI-CORE) must validate conformance against 
 ---
 
 ## 1. Introduction
-**Purpose:** Establish a formal, reproducible framework for AI–human research collaboration.  
-AWO defines the structural and procedural rules necessary for falsifiable, auditable, and citable research.
 
-**Scope:** This specification governs the structure, artifacts, and operational requirements of AWO projects.  
-It does not define runtime enforcement (covered by CRI-CORE) but specifies all conditions that runtime tools must verify.
+### 1.1 Purpose
+Aurora Workflow Orchestration (AWO) establishes a formal, falsifiable framework for conducting reproducible AI-assisted research.  
+It defines the structural and procedural rules by which reasoning processes—whether human, synthetic, or hybrid—are documented, attested, and version-controlled.
 
-**TODO:** Insert concise background paragraph linking to AWO Whitepaper rationale.
+This specification is **methodological**, not philosophical.  
+It governs the organization, validation, and archival of reasoning artifacts so that every claim produced under AWO can be independently verified.
+
+---
+
+### 1.2 Scope
+This document applies to all research workflows that:
+
+- Integrate AI or automated reasoning systems as active participants in the research process.  
+- Produce verifiable artifacts such as manifests, runs, and audit logs.  
+- Intend for those artifacts to be **reproducible, falsifiable, and citable**.  
+
+It defines the **minimum structural and procedural requirements** for an AWO-compliant repository, including file hierarchy, provenance recording, versioning, and attestation rules.
+
+AWO does **not** specify runtime behavior or enforcement mechanisms.  
+Those are defined in successor frameworks such as **CRI-CORE**, which must implement this specification as their normative foundation.
+
+---
+
+### 1.3 Objectives
+The objectives of the AWO standard are to:
+
+1. Encode the **scientific method** as a verifiable workflow rather than a descriptive ideal.  
+2. Replace subjective credibility with **objective auditability**.  
+3. Ensure that every reasoning artifact—data, model, or decision—can be traced to its origin.  
+4. Provide a foundation for automated reproducibility enforcement systems.  
+5. Support both manual and fully automated orchestration without altering compliance semantics.
+
+---
+
+### 1.4 Relationship to Other Documents
+- The **AWO Whitepaper** provides conceptual background and philosophical rationale.  
+- The **AWO Adoption Guide** describes practical implementation and onboarding.  
+- This **Method Specification** defines the normative requirements that all AWO artifacts must satisfy.  
+
+Where discrepancies occur, **this specification takes precedence**.
+
+---
+
+### 1.5 Normative References
+- **AWO Whitepaper v1.1** (Waveframe Labs)  
+- **Aurora Workflow Orchestration Adoption Guide v1.2.1**  
+- **Architecture Decision Records (ADR-0001 – ADR-0017)** — authoritative design decisions underlying AWO’s structural, governance, and lifecycle model.  
+- **CRI-CORE Design Notes** (draft, forthcoming)  
+- **ISO/IEC Directives Part 2** — interpretation of compliance terms (“shall,” “should,” “may”)
+
+---
+
+### 1.6 Status of This Version
+Version 1.2.1 represents the **finalized methodological form** of AWO under Waveframe Labs governance.  
+Future revisions may clarify or extend definitions for CRI-CORE compatibility but will not alter the normative logic without an explicit version increment.
 
 ---
 
