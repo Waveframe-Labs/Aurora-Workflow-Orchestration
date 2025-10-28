@@ -202,21 +202,129 @@ Any such extensions MUST maintain backward compatibility with this role schema a
 
 **TODO:** Cross-link these roles to CRI-CORE validation modules (e.g., `orchestrator-agent`, `auditor-module`, `consensus-engine`) once defined.
 
-
 ---
 
 ## 4. Repository Requirements
-Every AWO project MUST follow a consistent repository layout to ensure verifiability and interoperability.
 
-**Required Directories:**
-```
-/docs/        → manifests, specs, reports  
-/decisions/   → ADRs (0001–NNNN)  
-/logs/        → timestamped workflow notes  
-/runs/        → attested run artifacts  
-/figures/     → diagrams, lifecycle visuals  
-```
-**TODO:** Add detailed artifact rules and cross-link schema expectations.
+### 4.1 Purpose and Scope
+
+This section defines the mandatory and recommended structural requirements for an AWO-compliant repository.  
+These requirements ensure that every research artifact is **traceable**, **auditable**, and **reproducible** without external dependencies.  
+All provisions in this section are **normative** unless explicitly labeled “informative.”
+
+---
+
+### 4.2 Core Directory Structure
+
+An AWO-compliant repository **MUST** include the following top-level directories:
+
+| Directory | Purpose | Requirement |
+|------------|----------|-------------|
+| `/docs/` | Contains all formal documents (Whitepaper, Method Spec, Adoption Guide, PDFs, and audit summaries). | MUST |
+| `/decisions/` | Contains all Architecture Decision Records (ADRs). Each ADR MUST be timestamped and sequentially numbered. | MUST |
+| `/logs/` | Houses all workflow, audit, and override logs (see ADR-0004). | MUST |
+| `/schemas/` | Stores validation schemas and structure definitions for manifests, runs, and audits. | SHOULD |
+| `/templates/` | Contains boilerplate forms for manifests, audit reports, and ADRs. | SHOULD |
+| `/runs/` | Contains attested execution outputs, including manifests, reports, approvals, and checksums. | MUST |
+| `/figures/` | Contains diagrams, charts, and other non-textual documentation. | SHOULD |
+| `/workflows/` | Contains procedural examples or reproducible automation steps (optional, pre-CRI). | MAY |
+
+The repository root **MUST** contain:
+- `README.md` — entry point and index.
+- `CHANGELOG.md` — lifecycle record of repository evolution.
+- `SHA256SUMS.txt` — integrity registry for all signed artifacts.
+- `LICENSE` and `LICENSE-CC-BY-4.0.md` — primary and documentation licenses.
+- `.github/workflows/` — automated build and PDF pipelines.
+
+---
+
+### 4.3 Log Directory Specification
+
+Each AWO-compliant repository **MUST** implement the following substructure within `/logs/`:
+
+| Subfolder | Description | Reference |
+|------------|--------------|------------|
+| `/logs/workflow/` | Chronological records of human and agent activity, covering decisions, forks, merges, and context. | ADR-0004 |
+| `/logs/audits/` | Independent audit results, rejection events, or revalidation findings. | ADR-0003 |
+| `/logs/overrides/` | Manual interventions, rationale, and signatures for non-automated overrides. | ADR-0004, ADR-0012 |
+
+Log entries **MUST** follow the schema outlined in ADR-0004, including timestamps, participant IDs, impacted artifacts, and outcome codes.  
+Each log file **MUST NOT** be modified retroactively after attestation.
+
+---
+
+### 4.4 ADR Requirements
+
+- ADRs **MUST** follow sequential numbering (`ADR-0001` through `ADR-NNNN`) and reside in `/decisions/`.  
+- Each ADR **MUST** contain:  
+  - Title, Status, Context, Decision, Consequences, and References.  
+  - Date and author or originating role (Orchestrator, Auditor, etc.).  
+- ADRs **MUST** reference corresponding workflow or audit logs when applicable.  
+- Superseded ADRs **MUST** be marked `Deprecated` but retained for historical integrity.  
+- ADRs **SHOULD** be linked from the Method Spec or README where directly relevant.
+
+---
+
+### 4.5 Manifest and Run Directory Requirements
+
+Each repository **MUST** include a `/runs/` directory containing subfolders for every attested execution.  
+Each Run folder **MUST** contain:
+
+| File | Description | Requirement |
+|-------|--------------|-------------|
+| `manifest.json` or `.md` | Falsifiability declaration and preconditions for the run. | MUST |
+| `report.md` | Primary human-readable research output. | MUST |
+| `approval.json` | Attestation record confirming verification or rejection. | MUST |
+| `hash.txt` or inclusion in `SHA256SUMS.txt` | Integrity signature of run artifacts. | MUST |
+| `metadata.json` | Contextual parameters, participants, and timestamps. | SHOULD |
+
+All files within a Run folder **MUST** be immutable once signed and referenced in `SHA256SUMS.txt`.
+
+---
+
+### 4.6 Integrity and Attestation
+
+- The repository **MUST** maintain a single authoritative checksum file (`SHA256SUMS.txt`) in the root directory.  
+- Every attested artifact (PDF, manifest, run report, ADR, etc.) **MUST** be listed with its SHA-256 digest.  
+- Attestation signatures **MUST** follow the cryptographic signing policy defined in ADR-0015.  
+- Human signoffs **MUST** reference ADR-0012 and be recorded in `/logs/overrides/` if manual validation was required.
+
+---
+
+### 4.7 Documentation & PDF Builds
+
+- All core documents (`AWO_Method_Spec`, `AWO_Whitepaper`, `AWO_Adoption_Guide`) **MUST** be compiled via automated workflows.  
+- The build system **MUST** ensure reproducibility and checksum verification per ADR-0016.  
+- Generated PDFs **MUST** reside in `/docs/` and be referenced in the release assets.
+
+---
+
+### 4.8 Governance and Continuity
+
+- The repository **MUST** include a governance note or `README` section referencing ADR-0017, confirming oversight under the Aurora Research Initiative (ARI).  
+- Any repository transfer, rename, or fork **MUST** preserve ADR continuity and integrity hashes.  
+- The repository’s `README.md` **MUST** declare the canonical DOI (see ADR-0010).  
+
+---
+
+### 4.9 Compliance Tiers (Informative)
+
+AWO compliance operates in three tiers, as detailed in the Adoption Guide:
+- **Minimum Compliance** — manual logging and attestation only.  
+- **Standard Compliance** — includes structured manifests, checksums, and ADR linking.  
+- **Full Compliance** — includes automated builds, schema validation, and cryptographic attestation.
+
+---
+
+### 4.10 Future Integration
+
+When CRI-CORE enforcement becomes active:
+- Validation schemas in `/schemas/` **WILL** become executable policies.
+- Manual override logs in `/logs/overrides/` **WILL** trigger runtime verification events.
+- Repository audits **WILL** be automatically generated from `SHA256SUMS.txt` diffs.
+
+**TODO:** Link this section to CRI enforcement spec once published.
+
 
 ---
 
