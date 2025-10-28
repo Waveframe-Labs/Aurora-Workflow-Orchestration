@@ -148,14 +148,60 @@ Cross-references will be introduced once the enforcement layer is finalized.
 ---
 
 ## 3. Roles and Responsibilities
-AWO distinguishes between procedural roles to ensure accountability and non-circular validation.
 
-**Primary Roles:**
-- **Researcher:** Executes runs and maintains artifacts.  
-- **Maintainer:** Oversees repository integrity and version control.  
-- **Reviewer:** Performs verification and attestation of completed runs.
+### 3.1 Overview
+AWO defines **roles** as functional agents within a reasoning workflow, not as human job titles.  
+Each role represents a discrete epistemic operation necessary to ensure falsifiability, reproducibility, and integrity.  
+Roles may be embodied by humans, AI systems, or hybrid arrangements, but the **responsibility and accountability structure** must remain explicit and verifiable.
 
-**TODO:** Add explicit permissions/responsibilities (who can sign approvals, tag releases, modify manifests).
+Every AWO-compliant Run MUST declare the roles involved and the corresponding participants (human or synthetic).  
+Multiple roles MAY be fulfilled by a single agent if traceability and attestation integrity are preserved.
+
+---
+
+### 3.2 Canonical Roles
+
+| Role | Core Function | Description | Typical Implementation |
+|------|----------------|-------------|-------------------------|
+| **Orchestrator** | Governance and context management | Governs execution order, maintains reasoning context, and determines when to fork, merge, or conclude runs. Responsible for continuity, documentation, and decision routing. | Human-in-the-loop controller or primary model agent (e.g., lead researcher, workflow coordinator). |
+| **Voter / Evaluator** | Comparative validation | Compares multiple reasoning paths or outputs, ranks them by internal consistency and falsifiability, and selects the candidate most aligned with predefined criteria. | Model ensemble, peer review, or statistical evaluator. |
+| **Auditor** | Verification and compliance | Independently checks reasoning validity, schema adherence, falsifiability, and traceability to prior evidence. Approves or rejects attestation claims. | Dedicated verification model, CI validator, or human reviewer. |
+| **Synthesizer / Consensus** | Result consolidation | Merges validated reasoning threads into a coherent, singular artifact. Produces the final report or output from attested inputs. | Aggregation model, summarizer, or post-processing layer. |
+| **Critic / Red Team (optional)** | Adversarial robustness testing | Generates counterarguments or adversarial reasoning challenges to expose weaknesses in claims before attestation. | Adversarial model, external reviewer, or dedicated counterfactual analysis agent. |
+
+---
+
+### 3.3 Role Interactions
+
+- **Sequential Integrity:** Roles SHOULD execute in a reproducible order—Orchestrator → Evaluator → Auditor → Synthesizer.  
+  Optional Critic roles MAY interject between Evaluator and Synthesizer stages.
+- **Non-Circular Validation:** The same agent MUST NOT serve as both Orchestrator and Auditor within the same Run unless explicitly justified and recorded in the attestation log.
+- **Attestation Requirements:** Each Run MUST include a record of which roles were fulfilled, by whom, and under what authority.
+- **Traceability Obligation:** Artifacts and logs MUST explicitly reference the roles responsible for their generation or validation.
+
+---
+
+### 3.4 Role Attribution and Record-Keeping
+- Every `approval.json` file MUST list all participating roles and their associated agent identifiers (human name, model ID, or process hash).  
+- When multiple roles are automated, their decision boundaries MUST be defined in the workflow manifest or configuration file.  
+- Manual overrides or deviations from standard AWO behavior MUST be documented under /logs/overrides/ and cross-referenced to the applicable ADR  
+
+---
+
+### 3.5 Compliance and Auditing
+- AWO-compliant repositories MUST demonstrate separation of governance (Orchestrator) and verification (Auditor).  
+- Each role’s output MUST be traceable to an ADR or manifest entry.  
+- Automated systems fulfilling these roles MUST log model versions, prompt contexts, and decision justifications to ensure reproducibility.  
+- Failure to document role interactions constitutes a **non-conformance** condition under this specification.
+
+---
+
+### 3.6 Future Role Extensions
+Future AWO or CRI-CORE revisions MAY extend the canonical role set (e.g., **Planner**, **Historian**, **Meta-Auditor**) as automated reasoning matures.  
+Any such extensions MUST maintain backward compatibility with this role schema and preserve attestation semantics.
+
+**TODO:** Cross-link these roles to CRI-CORE validation modules (e.g., `orchestrator-agent`, `auditor-module`, `consensus-engine`) once defined.
+
 
 ---
 
