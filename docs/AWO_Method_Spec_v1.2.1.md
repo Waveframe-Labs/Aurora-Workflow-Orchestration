@@ -1266,23 +1266,200 @@ The following schema defines the minimum required fields for JSON-based manifest
 ---
 
 ## 13. Conformance Checklist
-Each repository MUST pass the following before claiming AWO compliance:
 
-- [ ] Standard directory structure present.  
-- [ ] At least one signed run in `/runs/`.  
-- [ ] ADRs and falsifiability manifests linked.  
-- [ ] SHA256SUMS.txt present at root.  
-- [ ] PDF artifacts built successfully.  
-- [ ] CHANGELOG includes version reference.  
-- [ ] README links to Whitepaper, Method Spec, Adoption Guide.  
+### 13.1 Purpose
+This section defines the mandatory verification steps a repository **MUST** complete before claiming compliance with the Aurora Workflow Orchestration (AWO) standard.  
+The checklist ensures each implementation maintains complete traceability, reproducibility, and documentation integrity across all lifecycle phases.
 
-**TODO:** Add automated compliance script references (future CRI module).
+This checklist also serves as the **baseline schema** for future automated compliance validation under CRI-CORE.
 
 ---
 
-## 14. Appendix C — Rationale Summary (Reserved)
-**TODO:** When the Method Spec text is finalized, reintroduce Appendix C summarizing why each rule exists in concise bullet form.  
-(Placeholder retained for structural continuity.)
+### 13.2 Repository Conformance Requirements
+
+Each repository claiming AWO compliance **MUST** satisfy the following conditions:
+
+| # | Requirement | Verification Method | Governing ADRs | Compliance Level |
+|---|--------------|--------------------|----------------|------------------|
+| 1 | **Standard directory structure present** | Verify `/docs/`, `/logs/`, `/runs/`, `/schemas/`, `/decisions/`, and `/templates/` directories exist. | 0011 | **MUST** |
+| 2 | **At least one signed run in `/runs/`** | Confirm presence of `approval.json` with valid attestation (§9). | 0012, 0015 | **MUST** |
+| 3 | **ADRs linked and numbered (0001–0017)** | Verify all referenced ADRs exist and correspond to governing sections. | 0001–0017 | **MUST** |
+| 4 | **Falsifiability manifest present** | Ensure each run contains `/runs/<run_id>/falsifiability-manifest.md` or `manifest.json`. | 0002, 0012 | **MUST** |
+| 5 | **SHA256SUMS.txt present and verified** | Regenerate and compare to recorded hash file (§10.5). | 0015 | **MUST** |
+| 6 | **CHANGELOG includes version reference** | Confirm most recent version is logged (§10.9). | 0010 | **MUST** |
+| 7 | **README cross-links all core documents** | README must reference the Whitepaper, Method Spec, and Adoption Guide. | 0017 | **MUST** |
+| 8 | **Governance and attestation logs maintained** | Verify `/logs/governance/` and `/logs/attestation_failures/` directories exist with entries. | 0003, 0012 | **MUST** |
+| 9 | **Licensing files present and unmodified** | Confirm `LICENSE` and `LICENSE-CC-BY-4.0.md` exist and match canonical text (§11.4). | 0006, 0017 | **MUST** |
+| 10 | **PDF build workflows operational** | Confirm automated GitHub Actions produce valid PDFs. | 0016 | **MUST** |
+| 11 | **ADR citations consistent across documents** | Cross-check citations in Method Spec, Whitepaper, and ADR index. | 0017 | **SHOULD** |
+| 12 | **Repository integrity registry updated** | Ensure `SHA256SUMS.txt` includes all critical files (PDFs, manifests, governance logs). | 0015 | **MUST** |
+| 13 | **Compliance declaration committed** | Add `/docs/AWO_Compliance_Report.md` or equivalent summary signed by Orchestrator. | 0012, 0017 | **MUST** |
+
+---
+
+### 13.3 Optional Extended Compliance
+
+For repositories implementing advanced reproducibility or CRI integrations, the following **optional** checks apply:
+
+| # | Requirement | Verification Method | Compliance Level |
+|---|--------------|--------------------|------------------|
+| 1 | **Automated validation via CRI-CORE** | Validator confirms compliance schema. | **MAY** |
+| 2 | **Dual attestation present** | Both Orchestrator and Auditor signatures recorded in approval file. | **SHOULD** |
+| 3 | **DOI registration complete** | DOI record publicly accessible and linked to release. | **SHOULD** |
+| 4 | **Role-attestation matrix documented** | `/docs/ROLE_ATTESTATION.md` includes all artifacts and responsible roles (§8.7). | **SHOULD** |
+| 5 | **Governance report exported** | Governance logs compiled into `GOVERNANCE_SUMMARY.md`. | **MAY** |
+
+---
+
+### 13.4 Automated Compliance Schema (Future Integration)
+
+The following JSON schema will define minimum conformance structure for automated validation in CRI-CORE v0.1:
+
+```json
+{
+  "$schema": "https://schema.waveframe.org/awo/compliance.schema.json",
+  "type": "object",
+  "properties": {
+    "repository_structure": {"type": "boolean"},
+    "signed_run_present": {"type": "boolean"},
+    "falsifiability_manifest_present": {"type": "boolean"},
+    "checksum_verified": {"type": "boolean"},
+    "governance_logs_present": {"type": "boolean"},
+    "licenses_valid": {"type": "boolean"},
+    "changelog_updated": {"type": "boolean"},
+    "pdf_build_verified": {"type": "boolean"},
+    "compliance_report_signed": {"type": "boolean"}
+  },
+  "required": [
+    "repository_structure",
+    "signed_run_present",
+    "falsifiability_manifest_present",
+    "checksum_verified",
+    "governance_logs_present",
+    "licenses_valid",
+    "changelog_updated",
+    "pdf_build_verified",
+    "compliance_report_signed"
+  ]
+}
+```
+
+---
+
+### 13.5 Manual Compliance Verification
+
+Manual audits **MUST** be completed prior to tagging a release (§10.7).  
+Auditors **SHOULD** verify all checklist items and record the verification event in `/logs/governance/`.  
+A summary report **MUST** be attached to the release as `AWO_Compliance_Report.md` with signatures and timestamps.
+
+Example:
+
+```markdown
+# AWO v1.2.1 Compliance Verification Report
+**Auditor:** Waveframe Labs  
+**Date:** 2025-10-28  
+**Summary:**  
+All required AWO compliance checks completed. Repository verified as reproducible and fully documented under Aurora Research Initiative governance.
+
+**Result:** ✅ PASS  
+**Linked ADRs:** 0001–0017  
+**Next Review:** 2026-04-01
+```
+
+---
+
+### 13.6 Future Integration Notes
+
+- CRI-CORE will provide automated compliance validation using `compliance_validator.py`.  
+- Compliance logs will be serialized as JSON outputs for downstream reproducibility dashboards.  
+- The compliance report will serve as a verifiable artifact in the provenance ledger.
+
+---
+
+**Governing ADRs:** 0001–0017  
+**Compliance Level:** MUST
+
+---
+
+## Appendix C — Rationale Summary
+
+### Purpose
+This appendix provides concise justifications for the normative rules defined in the Aurora Workflow Orchestration (AWO) Method Specification v1.2.1.  
+Each rule exists to enforce reproducibility, traceability, and falsifiability across human–AI research workflows.  
+Rationales are provided to ensure interpretability, not negotiation.
+
+---
+
+### C.1 Repository and Structural Rules
+
+| Section | Rule Summary | Rationale |
+|----------|---------------|------------|
+| §4 | Standardized repository structure | Guarantees every AWO-compliant repository can be audited and navigated identically, regardless of domain or implementer. |
+| §5 | Defined run lifecycle | Aligns human and machine workflows through four reproducible stages, ensuring every claim can be traced back to its originating phase. |
+| §6 | Artifact requirements | Establishes a verifiable minimum output set, ensuring reproducibility without reliance on institutional infrastructure. |
+| §10 | Release immutability | Prevents retroactive edits or silent version drift that would undermine traceability. |
+
+---
+
+### C.2 Governance and Verification
+
+| Section | Rule Summary | Rationale |
+|----------|---------------|------------|
+| §7 | Compliance tiering (MUST/SHOULD/MAY) | Enables multi-level enforcement: rigid for auditability, flexible for experimentation. |
+| §9 | Governance and attestation | Replaces subjective trust with explicit validation. Human and automated attestations are recorded as immutable evidence. |
+| §13 | Conformance checklist | Defines what “compliant” means in operational terms, enabling reproducibility testing by third parties. |
+
+---
+
+### C.3 Falsifiability and Epistemic Integrity
+
+| Section | Rule Summary | Rationale |
+|----------|---------------|------------|
+| §12 | Falsifiability manifests | Enforces Popperian rigor: all hypotheses must declare their disproof conditions *before* execution. |
+| §2 | Core definitions | Ensures shared language between human and AI collaborators; removes ambiguity from governance terms. |
+| §3 | Roles | Encodes epistemic separation of duties (Orchestrator, Auditor, Synthesizer, etc.), preventing self-validation bias. |
+
+---
+
+### C.4 Provenance and Cryptographic Integrity
+
+| Section | Rule Summary | Rationale |
+|----------|---------------|------------|
+| §6 | SHA256SUMS registry | Makes artifact integrity measurable, not assumed. Hashes serve as objective identity tokens for every research output. |
+| §9 | Approval.json requirement | Establishes a human–machine trust boundary through verifiable signatures and timestamps. |
+| §10 | DOI and checksum coupling | Ensures citations reference *frozen* states of the repository, binding publication to verifiable data. |
+
+---
+
+### C.5 Documentation and Governance Continuity
+
+| Section | Rule Summary | Rationale |
+|----------|---------------|------------|
+| §1 | Normative references | Maintains audit lineage and cross-references for every governing ADR and artifact. |
+| §8 | Governance under Aurora Research Initiative (ARI) | Provides institutional continuity and governance without dependence on centralized academic structures. |
+| §11 | Licensing duality | Separates code execution rights from documentation reuse rights, ensuring open reproducibility while protecting attribution. |
+
+---
+
+### C.6 Meta-Level Rationales
+
+1. **Human Oversight** — Ensures AI outputs remain accountable to human judgment (§9, §13).  
+2. **Falsifiability** — Enforces scientific rigor before computation begins (§12).  
+3. **Auditability** — Guarantees all claims, data, and reasoning have verifiable origins (§4–§10).  
+4. **Provenance Continuity** — Preserves the evidentiary chain from initial concept to publication (§5–§10).  
+5. **Interoperability** — Enables AWO to serve as a meta-standard adaptable across disciplines (§4, §5).  
+6. **Institutional Independence** — Demonstrates that reproducible governance can exist outside traditional peer review (§8, §11).  
+
+---
+
+### C.7 Forward Alignment with CRI-CORE
+
+The rationale structure also prepares AWO for integration with **CRI-CORE**, which will automate validation of these rules through schemas and attestation gates.  
+Each AWO rule maps directly to a forthcoming compliance schema within the CRI runtime, ensuring continuous auditability beyond manual enforcement.
+
+---
+
+**End of Appendix C — Rationale Summary (AWO v1.2.1)**
 
 ---
 
