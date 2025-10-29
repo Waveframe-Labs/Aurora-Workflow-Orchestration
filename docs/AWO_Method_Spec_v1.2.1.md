@@ -748,7 +748,7 @@ Once CRI-CORE is active:
 
 ---
 
-## 8. Governance and Attestation
+## 9. Governance and Attestation
 Each run requires human or automated attestation of validity and completeness.
 
 **Core Requirements:**
@@ -760,7 +760,7 @@ Each run requires human or automated attestation of validity and completeness.
 
 ---
 
-## 9. Release and Versioning
+## 10. Release and Versioning
 AWO-compliant repositories MUST version all outputs and preserve immutability.
 
 **Release Requirements:**
@@ -773,7 +773,7 @@ AWO-compliant repositories MUST version all outputs and preserve immutability.
 
 ---
 
-## 10. Licensing and Attribution
+## 11. Licensing and Attribution
 AWO uses dual licensing to separate executable and textual components.
 
 - **Code:** Licensed under Apache 2.0.  
@@ -784,7 +784,7 @@ AWO uses dual licensing to separate executable and textual components.
 
 ---
 
-## 11. Falsifiability Manifests
+## 12. Falsifiability Manifests
 Each experiment MUST include a falsifiability manifest before execution.
 
 **Manifest Contents:**
@@ -799,7 +799,7 @@ Each experiment MUST include a falsifiability manifest before execution.
 
 ---
 
-## 12. Conformance Checklist
+## 13. Conformance Checklist
 Each repository MUST pass the following before claiming AWO compliance:
 
 - [ ] Standard directory structure present.  
@@ -814,7 +814,7 @@ Each repository MUST pass the following before claiming AWO compliance:
 
 ---
 
-## 13. Appendix C — Rationale Summary (Reserved)
+## 14. Appendix C — Rationale Summary (Reserved)
 **TODO:** When the Method Spec text is finalized, reintroduce Appendix C summarizing why each rule exists in concise bullet form.  
 (Placeholder retained for structural continuity.)
 
