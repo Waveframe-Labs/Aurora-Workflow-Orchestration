@@ -489,31 +489,262 @@ Once CRI-CORE is operational:
 
 ---
 
-## 6. Artifacts and File Rules
-Every run MUST produce a verifiable set of artifacts:
+## 6. Artifacts and Provenance Rules
 
-| File | Description | Required |
-|------|--------------|-----------|
-| `workflow_frozen.json` | Captures executed parameters and inputs. | Yes |
-| `report.md` | Describes outcomes, metrics, and observations. | Yes |
-| `approval.json` | Signed validation record by human reviewer. | Yes |
-| `SHA256SUMS.txt` | Hash registry for all outputs. | Yes |
-| `manifest.json` or `manifest.md` | Defines falsifiability boundaries. | Yes |
+### 6.1 Purpose
+This section defines the mandatory artifacts, metadata files, and validation mechanisms that constitute the **evidence chain** in every AWO-compliant repository.  
+All artifacts must be uniquely identifiable, cryptographically verifiable, and cross-linked to the corresponding log and ADR entries.
 
-**TODO:** Add versioning, format validation (JSON schema references), and CRI-CORE integration hooks.
+---
+
+### 6.2 Required Artifacts per Run
+
+Every Run **MUST** produce a verifiable and complete set of artifacts:
+
+| File | Description | Required | Notes |
+|------|--------------|-----------|-------|
+| **workflow_frozen.json** | Snapshot of executed parameters, configuration state, and environment context. | Yes | Must be generated immediately before execution. |
+| **report.md** | Narrative or analytical summary describing the run outcome, metrics, and interpretations. | Yes | May be human- or model-authored but must include run ID and timestamp. |
+| **approval.json** | Signed attestation record confirming human or automated validation per ADR-0012. | Yes | Must reference corresponding manifest and checksum hashes. |
+| **SHA256SUMS.txt** | Integrity registry listing all artifact hashes within `/runs/` and `/docs/`. | Yes | Updated after each attested run. |
+| **manifest.json** or **manifest.md** | Defines falsifiability boundaries, inputs, and expected failure conditions. | Yes | Must be versioned and cross-referenced in ADRs and logs. |
+
+All files above **MUST** exist in each run folder (`/runs/<RUN_ID>/`).  
+All entries **MUST** be immutable once signed and referenced in `SHA256SUMS.txt`.
+
+---
+
+### 6.3 File Naming and Structure Conventions
+
+- Each run directory **MUST** be timestamped or uniquely identified (e.g., `RUN_2025-10-28_001`).  
+- Filenames **MUST** use lowercase alphanumeric characters and underscores only.  
+- Each file **MUST** contain a metadata header (JSON or YAML front-matter) including:  
+  - Run ID  
+  - Timestamp (ISO 8601)  
+  - Origin role (Orchestrator, Auditor, etc.)  
+  - Linked ADR IDs  
+  - Provenance lineage references (see below)
+
+---
+
+### 6.4 Provenance Chain and Lineage Requirements
+
+The **Provenance Chain** represents the traceable path connecting:
+1. Manifest → Workflow execution → Report → Approval → Archive.  
+2. ADR decisions and logs that define or verify each step.
+
+#### Minimum Provenance Links
+
+| Relationship | Requirement |
+|---------------|--------------|
+| Manifest ↔ Report | The report **MUST** reference the manifest version and falsifiability clause. |
+| Report ↔ Approval | The approval record **MUST** include hash references of the report and manifest. |
+| Approval ↔ SHA256SUMS | Each approval **MUST** verify against current checksum state. |
+| SHA256SUMS ↔ Release | The release process **MUST** include and verify the checksum file. |
+| ADR ↔ All | Relevant ADR numbers **MUST** be cited in manifest, report, and approval metadata. |
+
+All provenance references **MUST** be machine-readable and auditable via JSON key paths or Markdown tables.
+
+---
+
+### 6.5 Validation and Versioning Rules
+
+- Artifacts **MUST** conform to JSON or Markdown schemas defined under `/schemas/`.  
+- Schema validation **SHOULD** be performed manually for Minimum Compliance, and automatically for Full Compliance (see Adoption Guide).  
+- Each artifact revision **MUST** be versioned using semantic tags (`vX.Y.Z`).  
+- Any change that affects results **MUST** trigger a new Run folder.  
+- Historical artifacts **MUST NOT** be altered; corrections require a superseding Run ID and cross-reference.
+
+---
+
+### 6.6 Cryptographic and Attestation Linkage
+
+- Every artifact **MUST** be signed or hashed according to ADR-0015.  
+- The signing authority (human or model) **MUST** be recorded in `approval.json` and linked to `/logs/overrides/` if any manual intervention occurred.  
+- Attestation hashes **MUST** match those in `SHA256SUMS.txt`; discrepancies trigger audit flags.
+
+---
+
+### 6.7 Integration with Evidence Registry (ADR-0002)
+
+- Each artifact **MUST** register its existence in the Evidence Registry table (maintained under `/docs/Evidence_Registry.md` or equivalent).  
+- The registry **MUST** include:
+  - Artifact path  
+  - Type (manifest, report, etc.)  
+  - Linked ADRs  
+  - Hash value  
+  - Attestation reference  
+- Each registry update **MUST** be recorded in `/logs/workflow/` with a unique entry ID.
+
+---
+
+### 6.8 Future CRI-CORE Hooks
+
+Once CRI-CORE enforcement is active:
+- Each artifact type will correspond to a schema module (e.g., `manifest.schema.json`, `approval.schema.json`).  
+- Provenance chains will be validated automatically using CRI runtime modules.  
+- Manual overrides will trigger provenance-diff checks to confirm trace continuity.
+
+**TODO:** Define schema references and CRI module mappings once CRI-CORE Specification v0.1 is published.
 
 ---
 
 ## 7. Compliance Language
-This section defines the mandatory, recommended, and optional behaviors for implementers.
 
-| Level | Definition | Enforcement |
-|--------|-------------|-------------|
-| **MUST** | Required for compliance. | Hard validation |
-| **SHOULD** | Recommended unless documented exception. | Warning |
-| **MAY** | Optional feature. | No enforcement |
+### 7.1 Purpose
+This section defines the normative language used throughout the Aurora Workflow Orchestration (AWO) specification.  
+The following terms establish the required, recommended, and optional behaviors that determine conformance.
 
-**TODO:** Map existing AWO clauses to each compliance level.
+---
+
+### 7.2 Normative Terms
+
+| Keyword | Meaning | Enforcement Implication |
+|----------|----------|-------------------------|
+| **MUST** | A requirement that is absolutely mandatory for AWO compliance. Implementations lacking this behavior are non-conformant. | Hard validation — failure blocks attestation or release. |
+| **SHOULD** | A strong recommendation. Equivalent alternatives are permitted **only** if explicitly documented and justified in logs or ADRs. | Soft validation — warning status logged; manual review required. |
+| **MAY** | An optional or discretionary behavior that does not affect compliance. | Informational — no enforcement. |
+
+---
+
+### 7.3 Interpretive Rules
+
+- The words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are to be interpreted as described in **RFC 2119 / ISO IEC TR 29110**.  
+- All **MUST** clauses are binding for compliance certification under the Aurora Research Initiative (ARI).  
+- A **SHOULD** clause may be overridden **only** through a logged exception referencing its justification (see `/logs/overrides/`).  
+- A **MAY** clause introduces permitted flexibility and cannot be used to claim non-compliance of another implementation.  
+- Deviations from any **MUST** clause **MUST** be documented as a non-conformance record.
+
+---
+
+### 7.4 Mapping of Compliance Levels
+
+| Section | Description | Compliance Level |
+|----------|--------------|------------------|
+| §3 Roles and Responsibilities | Role declaration and separation of duties | **MUST** |
+| §4 Repository Requirements | Directory structure, ADR layout, log subfolders | **MUST** |
+| §5 Lifecycle and Run Phases | Sequential execution order and audit flow | **MUST** |
+| §6 Artifacts and Provenance Rules | Artifact creation, immutability, hash verification | **MUST** |
+| §8 Accountability Matrix | Role–artifact responsibility mapping | **SHOULD** |
+| §9 Versioning and Reproducibility | Tagging, checksum maintenance, archival | **MUST** |
+| §10 Licensing and Attribution | License files and acknowledgments | **MUST** |
+| §11 Adoption and Compliance Tiers | Implementation depth and flexibility | **MAY/SHOULD** |
+| §12 Future Integration | CRI-CORE hooks and schema mappings | **MAY** |
+
+---
+
+### 7.5 Non-Conformance Handling
+
+- Any violation of a **MUST** clause **MUST** be treated as a **non-compliance event** and logged in `/logs/audits/`.  
+- Deviations from a **SHOULD** clause **MUST** be recorded in `/logs/overrides/` with justification.  
+- Repeated or uncorrected non-conformances **MUST** trigger re-attestation or run invalidation.  
+- Compliance auditors **MAY** issue a variance report summarizing exceptions and resolutions.
+
+---
+
+### 7.6 Certification and Conformance Evidence
+
+- A repository claiming AWO compliance **MUST** include a `COMPLIANCE.md` file or equivalent table summarizing clause-level adherence.  
+- The file **SHOULD** include references to specific ADRs, manifests, and run IDs verifying each claim.  
+- Attestation signatures in `approval.json` serve as binding statements of compliance at the time of release.
+
+---
+
+## 8. Roles–Artifact Accountability Matrix
+
+### 8.1 Purpose
+This section defines the accountability relationships between AWO roles (as specified in §3) and the artifacts produced during the lifecycle (as specified in §6).  
+The objective is to ensure that every file, log, and decision is traceable to a responsible role and attested according to the AWO governance standard.
+
+Each artifact **MUST** have:
+- A clearly declared **origin role** (who created it).  
+- A **reviewing or attesting role** (who verified it).  
+- A **governing ADR reference** defining the applicable rules.
+
+---
+
+### 8.2 Role–Artifact Responsibility Matrix
+
+| Artifact | Origin Role(s) | Reviewing Role(s) | Governing ADRs | Compliance Level |
+|-----------|----------------|-------------------|----------------|------------------|
+| **manifest.json / manifest.md** | Orchestrator | Auditor | 0002, 0012 | **MUST** |
+| **workflow_frozen.json** | Orchestrator, Evaluator | Auditor | 0002, 0004 | **MUST** |
+| **report.md** | Synthesizer | Critic (optional), Auditor | 0009, 0012 | **MUST** |
+| **approval.json** | Auditor | Orchestrator (acknowledgment) | 0012, 0015 | **MUST** |
+| **SHA256SUMS.txt** | Orchestrator | Auditor | 0015, 0016 | **MUST** |
+| **ADR files** | Orchestrator, Auditor | Orchestrator | 0001–0017 | **MUST** |
+| **/logs/workflow/** | Orchestrator | Auditor | 0004 | **MUST** |
+| **/logs/audits/** | Auditor | Orchestrator (review only) | 0003, 0013 | **MUST** |
+| **/logs/overrides/** | Orchestrator (manual intervention) | Auditor | 0004, 0012 | **SHOULD** |
+| **/schemas/** | Orchestrator, Auditor | CRI validator (future) | 0002, 0015 | **MAY** |
+| **/templates/** | Orchestrator | N/A | 0011 | **MAY** |
+| **/figures/** | Orchestrator | N/A | 0009 | **MAY** |
+
+---
+
+### 8.3 Chain of Custody
+
+All artifacts **MUST** maintain a documented chain of custody that records:
+- **Creation timestamp**  
+- **Responsible role**  
+- **Verification signature or attestation hash**  
+- **Referenced ADR(s)**  
+- **Linked run ID**
+
+This metadata **MUST** be stored in either:
+- File front matter (for Markdown-based artifacts), or  
+- Embedded JSON keys (for structured data).
+
+Example metadata block:
+```yaml
+run_id: RUN_2025-10-28_001
+origin_role: Orchestrator
+verified_by: Auditor
+adr_refs: [0002, 0012]
+sha256: "2f7b3e8e..."
+timestamp: 2025-10-28T18:21:00Z
+```
+### 8.4 Attestation Logic
+
+  1) Primary Attestation
+
+  -Each artifact requiring human or automated approval (e.g., approval.json, report.md  MUST be signed off by the Auditor role.  
+  -Signatures may be human-readable (signed-by) or cryptographic (per ADR-0015).
+
+  2) Secondary Acknowledgment
+
+  -The Orchestrator SHOULD acknowledge attested artifacts via changelog or run note entry.  
+  -This creates a closed validation loop and allows two-party accountability.
+
+  3)Override Case
+
+  -If the Orchestrator bypasses or modifies an attested artifact, an entry MUST be logged in /logs/overrides/ citing justification and relevant ADR(s).
+
+### 8.5 Accountability Validation (Automated and Manual)
+
+  -Automated systems SHOULD validate that every artifact in /runs/ and /docs/ has both an origin and attesting role recorded.  
+  -Manual audits MUST confirm that metadata matches recorded logs and ADRs.  
+  -Missing or ambiguous role assignments MUST trigger a non-conformance flag under §7.5.  
+
+### 8.6 Role Coverage Summary
+
+| Role |	Primary Responsibilities |	Secondary Responsibilities |	Key Compliance Points | Orchestrator	Manages run lifecycle, produces manifests and workflow logs, coordinates attestation. |	Reviews audits, ensures completeness.	§3.2, §4.2, §5, §6 | Evaluator |	Generates and compares outputs from reasoning models. |	Assists in workflow_frozen capture. |	§3.2, §5.3 | Auditor |	Performs formal verification, approves or rejects artifacts, maintains audit logs. |	Validates checksum and signature integrity. |	§3.2, §5.4, §6.6 | Synthesizer |	Produces consolidated reports from approved reasoning paths. |	Supports narrative generation for publication. | §3.2, §5.3 | Critic / Red Team |	Optionally challenges claims to test falsifiability. |	N/A |	§3.2, §5.2 |  
+
+### 8.7 Conformance Evidence
+
+To demonstrate role–artifact compliance:  
+  -Repositories MUST maintain a ROLE_ATTESTATION.md or equivalent manifest summarizing each role’s contributions.  
+  -The file SHOULD be updated per release tag and reference ADRs, Run IDs, and hash values.  
+  -Future CRI-CORE integrations MAY automate this process using agent-based signature validation.  
+
+### 8.8 Future Integration Notes
+
+Once CRI-CORE is active:  
+  -Each role’s attestation will correspond to a schema validator module (e.g., auditor.schema.json).  
+  -The Accountability Matrix will be machine-enforced through the CRI runtime layer.  
+  -Non-human agents (models) will sign their outputs using embedded identity tokens or deterministic cryptographic fingerprints.  
+
+**TODO**: Define CRI-CORE accountability schema references upon release of CRI Specification v0.1.
 
 ---
 
