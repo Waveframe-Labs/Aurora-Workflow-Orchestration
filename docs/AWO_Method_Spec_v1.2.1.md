@@ -749,14 +749,135 @@ Once CRI-CORE is active:
 ---
 
 ## 9. Governance and Attestation
-Each run requires human or automated attestation of validity and completeness.
 
-**Core Requirements:**
-- Runs MUST include `approval.json` with reviewer signature and timestamp.  
-- Attestation MAY include checksum verification and peer confirmation.  
-- Failed attestations MUST be logged under `/logs/attestation_failures/`.  
+### 9.1 Purpose
+This section defines how AWO-governed research runs are validated, attested, and archived.  
+Attestation provides the binding guarantee that all artifacts within a run are **complete, verified, and reproducible** under human or automated oversight.
 
-**TODO:** Specify acceptable digital signature methods and verification workflows.
+All attestations constitute part of the formal governance record of a project and **MUST** be preserved in perpetuity for audit and citation.
+
+---
+
+### 9.2 Core Attestation Requirements
+
+| Requirement | Description | Governing ADRs | Compliance Level |
+|--------------|--------------|----------------|------------------|
+| **approval.json** | Each run **MUST** include a signed attestation file recording reviewer identity, timestamp, and verdict. | 0012, 0015 | **MUST** |
+| **Checksum verification** | The attesting role **MUST** confirm that all artifacts listed in `SHA256SUMS.txt` are valid. | 0015 | **MUST** |
+| **Peer confirmation** | Optional secondary review by another role (e.g., Critic or Red Team) **MAY** supplement the attestation. | 0013 | **MAY** |
+| **Failure logging** | Any rejected or failed attestation **MUST** be recorded under `/logs/attestation_failures/` with justification and linked run ID. | 0003, 0004 | **MUST** |
+| **Immutable record** | Once committed, attestations **MUST NOT** be modified or deleted; amendments require a superseding entry. | 0010 | **MUST** |
+
+---
+
+### 9.3 Attestation Metadata Schema
+
+All `approval.json` files **MUST** conform to a minimal metadata schema for traceability and verification.
+
+```json
+{
+  "run_id": "RUN_2025-10-28_001",
+  "reviewer_role": "Auditor",
+  "reviewer_identity": "s.wright@waveframelabs.org",
+  "attestation_timestamp": "2025-10-28T21:45:00Z",
+  "verdict": "approved",
+  "checksum_verified": true,
+  "adr_refs": ["0012", "0015"],
+  "signature": "base64-encoded digital signature",
+  "comments": "Verification completed successfully; no anomalies detected."
+}
+```
+
+The `signature` field may represent:
+- A manual human signature (`signed-by` line in text-based files), or  
+- A cryptographic signature generated via OIDC or PGP keypair (ADR-0015).
+
+---
+
+### 9.4 Signature and Verification Workflows
+
+1. **Human Attestation**
+   - The **Auditor** reviews all artifacts for integrity, compliance, and falsifiability.
+   - Signs `approval.json` manually or via embedded digital identity token.
+   - Marks run as `approved` or `rejected`.
+
+2. **Automated Attestation (Future CRI Integration)**
+   - A validator module checks artifact hashes, manifest completeness, and schema compliance.
+   - Generates deterministic signature via SHA256 + identity token.
+   - Writes automated attestation record to `/runs/<id>/approval.json`.
+
+3. **Dual-Signature Option**
+   - The **Orchestrator** may co-sign attested runs for dual accountability.
+   - Dual signatures are encouraged for formal publication releases.
+
+---
+
+### 9.5 Attestation Failure Handling
+
+- A failed attestation **MUST** generate a markdown entry in `/logs/attestation_failures/` using the following format:
+
+```markdown
+# Attestation Failure — RUN_2025-10-28_001
+**Date:** 2025-10-28  
+**Reviewer:** Auditor  
+**Reason:** Checksum mismatch in `report.md`  
+**Status:** Rejected  
+**Next Action:** Correct artifact and resubmit for attestation  
+**ADR References:** 0003, 0012
+```
+
+- Failed attestations **MUST NOT** be deleted; they serve as part of the permanent audit trail.
+- Corrected runs **MUST** reference the failed run ID in their manifest (`supersedes: RUN_2025-10-28_001`).
+
+---
+
+### 9.6 Governance Records
+
+Each repository **MUST** maintain a persistent log of all attestations, approvals, and failures under `/logs/governance/`.  
+These logs **MUST** contain:
+- Run ID  
+- Reviewer identity  
+- Timestamp  
+- Attestation verdict  
+- Linked ADRs  
+- Immutable reference to the attestation artifact
+
+This forms the canonical audit trail for human and automated verification.
+
+---
+
+### 9.7 Governance Roles and Oversight
+
+| Governance Function | Responsible Role | Description |
+|----------------------|------------------|-------------|
+| **Primary Review** | Auditor | Performs verification and signs `approval.json`. |
+| **Secondary Review (Optional)** | Critic / Red Team | Provides peer-level falsifiability challenge. |
+| **Governance Record Maintenance** | Orchestrator | Maintains `/logs/governance/` and ensures traceability. |
+| **Policy Enforcement** | Aurora Research Initiative (Waveframe Labs) | Oversees alignment of attestation procedures with AWO standard. |
+
+---
+
+### 9.8 Integrity Assurance
+
+- All attestation-related files **MUST** be included in the repository’s root `SHA256SUMS.txt`.  
+- Verification of checksums **MUST** occur before tagging a release (§10).  
+- Attestation results **MUST** propagate to any derived DOI, Zenodo, or archival metadata.
+
+---
+
+### 9.9 Future Integration Notes
+
+- CRI-CORE will implement attestation as an automated module (`attestation_validator.py`) using deterministic signatures.  
+- Each role’s digital identity **WILL** be represented by a unique agent keypair, recorded in the CRI identity ledger.  
+- Automated attestation results will trigger governance alerts or webhooks for audit notifications.
+
+**TODO:** Add CRI-CORE schema mapping once `attestation.schema.json` is defined.
+
+---
+
+**Governing ADRs:** 0003, 0004, 0010, 0012, 0013, 0015  
+**Compliance Level:** MUST
+
 
 ---
 
