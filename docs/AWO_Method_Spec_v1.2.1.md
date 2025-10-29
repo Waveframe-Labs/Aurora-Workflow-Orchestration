@@ -325,18 +325,167 @@ When CRI-CORE enforcement becomes active:
 
 **TODO:** Link this section to CRI enforcement spec once published.
 
-
 ---
 
 ## 5. Lifecycle and Run Phases
-Each research cycle proceeds through four canonical phases:
 
-1. **Fan-out (Planning)** — Define hypotheses, manifests, ADRs.  
-2. **Consensus (Execution)** — Perform runs and collect data.  
-3. **Attestation (Verification)** — Approve or reject based on falsifiability criteria.  
-4. **Archival (Publication)** — Freeze results, compute checksums, tag releases.
+### 5.1 Overview
+Every AWO-compliant project advances through a reproducible four-phase lifecycle.  
+These phases define the canonical order of epistemic operations, ensuring that each claim moves from **hypothesis** to **verified artifact** under transparent governance.
 
-**TODO:** Create table describing inputs/outputs for each phase.
+The canonical lifecycle phases are:
+
+1. **Fan-out (Planning)** — Definition of hypotheses, falsifiability conditions, and manifests.  
+2. **Consensus (Execution)** — Generation of reasoning paths or experimental runs.  
+3. **Attestation (Verification)** — Evaluation of results against falsifiability and audit criteria.  
+4. **Archival (Publication)** — Finalization, signing, and release of immutable artifacts.
+
+Each phase yields its own artifacts, logs, and ADRs, forming a complete reasoning lineage.
+
+---
+
+### 5.2 Phase 1 — Fan-Out (Planning)
+
+#### Purpose
+To define *what will be tested, how it could fail,* and *who will oversee verification.*  
+Fan-out begins the epistemic process by expanding a single research goal into a set of structured, falsifiable hypotheses.
+
+#### Activities
+- Create or update the **Run Manifest** (`manifest.md` or `.json`) describing:
+  - Objective, assumptions, and falsifiability criteria.
+  - Expected inputs, data sources, and transformation paths.
+  - Defined roles (Orchestrator, Evaluator, Auditor, Synthesizer).
+- Register a new **ADR** if the planned run changes methodology or assumptions.
+- Log planning steps under `/logs/workflow/`.
+
+#### Inputs
+- Prior ADRs and manifests.  
+- Source data, context from previous runs, or external citations.
+
+#### Outputs
+- Updated or new manifest.  
+- Associated ADR (e.g., “ADR-NNNN — Run Plan vX”).  
+- Planning log entries.  
+
+#### Trigger for Next Phase
+Orchestrator approval of the manifest and human sign-off per **ADR-0012 (Human-in-Loop Validation)**.
+
+---
+
+### 5.3 Phase 2 — Consensus (Execution)
+
+#### Purpose
+To perform reasoning, model inference, or experimental execution under the conditions defined in the manifest.
+
+#### Activities
+- Execute all reasoning agents or models specified.  
+- Collect generated outputs, intermediate data, and system logs.  
+- Optionally employ multiple agents or parameter sweeps to create a **fan-out of reasoning paths.**  
+- Evaluate preliminary consistency via internal scoring or evaluator votes.  
+- Record all contextual metadata (versions, seeds, hashes) in `/runs/<RUN_ID>/metadata.json`.  
+
+#### Inputs
+- Manifest and ADR definitions.  
+- Roles configuration file (implicit or explicit).  
+- Versioned environment and model parameters.
+
+#### Outputs
+- Raw results and intermediate artifacts.  
+- Execution logs (`/logs/workflow/`).  
+- Temporary evaluation summaries.
+
+#### Trigger for Next Phase
+Evaluator consensus or Orchestrator decision to proceed to formal verification.
+
+---
+
+### 5.4 Phase 3 — Attestation (Verification)
+
+#### Purpose
+To formally verify that results meet falsifiability and audit criteria defined in the manifest.  
+This phase converts raw outputs into **attested knowledge.**
+
+#### Activities
+- Auditors perform validation checks:
+  - Schema compliance (structure, completeness).  
+  - Logical falsifiability (did any counterexample occur?).  
+  - Provenance linkage (data lineage intact).  
+- Record results in `/logs/audits/`.  
+- If human validation is required, document it in `/logs/overrides/` referencing **ADR-0012.**  
+- Generate `approval.json` containing:
+  - Verdict (`approved`, `rejected`, or `needs-revision`).  
+  - Auditor signatures or cryptographic attestations (per **ADR-0015**).  
+  - References to manifest, run hash, and ADR numbers.
+
+#### Inputs
+- Run artifacts from Phase 2.  
+- Manifest and corresponding ADRs.  
+
+#### Outputs
+- `approval.json` (attestation record).  
+- Audit log entries with validation outcomes.  
+- Updated `SHA256SUMS.txt`.
+
+#### Trigger for Next Phase
+All required approvals recorded and checksums generated.
+
+---
+
+### 5.5 Phase 4 — Archival (Publication)
+
+#### Purpose
+To freeze, sign, and publish verified artifacts for long-term reproducibility and citation.  
+This is the point at which a Run becomes an immutable element of the research record.
+
+#### Activities
+- Move verified run artifacts into `/runs/` and compute final checksums.  
+- Update `SHA256SUMS.txt` and verify integrity.  
+- Generate or update PDFs via automated workflows (per **ADR-0016**).  
+- Create changelog entry summarizing the Run and resulting ADR references.  
+- Tag repository version (e.g., `v1.2.1`) and attach signed artifacts.  
+- Register DOI once repositories are synced to Zenodo or equivalent archival service (per **ADR-0010**).  
+
+#### Inputs
+- Verified artifacts from Attestation.  
+- Final audit results and approval files.
+
+#### Outputs
+- Immutable run directory with all signatures.  
+- Release tag and checksum record.  
+- DOI-linked archival snapshot.
+
+#### Trigger for Completion
+Publication of DOI and confirmation of checksum match against `SHA256SUMS.txt`.
+
+---
+
+### 5.6 Lifecycle Transition Matrix
+
+| Phase | Primary Inputs | Primary Outputs | Responsible Roles | Key Artifacts | Governing ADRs |
+|--------|----------------|-----------------|------------------|----------------|----------------|
+| **Fan-Out** | Prior ADRs, data, goals | Manifest, planning log | Orchestrator, Critic | `manifest.json`, ADR-NNNN | 0002, 0009, 0012 |
+| **Consensus** | Manifest | Raw results, metadata | Evaluator, Synthesizer | `metadata.json`, temp logs | 0002, 0013 |
+| **Attestation** | Run outputs | `approval.json`, audit logs | Auditor, Orchestrator | `/logs/audits/`, `/logs/overrides/` | 0003, 0012, 0015 |
+| **Archival** | Verified artifacts | Signed release, DOI, checksums | Orchestrator, Auditor | `SHA256SUMS.txt`, release tag | 0010, 0014, 0016, 0017 |
+
+---
+
+### 5.7 Compliance Expectations
+- Every AWO Run **MUST** pass through all four phases in order.  
+- No phase **MAY** be skipped or merged unless justified in an ADR and recorded in `/logs/overrides/`.  
+- Each transition **MUST** be timestamped and logged.  
+- Failing a phase (e.g., rejection in Attestation) **MUST** result in either iteration or termination — never silent acceptance.  
+- Archival freezes all prior phases; no edits are permitted post-checksum.
+
+---
+
+### 5.8 Future Automation Notes
+Once CRI-CORE is operational:
+- Each phase will map to a discrete enforcement module.  
+- State transitions will be validated via CRI schema events.  
+- Overrides will trigger automated diff-based verification alerts.
+
+**TODO:** Define JSON schema alignment between lifecycle phases and CRI runtime once available.
 
 ---
 
