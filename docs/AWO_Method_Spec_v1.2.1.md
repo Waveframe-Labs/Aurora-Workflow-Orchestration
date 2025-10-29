@@ -1,6 +1,8 @@
 # Aurora Workflow Orchestration (AWO)
 ## Method Specification — v1.2.1 (Scaffold)
 Maintainer: Waveframe Labs  
+Version: 1.2.1 Final  
+Release Date: 2025-10-28  
 License: CC BY 4.0 (docs), Apache 2.0 (code)
 
 ---
