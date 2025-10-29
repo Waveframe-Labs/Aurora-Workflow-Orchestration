@@ -145,6 +145,8 @@ It includes participant identity, timestamp, and signature or digital hash.
 All defined entities in this section will be mapped to corresponding CRI-CORE schema classes in later versions.  
 Cross-references will be introduced once the enforcement layer is finalized.
 
+<!-- CRI-TODO: Add CRI-CORE schema identifiers once published. -->
+
 **TODO:** Refine definitions list and cross-link to CRI-CORE schema references after CRI draft publication.
 
 ---
@@ -186,7 +188,7 @@ Multiple roles MAY be fulfilled by a single agent if traceability and attestatio
 ### 3.4 Role Attribution and Record-Keeping
 - Every `approval.json` file MUST list all participating roles and their associated agent identifiers (human name, model ID, or process hash).  
 - When multiple roles are automated, their decision boundaries MUST be defined in the workflow manifest or configuration file.  
-- Manual overrides or deviations from standard AWO behavior MUST be documented under /logs/overrides/ and cross-referenced to the applicable ADR  
+- Manual overrides or deviations from standard AWO behavior MUST be documented under /logs/overrides/ and cross-referenced to the applicable ADR.  
 
 ---
 
@@ -201,6 +203,8 @@ Multiple roles MAY be fulfilled by a single agent if traceability and attestatio
 ### 3.6 Future Role Extensions
 Future AWO or CRI-CORE revisions MAY extend the canonical role set (e.g., **Planner**, **Historian**, **Meta-Auditor**) as automated reasoning matures.  
 Any such extensions MUST maintain backward compatibility with this role schema and preserve attestation semantics.
+
+<!-- CRI-TODO: Link role modules once CRI-CORE publishes validator interfaces. -->
 
 **TODO:** Cross-link these roles to CRI-CORE validation modules (e.g., `orchestrator-agent`, `auditor-module`, `consensus-engine`) once defined.
 
@@ -324,6 +328,8 @@ When CRI-CORE enforcement becomes active:
 - Validation schemas in `/schemas/` **WILL** become executable policies.
 - Manual override logs in `/logs/overrides/` **WILL** trigger runtime verification events.
 - Repository audits **WILL** be automatically generated from `SHA256SUMS.txt` diffs.
+
+<!-- CRI-TODO: Link to CRI-CORE enforcement spec once available. -->
 
 **TODO:** Link this section to CRI enforcement spec once published.
 
@@ -487,6 +493,8 @@ Once CRI-CORE is operational:
 - State transitions will be validated via CRI schema events.  
 - Overrides will trigger automated diff-based verification alerts.
 
+<!-- CRI-TODO: Define JSON schema alignment between lifecycle phases and CRI runtime. -->
+
 **TODO:** Define JSON schema alignment between lifecycle phases and CRI runtime once available.
 
 ---
@@ -587,6 +595,8 @@ Once CRI-CORE enforcement is active:
 - Provenance chains will be validated automatically using CRI runtime modules.  
 - Manual overrides will trigger provenance-diff checks to confirm trace continuity.
 
+<!-- CRI-TODO: Define schema references and CRI module mappings once CRI-CORE v0.1 is published. -->
+
 **TODO:** Define schema references and CRI module mappings once CRI-CORE Specification v0.1 is published.
 
 ---
@@ -628,9 +638,8 @@ The following terms establish the required, recommended, and optional behaviors 
 | §5 Lifecycle and Run Phases | Sequential execution order and audit flow | **MUST** |
 | §6 Artifacts and Provenance Rules | Artifact creation, immutability, hash verification | **MUST** |
 | §8 Accountability Matrix | Role–artifact responsibility mapping | **SHOULD** |
-| §9 Versioning and Reproducibility | Tagging, checksum maintenance, archival | **MUST** |
-| §10 Licensing and Attribution | License files and acknowledgments | **MUST** |
-| §11 Adoption and Compliance Tiers | Implementation depth and flexibility | **MAY/SHOULD** |
+| §9 Governance and Attestation | Tagging, checksum maintenance, archival | **MUST** |
+| §11 Licensing and Attribution | License files and acknowledgments | **MUST** |
 | §12 Future Integration | CRI-CORE hooks and schema mappings | **MAY** |
 
 ---
@@ -708,43 +717,48 @@ timestamp: 2025-10-28T18:21:00Z
 ```
 ### 8.4 Attestation Logic
 
-  1) Primary Attestation
+1) **Primary Attestation**  
+- Each artifact requiring human or automated approval (e.g., `approval.json`, `report.md`) **MUST** be signed off by the Auditor role.  
+- Signatures may be human-readable (signed-by) or cryptographic (per ADR-0015).
 
-  -Each artifact requiring human or automated approval (e.g., approval.json, report.md  MUST be signed off by the Auditor role.  
-  -Signatures may be human-readable (signed-by) or cryptographic (per ADR-0015).
+2) **Secondary Acknowledgment**  
+- The Orchestrator **SHOULD** acknowledge attested artifacts via changelog or run note entry.  
+- This creates a closed validation loop and allows two-party accountability.
 
-  2) Secondary Acknowledgment
-
-  -The Orchestrator SHOULD acknowledge attested artifacts via changelog or run note entry.  
-  -This creates a closed validation loop and allows two-party accountability.
-
-  3)Override Case
-
-  -If the Orchestrator bypasses or modifies an attested artifact, an entry MUST be logged in /logs/overrides/ citing justification and relevant ADR(s).
+3) **Override Case**  
+- If the Orchestrator bypasses or modifies an attested artifact, an entry **MUST** be logged in `/logs/overrides/` citing justification and relevant ADR(s).
 
 ### 8.5 Accountability Validation (Automated and Manual)
 
-  -Automated systems SHOULD validate that every artifact in /runs/ and /docs/ has both an origin and attesting role recorded.  
-  -Manual audits MUST confirm that metadata matches recorded logs and ADRs.  
-  -Missing or ambiguous role assignments MUST trigger a non-conformance flag under §7.5.  
+- Automated systems **SHOULD** validate that every artifact in `/runs/` and `/docs/` has both an origin and attesting role recorded.  
+- Manual audits **MUST** confirm that metadata matches recorded logs and ADRs.  
+- Missing or ambiguous role assignments **MUST** trigger a non-conformance flag under §7.5.  
 
 ### 8.6 Role Coverage Summary
 
-| Role |	Primary Responsibilities |	Secondary Responsibilities |	Key Compliance Points | Orchestrator	Manages run lifecycle, produces manifests and workflow logs, coordinates attestation. |	Reviews audits, ensures completeness.	§3.2, §4.2, §5, §6 | Evaluator |	Generates and compares outputs from reasoning models. |	Assists in workflow_frozen capture. |	§3.2, §5.3 | Auditor |	Performs formal verification, approves or rejects artifacts, maintains audit logs. |	Validates checksum and signature integrity. |	§3.2, §5.4, §6.6 | Synthesizer |	Produces consolidated reports from approved reasoning paths. |	Supports narrative generation for publication. | §3.2, §5.3 | Critic / Red Team |	Optionally challenges claims to test falsifiability. |	N/A |	§3.2, §5.2 |  
+| Role | Primary Responsibilities | Secondary Responsibilities | Key Compliance Points |
+|------|--------------------------|----------------------------|-----------------------|
+| **Orchestrator** | Manage run lifecycle; produce manifests and workflow logs; coordinate attestation. | Review audits; ensure completeness. | §3.2, §4.2, §5, §6 |
+| **Evaluator** | Generate and compare outputs from reasoning models. | Assist in `workflow_frozen.json` capture. | §3.2, §5.3 |
+| **Auditor** | Perform formal verification; approve or reject artifacts; maintain audit logs. | Validate checksum and signature integrity. | §3.2, §5.4, §6.6 |
+| **Synthesizer** | Produce consolidated reports from approved reasoning paths. | Support narrative generation for publication. | §3.2, §5.3 |
+| **Critic / Red Team** | Challenge claims to test falsifiability (optional). | N/A | §3.2, §5.2 |
 
 ### 8.7 Conformance Evidence
 
 To demonstrate role–artifact compliance:  
-  -Repositories MUST maintain a ROLE_ATTESTATION.md or equivalent manifest summarizing each role’s contributions.  
-  -The file SHOULD be updated per release tag and reference ADRs, Run IDs, and hash values.  
-  -Future CRI-CORE integrations MAY automate this process using agent-based signature validation.  
+- Repositories **MUST** maintain a `ROLE_ATTESTATION.md` or equivalent manifest summarizing each role’s contributions.  
+- The file **SHOULD** be updated per release tag and reference ADRs, Run IDs, and hash values.  
+- Future CRI-CORE integrations **MAY** automate this process using agent-based signature validation.  
 
 ### 8.8 Future Integration Notes
 
 Once CRI-CORE is active:  
-  -Each role’s attestation will correspond to a schema validator module (e.g., auditor.schema.json).  
-  -The Accountability Matrix will be machine-enforced through the CRI runtime layer.  
-  -Non-human agents (models) will sign their outputs using embedded identity tokens or deterministic cryptographic fingerprints.  
+- Each role’s attestation will correspond to a schema validator module (e.g., `auditor.schema.json`).  
+- The Accountability Matrix will be machine-enforced through the CRI runtime layer.  
+- Non-human agents (models) will sign their outputs using embedded identity tokens or deterministic cryptographic fingerprints.  
+
+<!-- CRI-TODO: Define CRI-CORE accountability schema references when CRI Spec v0.1 is released. -->
 
 **TODO**: Define CRI-CORE accountability schema references upon release of CRI Specification v0.1.
 
@@ -873,6 +887,8 @@ This forms the canonical audit trail for human and automated verification.
 - Each role’s digital identity **WILL** be represented by a unique agent keypair, recorded in the CRI identity ledger.  
 - Automated attestation results will trigger governance alerts or webhooks for audit notifications.
 
+<!-- CRI-TODO: Add CRI-CORE schema mapping once `attestation.schema.json` is defined. -->
+
 **TODO:** Add CRI-CORE schema mapping once `attestation.schema.json` is defined.
 
 ---
@@ -912,7 +928,7 @@ Every AWO-compliant release represents a **frozen, reproducible state** of the r
    - Pre-release or test tags (e.g., `v1.2.1-beta`) **MAY** be used internally but **MUST NOT** be cited as archival releases.
 
 2. **Tag Commit Association**
-   - The tag **MUST** correspond to the exact commit that generated the release artifacts and SHA256SUMS file.
+   - The tag **MUST** correspond to the exact commit that generated the release artifacts and `SHA256SUMS.txt` file.
    - Git commit message **SHOULD** match the release title in CHANGELOG.
 
 3. **Amended Releases**
@@ -958,12 +974,12 @@ The checksum process ensures content-addressable integrity across all archived a
 
 ### 10.6 DOI Registration and Archival
 
-- Public releases **SHOULD** be archived with a persistent DOI through [Zenodo](https://zenodo.org) or equivalent repository.  
+- Public releases **SHOULD** be archived with a persistent DOI through Zenodo or equivalent repository.  
 - Each DOI record **MUST** reference:
   - Repository URL and commit hash  
   - Release tag (e.g., `v1.2.1`)  
   - Author and ORCID metadata  
-  - Associated artifacts (PDFs, SHA256SUMS, CITATION.cff)
+  - Associated artifacts (PDFs, `SHA256SUMS.txt`, `CITATION.cff`)
 
 **Zenodo Integration Notes:**
 - Zenodo automatically version-links new uploads under the same “concept DOI.”  
@@ -1008,7 +1024,7 @@ Included Artifacts:
 - CITATION.cff  
 - CHANGELOG.md  
 
-DOI: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+DOI: 10.5281/zenodo.17013612
 ```
 
 ---
@@ -1018,8 +1034,8 @@ DOI: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 Each release **MUST** demonstrate the following before publication:
 
 - [x] Attestation approved and logged (§9)  
-- [x] SHA256SUMS.txt regenerated and verified  
-- [x] CHANGELOG updated with release details  
+- [x] `SHA256SUMS.txt` regenerated and verified  
+- [x] `CHANGELOG.md` updated with release details  
 - [x] Artifacts attached to GitHub and/or Zenodo  
 - [x] DOI record cross-linked to release tag  
 - [x] Governance logs reflect approval event
@@ -1058,8 +1074,8 @@ All derivative works, redistributions, or publications referencing AWO materials
 |--------|-------------|----------|
 | **Author** | Full name of primary maintainer. | *Shawn C. Wright* |
 | **Affiliation** | Organization or project under which the work is governed. | *Waveframe Labs / Aurora Research Initiative* |
-| **ORCID** | Persistent researcher identifier. | [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295) |
-| **Concept DOI** | Persistent identifier for the overall project lineage. | [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612) |
+| **ORCID** | Persistent researcher identifier. | 0009-0006-6043-9295 |
+| **Concept DOI** | Persistent identifier for the overall project lineage. | 10.5281/zenodo.17013612 |
 | **License Notice** | Statement of applicable licenses. | “Code licensed under Apache 2.0; Documentation under CC BY 4.0.” |
 
 Attribution **MUST** appear in at least one of the following locations:
@@ -1240,7 +1256,7 @@ The following schema defines the minimum required fields for JSON-based manifest
 
 | Workflow Type | Manifest Creation | Verification Method | Example Implementation |
 |----------------|------------------|---------------------|-------------------------|
-| **Manual AWO Runs** | Authored by Orchestrator before execution. | Verified by Auditor post-run. | `manifest.md` signed manually. |
+| **Manual AWO Runs** | Authored by Orchestrator before execution. | Verified by Auditor post-run. | `manifest.md` signed manually (instantiated from `templates/falsifiability-manifest.md`). |
 | **CRI-CORE Integrated Runs** | Auto-generated from hypothesis input. | Validated by schema engine (`manifest_validator.py`). | `manifest.json` validated automatically. |
 
 ---
@@ -1259,6 +1275,10 @@ The following schema defines the minimum required fields for JSON-based manifest
 - CRI-CORE will implement automated manifest validation using deterministic schemas.  
 - Falsifiability data may be visualized in the CRI dashboard for longitudinal tracking of epistemic robustness.  
 - Future schema versions will include extended metadata such as probabilistic priors and entropy-weighted predictions.
+
+<!-- CRI-TODO: Hook to CRI manifest validator once available. -->
+
+**TODO:** Hook to CRI manifest validator once available.
 
 ---
 
@@ -1286,7 +1306,7 @@ Each repository claiming AWO compliance **MUST** satisfy the following condition
 | 1 | **Standard directory structure present** | Verify `/docs/`, `/logs/`, `/runs/`, `/schemas/`, `/decisions/`, and `/templates/` directories exist. | 0011 | **MUST** |
 | 2 | **At least one signed run in `/runs/`** | Confirm presence of `approval.json` with valid attestation (§9). | 0012, 0015 | **MUST** |
 | 3 | **ADRs linked and numbered (0001–0017)** | Verify all referenced ADRs exist and correspond to governing sections. | 0001–0017 | **MUST** |
-| 4 | **Falsifiability manifest present** | Ensure each run contains `/runs/<run_id>/falsifiability-manifest.md` or `manifest.json`. | 0002, 0012 | **MUST** |
+| 4 | **Falsifiability manifest present** | Ensure each run contains `/runs/<run_id>/falsifiability-manifest.md` (instantiated from `templates/falsifiability-manifest.md`) **or** `manifest.json`. | 0002, 0012 | **MUST** |
 | 5 | **SHA256SUMS.txt present and verified** | Regenerate and compare to recorded hash file (§10.5). | 0015 | **MUST** |
 | 6 | **CHANGELOG includes version reference** | Confirm most recent version is logged (§10.9). | 0010 | **MUST** |
 | 7 | **README cross-links all core documents** | README must reference the Whitepaper, Method Spec, and Adoption Guide. | 0017 | **MUST** |
@@ -1363,7 +1383,7 @@ Example:
 **Summary:**  
 All required AWO compliance checks completed. Repository verified as reproducible and fully documented under Aurora Research Initiative governance.
 
-**Result:** ✅ PASS  
+**Result:** PASS  
 **Linked ADRs:** 0001–0017  
 **Next Review:** 2026-04-01
 ```
@@ -1376,7 +1396,7 @@ All required AWO compliance checks completed. Repository verified as reproducibl
 - Compliance logs will be serialized as JSON outputs for downstream reproducibility dashboards.  
 - The compliance report will serve as a verifiable artifact in the provenance ledger.
 
----
+<!-- CRI-TODO: Publish compliance.schema.json and validator module names. -->
 
 **Governing ADRs:** 0001–0017  
 **Compliance Level:** MUST
