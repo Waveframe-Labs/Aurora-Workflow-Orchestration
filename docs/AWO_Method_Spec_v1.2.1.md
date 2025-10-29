@@ -878,45 +878,390 @@ This forms the canonical audit trail for human and automated verification.
 **Governing ADRs:** 0003, 0004, 0010, 0012, 0013, 0015  
 **Compliance Level:** MUST
 
-
 ---
 
 ## 10. Release and Versioning
-AWO-compliant repositories MUST version all outputs and preserve immutability.
 
-**Release Requirements:**
-- Each release corresponds to a reproducible state of the repository.  
-- Tags MUST follow semantic versioning (e.g., `v1.2.1`).  
-- Releases MUST attach PDF artifacts, SHA256SUMS, and ADR references.  
-- Released runs MUST NOT be altered post-publication.
+### 10.1 Purpose
+This section defines the release, versioning, and archival policies that ensure AWO-governed repositories remain immutable, traceable, and verifiable over time.  
+Every AWO-compliant release represents a **frozen, reproducible state** of the repository — complete with its documentation, checksums, and attestations.
 
-**TODO:** Add instructions for checksum regeneration and Zenodo linkage.
+---
+
+### 10.2 Core Release Requirements
+
+| Requirement | Description | Governing ADRs | Compliance Level |
+|--------------|--------------|----------------|------------------|
+| **Semantic Versioning** | All releases **MUST** follow the semantic versioning convention `vMAJOR.MINOR.PATCH` (e.g., `v1.2.1`). | 0010 | **MUST** |
+| **Artifact Immutability** | Once tagged, all artifacts within the release (PDFs, manifests, reports, checksums) **MUST NOT** be altered. | 0010, 0014 | **MUST** |
+| **Checksum Registry** | Each release **MUST** include `SHA256SUMS.txt` with verified hashes for all distributed files. | 0015 | **MUST** |
+| **DOI Linkage** | Every public release **SHOULD** include a DOI via Zenodo or an equivalent archival service. | 0010, 0017 | **SHOULD** |
+| **Release Attachments** | The release **MUST** attach final PDF artifacts, integrity file, and citation metadata. | 0010, 0016 | **MUST** |
+| **Change Documentation** | The `CHANGELOG.md` **MUST** include an entry describing new or modified artifacts. | 0010 | **MUST** |
+
+---
+
+### 10.3 Tagging Policy
+
+1. **Tag Naming Convention**
+   - Format: `v<major>.<minor>.<patch>`  
+     Examples: `v1.2.1`, `v2.0.0`  
+   - Tags **MUST** be unique and immutable.  
+   - Pre-release or test tags (e.g., `v1.2.1-beta`) **MAY** be used internally but **MUST NOT** be cited as archival releases.
+
+2. **Tag Commit Association**
+   - The tag **MUST** correspond to the exact commit that generated the release artifacts and SHA256SUMS file.
+   - Git commit message **SHOULD** match the release title in CHANGELOG.
+
+3. **Amended Releases**
+   - If a critical fix is required post-publication, a **new patch version** (e.g., `v1.2.2`) **MUST** be issued.
+   - Reusing or overwriting tags constitutes a non-compliance event (§7.5).
+
+---
+
+### 10.4 Artifact Attachment Policy
+
+Each release **MUST** attach the following verified files to its GitHub or archival entry:
+
+| File | Description |
+|------|--------------|
+| `AWO_Method_Spec_<ver>.pdf` | Finalized Method Specification document. |
+| `AWO_Whitepaper_<ver>.pdf` | Finalized Whitepaper. |
+| `SHA256SUMS.txt` | Integrity file listing all hashes. |
+| `CITATION.cff` | Machine-readable citation metadata. |
+| `CHANGELOG.md` | Historical record of updates. |
+| `approval.json` (optional) | Attestation record, if release represents an approved run. |
+
+All attachments **MUST** match the recorded checksums in `SHA256SUMS.txt`.
+
+---
+
+### 10.5 Checksum Regeneration Workflow
+
+Before final tagging, the following checksum verification process **MUST** occur:
+
+1. Generate fresh checksums for all distributable files:
+   ```bash
+   sha256sum docs/*.pdf > SHA256SUMS.txt
+   sha256sum CITATION.cff >> SHA256SUMS.txt
+   sha256sum CHANGELOG.md >> SHA256SUMS.txt
+   ```
+2. Verify against any previous version to confirm consistency.  
+3. Commit updated `SHA256SUMS.txt` prior to tagging.  
+4. Attest checksum integrity via `approval.json` (§9).
+
+The checksum process ensures content-addressable integrity across all archived artifacts.
+
+---
+
+### 10.6 DOI Registration and Archival
+
+- Public releases **SHOULD** be archived with a persistent DOI through [Zenodo](https://zenodo.org) or equivalent repository.  
+- Each DOI record **MUST** reference:
+  - Repository URL and commit hash  
+  - Release tag (e.g., `v1.2.1`)  
+  - Author and ORCID metadata  
+  - Associated artifacts (PDFs, SHA256SUMS, CITATION.cff)
+
+**Zenodo Integration Notes:**
+- Zenodo automatically version-links new uploads under the same “concept DOI.”  
+- AWO releases **MUST** maintain continuity with the concept DOI established at project initiation.  
+- If account merges or DOI conflicts occur, the concept DOI **MUST** be treated as authoritative (§README).
+
+---
+
+### 10.7 Archival Protocol
+
+1. **Release Creation**
+   - Verify all governance and attestation steps complete (§9).  
+   - Ensure all artifacts have valid checksums.  
+   - Commit all documentation updates.  
+
+2. **Tag and Publish**
+   - Tag repository with final version.  
+   - Attach all required artifacts.  
+   - Publish release through GitHub and/or Zenodo.  
+
+3. **Post-Publication Lock**
+   - No further changes permitted to tagged commit.  
+   - Only errata or new minor/patch versions may follow.  
+
+---
+
+### 10.8 Example Release Entry
+
+```markdown
+# AWO v1.2.1 — Documentation & Accessibility Finalization
+Release Date: 2025-10-28  
+Maintainer: Waveframe Labs  
+Contact: s.wright@waveframelabs.org  
+
+Overview:
+Finalized documentation for Aurora Workflow Orchestration (AWO) under Waveframe Labs governance, introducing governance logs, checksum verification, and final archival compliance.  
+
+Included Artifacts:
+- AWO_Method_Spec_v1.2.1.pdf  
+- AWO_Whitepaper_v1.1.1.pdf  
+- SHA256SUMS.txt  
+- CITATION.cff  
+- CHANGELOG.md  
+
+DOI: [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+```
+
+---
+
+### 10.9 Compliance Verification
+
+Each release **MUST** demonstrate the following before publication:
+
+- [x] Attestation approved and logged (§9)  
+- [x] SHA256SUMS.txt regenerated and verified  
+- [x] CHANGELOG updated with release details  
+- [x] Artifacts attached to GitHub and/or Zenodo  
+- [x] DOI record cross-linked to release tag  
+- [x] Governance logs reflect approval event
+
+---
+
+**Governing ADRs:** 0010, 0014, 0016, 0017  
+**Compliance Level:** MUST  
 
 ---
 
 ## 11. Licensing and Attribution
-AWO uses dual licensing to separate executable and textual components.
 
-- **Code:** Licensed under Apache 2.0.  
-- **Documentation:** Licensed under CC BY 4.0.  
-- Attribution MUST include author, ORCID, and concept DOI in derivative works.
+### 11.1 Purpose
+This section defines the licensing and attribution standards that govern the use, distribution, and citation of Aurora Workflow Orchestration (AWO) materials.  
+AWO uses a **dual-license model** to separate executable and textual components, ensuring that both source code and documentation remain openly accessible while maintaining clear intellectual property boundaries.
 
-**TODO:** Add structured attribution metadata schema reference.
+---
+
+### 11.2 Dual Licensing Structure
+
+| Component Type | License | Description | Governing ADR | Compliance Level |
+|----------------|----------|--------------|----------------|------------------|
+| **Source Code** | Apache 2.0 | Grants open use, modification, and distribution rights for all executable and workflow logic. | 0006 | **MUST** |
+| **Documentation & Text** | CC BY 4.0 | Allows reuse, adaptation, and redistribution with required attribution. | 0006, 0017 | **MUST** |
+
+This separation ensures that code implementations can be integrated into open infrastructure projects, while research documentation remains attributable to its original author and institution.
+
+---
+
+### 11.3 Attribution Requirements
+
+All derivative works, redistributions, or publications referencing AWO materials **MUST** include the following attribution fields:
+
+| Field | Description | Example |
+|--------|-------------|----------|
+| **Author** | Full name of primary maintainer. | *Shawn C. Wright* |
+| **Affiliation** | Organization or project under which the work is governed. | *Waveframe Labs / Aurora Research Initiative* |
+| **ORCID** | Persistent researcher identifier. | [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295) |
+| **Concept DOI** | Persistent identifier for the overall project lineage. | [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612) |
+| **License Notice** | Statement of applicable licenses. | “Code licensed under Apache 2.0; Documentation under CC BY 4.0.” |
+
+Attribution **MUST** appear in at least one of the following locations:
+- The repository `README.md`
+- Any redistributed documentation or derivative works
+- Metadata entries in DOI or preprint systems
+- Published works referencing AWO as a reproducibility method
+
+---
+
+### 11.4 Required License Files
+
+Each AWO-compliant repository **MUST** include the following license files at its root:
+
+| File | Description |
+|------|--------------|
+| `LICENSE` | The Apache 2.0 license text governing executable content. |
+| `LICENSE-CC-BY-4.0.md` | The Creative Commons Attribution 4.0 license text governing documentation. |
+| `NOTICE` *(optional)* | May include additional acknowledgments or third-party dependencies. |
+
+These license files **MUST NOT** be modified except to update copyright years or maintainers.
+
+---
+
+### 11.5 Attribution Metadata Schema
+
+To support automated validation and citation generation, AWO-compliant repositories **SHOULD** maintain structured attribution metadata in JSON or YAML format.
+
+Example (`attribution.json`):
+
+```json
+{
+  "project": "Aurora Workflow Orchestration (AWO)",
+  "author": "Shawn C. Wright",
+  "affiliation": "Waveframe Labs / Aurora Research Initiative",
+  "orcid": "0009-0006-6043-9295",
+  "concept_doi": "10.5281/zenodo.17013612",
+  "licenses": {
+    "code": "Apache-2.0",
+    "documentation": "CC-BY-4.0"
+  },
+  "repository_url": "https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration",
+  "release_tag": "v1.2.1",
+  "attestation_status": "approved"
+}
+```
+
+This metadata **MAY** be used by CRI-CORE to auto-generate citation badges, compliance checks, and DOI payloads.
+
+---
+
+### 11.6 Redistribution and Derivative Works
+
+- Redistribution of modified AWO code **MUST** preserve the Apache 2.0 notice.  
+- Redistribution of modified documentation **MUST** include visible attribution to the original author and DOI.  
+- Any derivative research or software **SHOULD** clearly indicate whether it remains AWO-compliant or diverges from the standard.  
+- Repositories using AWO as a framework **MAY** include their own attribution schema extending the above fields.
+
+---
+
+### 11.7 License Enforcement and Governance
+
+Waveframe Labs retains governance authority over the AWO standard under the **Aurora Research Initiative (ARI)**, as established in ADR-0017.  
+Compliance with licensing terms ensures long-term reproducibility, traceability, and authorship integrity across derivative projects.
+
+Violations or ambiguities regarding licensing **MUST** be documented in `/logs/governance/` and resolved through governance review (§9).
+
+---
+
+**Governing ADRs:** 0006, 0014, 0017  
+**Compliance Level:** MUST
 
 ---
 
 ## 12. Falsifiability Manifests
-Each experiment MUST include a falsifiability manifest before execution.
 
-**Manifest Contents:**
-- Hypothesis statement  
-- Predicted outcomes  
-- Disproof criteria  
-- Experimental plan  
-- Acceptance thresholds  
-- Known risks
+### 12.1 Purpose
+Falsifiability is the foundation of AWO’s reproducibility standard.  
+Every research run **MUST** define its disproof criteria before execution to prevent post hoc reasoning or unverifiable outcomes.  
+The falsifiability manifest ensures each run begins with explicit hypotheses, boundaries, and measurable success conditions.
 
-**TODO:** Formalize manifest schema for CRI-CORE parsing.
+---
+
+### 12.2 Core Manifest Requirements
+
+| Requirement | Description | Governing ADRs | Compliance Level |
+|--------------|--------------|----------------|------------------|
+| **Manifest Presence** | Each run **MUST** include a `manifest.json` or `manifest.md` file in its directory. | 0002 | **MUST** |
+| **Disproof Criteria** | Each manifest **MUST** define falsification conditions for all primary claims. | 0002 | **MUST** |
+| **Hypothesis Statement** | Each manifest **MUST** declare the specific hypothesis being tested. | 0002 | **MUST** |
+| **Acceptance Thresholds** | The manifest **MUST** define quantitative or qualitative acceptance boundaries. | 0002 | **MUST** |
+| **Known Risks** | Each manifest **SHOULD** include a list of known limitations, uncertainties, or external dependencies. | 0002 | **SHOULD** |
+| **Experimental Plan** | Each manifest **MUST** describe the intended sequence of actions or analyses. | 0002 | **MUST** |
+
+---
+
+### 12.3 Example Falsifiability Manifest (`manifest.json`)
+
+```json
+{
+  "run_id": "RUN_2025-10-28_001",
+  "title": "Entropy-Driven Expansion Model Validation",
+  "hypothesis": "Cosmological expansion rate correlates with entropy gradient across horizon boundaries.",
+  "predicted_outcomes": [
+    "Measured entropy growth rate exceeds geometric expansion rate.",
+    "Entropy variance remains bounded within ±3σ of model prediction."
+  ],
+  "disproof_criteria": [
+    "Entropy gradient fails to correlate with Hubble parameter over observed intervals.",
+    "Simulated entropy trajectory diverges beyond tolerance threshold for three consecutive iterations."
+  ],
+  "acceptance_thresholds": {
+    "correlation_coefficient_min": 0.8,
+    "entropy_growth_tolerance": 0.05
+  },
+  "experimental_plan": "Simulate entropic horizon model under varying initial conditions; compare observed entropy evolution against predicted rates.",
+  "known_risks": [
+    "Limited data resolution at high redshift values.",
+    "Numerical instability in early-run entropy estimations."
+  ],
+  "created_by": "Orchestrator",
+  "verified_by": "Auditor",
+  "adr_refs": ["0002", "0012"],
+  "timestamp": "2025-10-28T22:45:00Z"
+}
+```
+
+---
+
+### 12.4 Manifest Structure and Placement
+
+Each run **MUST** store its falsifiability manifest in the root of its `/runs/<run_id>/` directory.  
+Example structure:
+
+```
+/runs/
+ ├── RUN_2025-10-28_001/
+ │    ├── manifest.json
+ │    ├── workflow_frozen.json
+ │    ├── report.md
+ │    ├── approval.json
+ │    └── SHA256SUMS.txt
+```
+
+Each manifest file **MUST** be included in checksum verification (§10.5) and referenced in its corresponding attestation (§9).
+
+---
+
+### 12.5 Manifest Schema Definition
+
+The following schema defines the minimum required fields for JSON-based manifests:
+
+```json
+{
+  "$schema": "https://schema.waveframe.org/awo/manifest.schema.json",
+  "title": "AWO Falsifiability Manifest",
+  "type": "object",
+  "properties": {
+    "run_id": {"type": "string"},
+    "hypothesis": {"type": "string"},
+    "predicted_outcomes": {"type": "array", "items": {"type": "string"}},
+    "disproof_criteria": {"type": "array", "items": {"type": "string"}},
+    "acceptance_thresholds": {"type": "object"},
+    "experimental_plan": {"type": "string"},
+    "known_risks": {"type": "array", "items": {"type": "string"}},
+    "created_by": {"type": "string"},
+    "verified_by": {"type": "string"},
+    "adr_refs": {"type": "array", "items": {"type": "string"}},
+    "timestamp": {"type": "string", "format": "date-time"}
+  },
+  "required": ["run_id", "hypothesis", "disproof_criteria", "acceptance_thresholds", "experimental_plan"]
+}
+```
+
+---
+
+### 12.6 Manual vs. Automated Compliance
+
+| Workflow Type | Manifest Creation | Verification Method | Example Implementation |
+|----------------|------------------|---------------------|-------------------------|
+| **Manual AWO Runs** | Authored by Orchestrator before execution. | Verified by Auditor post-run. | `manifest.md` signed manually. |
+| **CRI-CORE Integrated Runs** | Auto-generated from hypothesis input. | Validated by schema engine (`manifest_validator.py`). | `manifest.json` validated automatically. |
+
+---
+
+### 12.7 Governance and Traceability
+
+- Each falsifiability manifest **MUST** reference its governing ADRs (typically 0002 and 0012).  
+- The manifest’s hash value **MUST** be included in the `SHA256SUMS.txt`.  
+- Any revisions to the manifest **MUST** be versioned with a unique timestamp and included in governance logs (§9).  
+- Superseded manifests **MUST** reference the previous run ID (`supersedes` field).
+
+---
+
+### 12.8 Future Integration Notes
+
+- CRI-CORE will implement automated manifest validation using deterministic schemas.  
+- Falsifiability data may be visualized in the CRI dashboard for longitudinal tracking of epistemic robustness.  
+- Future schema versions will include extended metadata such as probabilistic priors and entropy-weighted predictions.
+
+---
+
+**Governing ADRs:** 0002, 0012  
+**Compliance Level:** MUST
 
 ---
 
