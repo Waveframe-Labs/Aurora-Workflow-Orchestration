@@ -202,7 +202,7 @@ All enforcement and runtime development continues in **CRI-CORE**, the operation
 This repository maintains a cryptographic integrity registry (`SHA256SUMS.txt`) at the root level.  
 The registry is automatically rebuilt and committed by the **Build root SHA256SUMS** workflow.
 
-[![Integrity Registry](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha.yml/badge.svg)](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha.yml)
+[![Integrity Registry](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha256sums.yml/badge.svg)](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha256sums.yml)
 
 **Scope:**  
 - All primary specification, whitepaper, and adoption guide files under `/docs/`.  
