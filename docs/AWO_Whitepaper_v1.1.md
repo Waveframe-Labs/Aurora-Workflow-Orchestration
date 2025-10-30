@@ -80,7 +80,7 @@ These formal designations replace earlier informal “Implementer / Refiner / Cr
 ## 4. Core Artifacts
 Each AWO repository must contain:
 
-- **Falsifiability Manifest** (`/docs/FALSIFIABILITY_MANIFEST.md`) — claim IDs, tests, thresholds, and audit status.  
+- **Falsifiability Manifest** (`/docs/falsifiability-manifest.md`) — claim IDs, tests, thresholds, and audit status.  
 - **Run Manifest** (`/runs/run_*/run_manifest.json`) — canonical record of execution.  
 - **Schemas** (`/schemas/*.json`) — validate manifests and logs.  
 - **Decision Records (ADRs)** (`/decisions/*.md`) — document trade-offs and rationale.  
