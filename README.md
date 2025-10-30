@@ -193,6 +193,31 @@ Future changes occur only as errata or citation updates.
 ## Repository Status
 
 This repository is an archival reference artifact — stable, verifiable, and citable.  
-All enforcement and runtime development continues in **CRI-CORE**, the operational extension of AWO.
+All enforcement and runtime development continues in **CRI-CORE**, the operational extension of AWO.  
 
-AWO is the standard. CRI is the system.
+---  
+
+## Integrity and Verification
+
+This repository maintains a cryptographic integrity registry (`SHA256SUMS.txt`) at the root level.  
+The registry is automatically rebuilt and committed by the **Build root SHA256SUMS** workflow.
+
+[![Integrity Registry](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha.yml/badge.svg)](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha.yml)
+
+**Scope:**  
+- All primary specification, whitepaper, and adoption guide files under `/docs/`.  
+- All Architecture Decision Records under `/decisions/`.  
+- Core compliance, license, and governance files at repository root.  
+- All current (non-legacy) run artifacts under `/runs/`.
+
+**Exclusions:**  
+- `/runs_legacy/` (archived data)  
+- Workflow files and `.git` internals
+
+To verify locally:
+
+```bash
+sha256sum --check SHA256SUMS.txt
+```  
+
+AWO is the standard. CRI is the system.  
