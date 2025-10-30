@@ -1,13 +1,17 @@
-name: Root SHA256SUMS
+name: Build root SHA256SUMS
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}   # run manually from Actions tab
 
 permissions:
-  contents: write
+  contents: write         # needed to commit SHA256SUMS.txt
+
+concurrency:
+  group: root-sha256sums
+  cancel-in-progress: false
 
 jobs:
-  build:
+  build-root-sha:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,49 +19,72 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Generate root SHA256SUMS.txt
+      - name: Generate SHA256SUMS.txt (root)
+        shell: bash
         run: |
-          set -eu
-          cd "$GITHUB_WORKSPACE"
+          set -euo pipefail
+          shopt -s globstar nullglob
 
-          tmpfile="$(mktemp)"
-          : > "$tmpfile"
+          # Assemble the file list (ordered, deterministic).
+          files=(
+            docs/**/*.pdf
+            docs/**/*.md
+            decisions/**/*.md
+            README.md
+            CHANGELOG.md
+            CITATION.cff
+            COMPLIANCE.md
+            SECURITY.md
+            LICENSE
+            LICENSE-CC-BY-4.0.md
+            LICENSE.md
+            figures/**/*.{png,jpg,jpeg,svg,pdf}
+            runs/**/approval.json
+            runs/**/report.md
+            runs/**/workflow_frozen.json
+            runs/**/manifest.md
+            runs/**/manifest.json
+            runs/**/SHA256SUMS.txt
+            logs/governance/**/*.md
+            logs/attestation_failures/**/*.md
+          )
 
-          # Include docs PDFs and MDs
-          if [ -d docs ]; then
-            find docs -type f \( -name '*.pdf' -o -name '*.md' \) -print0 \
-              | sort -z | xargs -0 sha256sum >> "$tmpfile" || true
-          fi
-
-          # Include everything under runs/ (but NOT runs_legacy/)
-          if [ -d runs ]; then
-            find runs -type f -print0 | sort -z | xargs -0 sha256sum >> "$tmpfile"
-          fi
-
-          # Include top-level core files if present
-          for f in README.md CHANGELOG.md CITATION.cff LICENSE LICENSE-CC-BY-4.0.md; do
-            [ -f "$f" ] && sha256sum "$f" >> "$tmpfile" || true
+          # Build the list, excluding runs_legacy and any non-existent globs.
+          tmplist=$(mktemp)
+          > "$tmplist"
+          for f in "${files[@]}"; do
+            for g in $f; do
+              # Skip if it lives under runs_legacy/
+              [[ "$g" == runs_legacy/* ]] && continue
+              [[ -f "$g" ]] && printf '%s\0' "$g" >> "$tmplist"
+            done
           done
 
-          # Include any other top-level .md (besides README.md already handled)
-          for f in *.md; do
-            [ "$f" = "README.md" ] && continue
-            [ -f "$f" ] && sha256sum "$f" >> "$tmpfile"
-          done
-
-          # Sort deterministically by path and write final file
-          sort -k2,2 "$tmpfile" > SHA256SUMS.txt
-          rm "$tmpfile"
-
-      - name: Commit SHA256SUMS.txt
-        run: |
-          set -eu
-          if git diff --quiet SHA256SUMS.txt; then
-            echo "No changes to SHA256SUMS.txt"
-            exit 0
+          # Sort deterministically and hash.
+          if [[ -s "$tmplist" ]]; then
+            tr '\0' '\n' < "$tmplist" | LC_ALL=C sort -u | \
+              xargs -I{} -r sha256sum "{}" > SHA256SUMS.txt
+          else
+            echo "No files matched; not overwriting SHA256SUMS.txt" >&2
+            exit 1
           fi
+
+      - name: Show summary
+        run: |
+          head -n 25 SHA256SUMS.txt || true
+          echo "---"
+          echo "Total lines:" $(wc -l < SHA256SUMS.txt)
+
+      - name: Commit and push if changed
+        shell: bash
+        run: |
+          set -e
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add SHA256SUMS.txt
-          git commit -m "chore: update root SHA256SUMS.txt"
-          git push
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- SHA256SUMS.txt; then
+            git add SHA256SUMS.txt
+            git commit -m "Update root SHA256SUMS.txt (automated)"
+            git push
+          else
+            echo "No changes to SHA256SUMS.txt"
+          fi
