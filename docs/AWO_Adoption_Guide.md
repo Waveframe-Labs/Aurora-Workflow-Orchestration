@@ -90,7 +90,7 @@ my-awo-project/
 ```
 
 2) **Add a falsifiability manifest**
-Create `docs/FALSIFIABILITY_MANIFEST.md`:
+Create `docs/falsifiability-manifest.md`:
 ```
 Hypothesis:
 Predictions (disprovable):
