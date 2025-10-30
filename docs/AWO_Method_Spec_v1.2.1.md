@@ -202,26 +202,26 @@ Multiple roles MAY be fulfilled by a single agent if traceability and attestatio
 
 ### 3.5a Red Team — Normative Role Definition
 
-The **Red Team** is an adversarial critique role whose purpose is to test the logical coherence, falsifiability, and reproducibility of claims produced under the AWO method.  
-Every AWO-compliant repository **MUST** provide for independent Red Team critique—human, synthetic, or hybrid—as part of the Attestation workflow.
+The **Red Team** is an *optional but recommended* adversarial role within the AWO governance model.  
+Its function is to challenge the logical soundness, falsifiability, and reproducibility of results produced during a run.
 
-**MUST**
-- Attempt at least one reproducible falsification or counterexample for each major claim targeted for attestation and archival.  
-- Record every challenge as a *Challenge Artifact* under `/artifacts/redteam/` (or equivalent) and attach SHA-256 checksums and entropy metrics to each artifact.  
-- Cause the Attestation Gate to mark a run `FAILED_VERIFICATION` if any challenge successfully falsifies a claim.
+**Status:** Advisory — automation and schema integration deferred until CRI-CORE implementation.
 
-**SHOULD**
-- Operate with adversarial independence (no prior access to finalized consensus artifacts until the challenge is issued).  
-- Include compression or entropy measurements for any synthesized counterexamples to support Neurotransparency signals.
+#### Requirements
 
-**MAY**
-- Be implemented via automated adversarial agents (CRI plugins), human reviewers, or hybrid workflows.  
-- Reference operational playbooks defined in CRI-CORE (see `cri/redteam_playbook.md` and `cri/schemas/redteam.challenge.schema.json`).
+| Level | Requirement |
+|:------|:-------------|
+| **MUST** | Operate independently from the Orchestrator and Auditor. |
+|  | Attempt at least one explicit falsification or contradiction for each major claim subject to Attestation. |
+|  | Record each challenge as a narrative entry in the run’s `report.md` under the heading `## Red Team Review`. |
+|  | If a challenge successfully falsifies a claim, mark the corresponding verdict in `approval.json` as `FAILED_VERIFICATION`. |
+| **SHOULD** | Maintain adversarial separation (no prior access to finalized consensus artifacts). |
+|  | Include entropy or compression observations, where available, to support future Neurotransparency metrics. |
+| **MAY** | Be executed manually (human reviewer) or through automated agents once CRI-CORE introduces adversarial challenge modules. |
 
-**Rationale:**  
-The Red Team function introduces structured adversarial testing to strengthen falsifiability.  
-It complements the Auditor by focusing on *robustness under contradiction* rather than compliance alone.  
-Entropy deltas recorded during challenges provide quantitative Neurotransparency indicators and feed back into CRI runtime analytics.
+#### Rationale
+This clause defines the Red Team role without introducing new folders or schema dependencies.  
+It allows human reviewers to perform adversarial verification immediately using existing artifact locations (`report.md`, `approval.json`), ensuring the falsifiability principle is maintained until automated CRI-CORE modules become available.
 
 ---
 
