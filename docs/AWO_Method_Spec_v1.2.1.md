@@ -200,6 +200,31 @@ Multiple roles MAY be fulfilled by a single agent if traceability and attestatio
 
 ---
 
+### 3.5a Red Team — Normative Role Definition
+
+The **Red Team** is an adversarial critique role whose purpose is to test the logical coherence, falsifiability, and reproducibility of claims produced under the AWO method.  
+Every AWO-compliant repository **MUST** provide for independent Red Team critique—human, synthetic, or hybrid—as part of the Attestation workflow.
+
+**MUST**
+- Attempt at least one reproducible falsification or counterexample for each major claim targeted for attestation and archival.  
+- Record every challenge as a *Challenge Artifact* under `/artifacts/redteam/` (or equivalent) and attach SHA-256 checksums and entropy metrics to each artifact.  
+- Cause the Attestation Gate to mark a run `FAILED_VERIFICATION` if any challenge successfully falsifies a claim.
+
+**SHOULD**
+- Operate with adversarial independence (no prior access to finalized consensus artifacts until the challenge is issued).  
+- Include compression or entropy measurements for any synthesized counterexamples to support Neurotransparency signals.
+
+**MAY**
+- Be implemented via automated adversarial agents (CRI plugins), human reviewers, or hybrid workflows.  
+- Reference operational playbooks defined in CRI-CORE (see `cri/redteam_playbook.md` and `cri/schemas/redteam.challenge.schema.json`).
+
+**Rationale:**  
+The Red Team function introduces structured adversarial testing to strengthen falsifiability.  
+It complements the Auditor by focusing on *robustness under contradiction* rather than compliance alone.  
+Entropy deltas recorded during challenges provide quantitative Neurotransparency indicators and feed back into CRI runtime analytics.
+
+---
+
 ### 3.6 Future Role Extensions
 Future AWO or CRI-CORE revisions MAY extend the canonical role set (e.g., **Planner**, **Historian**, **Meta-Auditor**) as automated reasoning matures.  
 Any such extensions MUST maintain backward compatibility with this role schema and preserve attestation semantics.
