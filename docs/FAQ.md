@@ -28,13 +28,9 @@ You can study or remix the repositories freely, but if you diverge from the **Me
 
 ### Do I need to set up CI?
 
-Yes, eventually.  
-AWO repositories use **GitHub Actions** for reproducibility automation:
-- Markdown → PDF pipelines for versioned documentation.  
-- Root-level `SHA256SUMS.txt` regeneration for artifact integrity.  
-- Optional validation jobs for manifests or attestation.
-
-You can contribute without CI for small documentation or ADR edits, but any repository claiming compliance **MUST** include those workflows.
+Not for **Minimum** tier.  
+Minimum compliance allows **manual orchestration** (no CI) as long as manifests, attestation, and checksums are present.  
+CI becomes **SHOULD** for **Standard** tier and effectively **MUST** for **Full** tier (CRI-CORE automation).
 
 ---
 
@@ -81,9 +77,9 @@ Contributors act under formal AWO roles:
 | Role | Responsibility |
 |------|----------------|
 | **Critic** | Challenges logic, tests falsifiability, and identifies weaknesses. |
-| **Signer** | Validates adherence to the Method Spec and attests to result integrity. |
-| **Maintainer** | Performs final merge after all checks pass. |
-| **Observer** | Reviews passively, learning the process without active authorship. |
+| **Auditor** | Verifies conformance to the Method Spec and attests to result integrity (`approval.json`). |
+| **Maintainer** | Performs final merge after checks pass and governance entries are updated. |
+| **Observer** | Reviews passively to learn the process. |
 
 Each contribution must include its reviewer roles in the PR or run manifest.
 
