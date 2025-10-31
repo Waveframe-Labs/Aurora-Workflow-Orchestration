@@ -33,7 +33,7 @@ By the end of this guide you will:
 - Initialize a project using AWO’s file structure.
 - Produce a **signed, reproducible run** with an auditable record under `/runs/`.
 - Log decisions and assumptions using ADRs and falsifiability manifests.
-- Validate the run against the **AWO Method Spec v1.2**.
+- Validate the run against the **AWO Method Spec v1.2.1**.
 - Know how to upgrade from manual orchestration to CI, and later to CRI-CORE.
 
 ## 2. Prerequisites
@@ -201,7 +201,7 @@ Full runtime automation is demonstrated in the CRI-CORE repository and will be e
 - **Non-determinism:** Pin seeds and constrain thread counts (e.g., `PYTHONHASHSEED=0`, `OMP_NUM_THREADS=1`).
 
 ## 14. Cross-Links and References
-- Method Spec: `docs/AWO_Method_Spec_v1.2.md`
+- Method Spec: `docs/AWO_Method_Spec_v1.2.1.md`
 - Whitepaper: `docs/AWO_Whitepaper_v1.1.md`
 - Template: https://github.com/Waveframe-Labs/AWO-Template
 - Main README: `../README.md`
