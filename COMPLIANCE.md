@@ -76,9 +76,9 @@ All governance and compliance activities are logged immutably and cross-referenc
 
 | Artifact | Description | Link |
 |-----------|--------------|------|
-| **AWO_Compliance_Report.md** | Primary compliance verification report. | [View File](AWO_Compliance_Report.md) |
-| **ROLE_ATTESTATION.md** | Role–artifact verification manifest. | [View File](ROLE_ATTESTATION.md) |
-| **GOVERNANCE_SUMMARY.md** | Repository governance summary record. | [View File](GOVERNANCE_SUMMARY.md) |
+| **AWO_Compliance_Report.md** | Primary compliance verification report. | [View File](docs/AWO_Compliance_Report.md) |
+| **ROLE_ATTESTATION.md** | Role–artifact verification manifest. | [View File](docs/ROLE_ATTESTATION.md) |
+| **GOVERNANCE_SUMMARY.md** | Repository governance summary record. | [View File](docs/GOVERNANCE_SUMMARY.md) |
 
 ---
 
