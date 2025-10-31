@@ -143,7 +143,7 @@ Each Run must reference at least one ADR.
 **Manifest (Falsifiability Manifest)**  
 A declaration of the hypothesis, predicted outcomes, and explicit disproof conditions for a Run.  
 The Manifest defines what constitutes falsification before execution.    
-**Naming:** The run’s manifest **MUST** be stored as `run_manifest.json` in `/runs/<RUN_ID>/`. A template MAY exist under `/templates/manifest.md` for manual entry; the template is not the run record.  
+**Naming:** The run’s manifest **MUST** be stored as `run_manifest.json` in `/runs/<RUN_ID>/`. A template MAY exist under `/templates/run_manifest.md` for manual entry; the template is not the run record.  
 
 ---
 
@@ -539,7 +539,7 @@ Publication of DOI and confirmation of checksum match against `SHA256SUMS.txt`.
 
 | Phase | Primary Inputs | Primary Outputs | Responsible Roles | Key Artifacts | Governing ADRs |
 |--------|----------------|-----------------|------------------|----------------|----------------|
-| **Fan-Out** | Prior ADRs, data, goals | Manifest, planning log | Orchestrator, Critic | `manifest.json`, ADR-NNNN | 0002, 0009, 0012 |
+| **Fan-Out** | Prior ADRs, data, goals | Manifest, planning log | Orchestrator, Critic | `run_manifest.json`, ADR-NNNN | 0002, 0009, 0012 |
 | **Consensus** | Manifest | Raw results, metadata | Evaluator, Synthesizer | `metadata.json`, temp logs | 0002, 0013 |
 | **Attestation** | Run outputs | `approval.json`, audit logs | Auditor, Orchestrator | `/logs/audits/`, `/logs/overrides/` | 0003, 0012, 0015 |
 | **Archival** | Verified artifacts | Signed release, DOI, checksums | Orchestrator, Auditor | `SHA256SUMS.txt`, release tag | 0010, 0014, 0016, 0017 |
@@ -749,7 +749,7 @@ Each artifact **MUST** have:
 
 | Artifact | Origin Role(s) | Reviewing Role(s) | Governing ADRs | Compliance Level |
 |-----------|----------------|-------------------|----------------|------------------|
-| **manifest.json / manifest.md** | Orchestrator | Auditor | 0002, 0012 | **MUST** |
+| **run_manifest.json / run_manifest.md** | Orchestrator | Auditor | 0002, 0012 | **MUST** |
 | **workflow_frozen.json** | Orchestrator, Evaluator | Auditor | 0002, 0004 | **MUST** |
 | **report.md** | Synthesizer | Critic (optional), Auditor | 0002, 0012 | **MUST** |
 | **approval.json** | Auditor | Orchestrator (acknowledgment) | 0012, 0015 | **MUST** |
@@ -1298,7 +1298,7 @@ Example structure:
 ```
 /runs/
  ├── RUN_2025-10-28_001/
- │    ├── manifest.json
+ │    ├── run_manifest.json
  │    ├── workflow_frozen.json
  │    ├── report.md
  │    ├── approval.json
@@ -1341,8 +1341,8 @@ The following schema defines the minimum required fields for JSON-based manifest
 
 | Workflow Type | Manifest Creation | Verification Method | Example Implementation |
 |----------------|------------------|---------------------|-------------------------|
-| **Manual AWO Runs** | Authored by Orchestrator before execution. | Verified by Auditor post-run. | `manifest.md` signed manually (instantiated from `templates/falsifiability-manifest.md`). |
-| **CRI-CORE Integrated Runs** | Auto-generated from hypothesis input. | Validated by schema engine (`manifest_validator.py`). | `manifest.json` validated automatically. |
+| **Manual AWO Runs** | Authored by Orchestrator before execution. | Verified by Auditor post-run. | `run_manifest.md` signed manually (instantiated from `templates/falsifiability-manifest.md`). |
+| **CRI-CORE Integrated Runs** | Auto-generated from hypothesis input. | Validated by schema engine (`manifest_validator.py`). | `run_manifest.json` validated automatically. |
 
 ---
 
@@ -1391,7 +1391,7 @@ Each repository claiming AWO compliance **MUST** satisfy the following condition
 | 1 | **Standard directory structure present** | Verify `/docs/`, `/logs/`, `/runs/`, `/schemas/`, `/decisions/`, and `/templates/` directories exist. | 0011 | **MUST** |
 | 2 | **At least one signed run in `/runs/`** | Confirm presence of `approval.json` with valid attestation (§9). | 0012, 0015 | **MUST** |
 | 3 | **ADRs linked and numbered (0001–0017)** | Verify all referenced ADRs exist and correspond to governing sections. | 0001–0017 | **MUST** |
-| 4 | **Falsifiability manifest present** | Ensure each run contains `/runs/<run_id>/falsifiability-manifest.md` (instantiated from `templates/falsifiability-manifest.md`) **or** `manifest.json`. | 0002, 0012 | **MUST** |
+| 4 | **Falsifiability manifest present** | Ensure each run contains `/runs/<run_id>/falsifiability-manifest.md` (instantiated from `templates/falsifiability-manifest.md`) **or** `run_manifest.json`. | 0002, 0012 | **MUST** |
 | 5 | **SHA256SUMS.txt present and verified** | Regenerate and compare to recorded hash file (§10.5). | 0015 | **MUST** |
 | 6 | **CHANGELOG includes version reference** | Confirm most recent version is logged (§10.9). | 0010 | **MUST** |
 | 7 | **README cross-links all core documents** | README must reference the Whitepaper, Method Spec, and Adoption Guide. | 0017 | **MUST** |
