@@ -88,7 +88,7 @@ Fail attestation if any claim-affecting inference lacks a recorded origin, evide
 
 **SHOULD**
 
-Include concise “reasoning excerpts” or pointers (e.g., prompt IDs, model run IDs, diff snippets) to minimize ambiguity.
+Include concise “evidence pointers” (e.g., `prompt_id`, `run_id`, `diff_anchor`, file path + line range per §8.3) to minimize ambiguity.
 
 **MAY**
 
@@ -143,7 +143,7 @@ Each Run must reference at least one ADR.
 **Manifest (Falsifiability Manifest)**  
 A declaration of the hypothesis, predicted outcomes, and explicit disproof conditions for a Run.  
 The Manifest defines what constitutes falsification before execution.  
-It serves as the precondition for attestation and must be stored under `/docs/`.
+It serves as the precondition for attestation and MUST be stored under `/runs/<RUN_ID>/` (see §12.4).  
 
 ---
 
@@ -232,7 +232,7 @@ Missing or unverifiable evidence pointers SHALL be treated as a non-conformance 
 
 ---
 
-### 3.5a Red Team — Normative Role Definition
+### 3.6 Red Team — Normative Role Definition
 
 The **Red Team** is an *optional but recommended* adversarial role within the AWO governance model.  
 Its function is to challenge the logical soundness, falsifiability, and reproducibility of results produced during a run.
@@ -257,7 +257,7 @@ It allows human reviewers to perform adversarial verification immediately using 
 
 ---
 
-### 3.6 Future Role Extensions
+### 3.7 Future Role Extensions
 Future AWO or CRI-CORE revisions MAY extend the canonical role set (e.g., **Planner**, **Historian**, **Meta-Auditor**) as automated reasoning matures.  
 Any such extensions MUST maintain backward compatibility with this role schema and preserve attestation semantics.
 
@@ -450,9 +450,10 @@ To perform reasoning, model inference, or experimental execution under the condi
 - Collect generated outputs, intermediate data, and system logs.  
 - Optionally employ multiple agents or parameter sweeps to create a **fan-out of reasoning paths.**  
 - Evaluate preliminary consistency via internal scoring or evaluator votes.  
-- Record all contextual metadata (versions, seeds, hashes) in `/runs/<RUN_ID>/metadata.json`.
+- Record all contextual parameters (versions, seeds, env vars) into `/runs/<RUN_ID>/workflow_frozen.json` immediately before execution.
+- During/after execution, write run-level metadata (participants, timing, outputs index) to `/runs/<RUN_ID>/metadata.json`.
 - Capture reasoning context identifiers (e.g., prompt IDs, model/version, seeds, diff anchors) and store durable pointers under `/logs/workflow/`.  
-
+ 
 #### Inputs
 - Manifest and ADR definitions.  
 - Roles configuration file (implicit or explicit).  
@@ -742,7 +743,7 @@ Each artifact **MUST** have:
 |-----------|----------------|-------------------|----------------|------------------|
 | **manifest.json / manifest.md** | Orchestrator | Auditor | 0002, 0012 | **MUST** |
 | **workflow_frozen.json** | Orchestrator, Evaluator | Auditor | 0002, 0004 | **MUST** |
-| **report.md** | Synthesizer | Critic (optional), Auditor | 0009, 0012 | **MUST** |
+| **report.md** | Synthesizer | Critic (optional), Auditor | 0002, 0012 | **MUST** |
 | **approval.json** | Auditor | Orchestrator (acknowledgment) | 0012, 0015 | **MUST** |
 | **SHA256SUMS.txt** | Orchestrator | Auditor | 0015, 0016 | **MUST** |
 | **ADR files** | Orchestrator, Auditor | Orchestrator | 0001–0017 | **MUST** |
