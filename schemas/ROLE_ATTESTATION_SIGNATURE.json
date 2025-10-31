@@ -1,0 +1,79 @@
+{
+  "filetype": "attestation_signature",
+  "version": "1.2.1",
+  "repository": "Aurora-Workflow-Orchestration",
+  "authority": "Aurora Research Initiative (ARI)",
+  "maintainer": "Waveframe Labs",
+  "contact": "swright@waveframelabs.org",
+  "generated_at": "2025-10-31T23:00:00Z",
+  "signing_standard": "ADR-0015",
+  "neurotransparency_standard": "§1.6 AWO Method Spec v1.2.1",
+  "attestation": {
+    "manifest.json": {
+      "origin_role": "Orchestrator",
+      "verifying_role": "Auditor",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0002", "0012"],
+      "neuro_evidence": "logs/workflow/2025-10-28_manifest_context.md#L20-L48",
+      "sha256": "to_be_filled_by_sha_workflow"
+    },
+    "workflow_frozen.json": {
+      "origin_role": "Orchestrator",
+      "verifying_role": "Auditor",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0002", "0004"],
+      "neuro_evidence": "runs/run_2025-10-31T00-00-42Z/workflow_trace.md#L10-L40",
+      "sha256": "to_be_filled_by_sha_workflow"
+    },
+    "report.md": {
+      "origin_role": "Synthesizer",
+      "verifying_role": "Critic→Auditor",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0009", "0012"],
+      "neuro_evidence": "logs/workflow/2025-10-28_report_reasoning.md#L5-L45",
+      "sha256": "to_be_filled_by_sha_workflow"
+    },
+    "approval.json": {
+      "origin_role": "Auditor",
+      "verifying_role": "Orchestrator",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0012", "0015"],
+      "neuro_evidence": "logs/audits/2025-10-28_attestation_review.md#L12-L60",
+      "sha256": "to_be_filled_by_sha_workflow"
+    },
+    "SHA256SUMS.txt": {
+      "origin_role": "Orchestrator",
+      "verifying_role": "Auditor",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0015", "0016"],
+      "neuro_evidence": "logs/audits/2025-10-28_integrity_review.md#L3-L20",
+      "sha256": "to_be_filled_by_sha_workflow"
+    },
+    "logs/governance/": {
+      "origin_role": "Orchestrator",
+      "verifying_role": "Auditor",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0017"],
+      "neuro_evidence": "logs/governance/2025-10-28_entry.md#L1-L30",
+      "sha256": "to_be_filled_by_sha_workflow"
+    },
+    "templates/falsifiability-manifest.md": {
+      "origin_role": "Orchestrator",
+      "verifying_role": "N/A",
+      "verification_date": "2025-10-28",
+      "adr_refs": ["0011"],
+      "neuro_evidence": "templates/falsifiability-manifest.md",
+      "sha256": "to_be_filled_by_sha_workflow"
+    }
+  },
+  "chain_of_custody": {
+    "auditor_of_record": "Waveframe Labs — AWO Verification Unit",
+    "authorized_maintainer": "Shawn C. Wright <swright@waveframelabs.org>",
+    "governance_authority": "Aurora Research Initiative (ARI)"
+  },
+  "signature": {
+    "algorithm": "SHA256 + RSA-2048",
+    "fingerprint": "pending_digital_signature_generation",
+    "signed_timestamp": "pending"
+  }
+}
