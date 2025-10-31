@@ -53,6 +53,8 @@ All required artifacts have been reviewed for:
 **Authorized Maintainer:** Shawn C. Wright (<swright@waveframelabs.org>)  
 **Governance Authority:** Aurora Research Initiative (ARI)
 
----
+---  
+
+_Machine-readable counterpart: [`/schemas/ROLE_ATTESTATION_SIGNATURE.json`](../schemas/ROLE_ATTESTATION_SIGNATURE.json)_  
 
 **End of ROLE_ATTESTATION.md — Aurora Workflow Orchestration v1.2.1**
