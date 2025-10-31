@@ -26,7 +26,8 @@ Aurora Workflow Orchestration (AWO) establishes a formal, falsifiable framework 
 It defines the structural and procedural rules by which reasoning processes—whether human, synthetic, or hybrid—are documented, attested, and version-controlled.
 
 This specification is **methodological**, not philosophical.  
-It governs the organization, validation, and archival of reasoning artifacts so that every claim produced under AWO can be independently verified.
+Each reasoning process is treated as a bounded, attestable experiment.  
+The focus is on procedural traceability rather than interpretive meaning.
 
 ---
 
@@ -79,7 +80,7 @@ Neurotransparency is the requirement that every inference influencing a claim is
 
 **MUST**
 
-Record role-attribution and traceable evidence for all claim-affecting inferences in one of: /logs/workflow/, /logs/audits/, ADRs, manifests, or approval.json.
+Record role-attribution and traceable evidence for all claim-affecting inferences in one of: `/logs/workflow/`, `/logs/audits/`, `/decisions/`, `/docs/manifests/`, or `approval.json`.
 
 Ensure each attested artifact cites the originating role, linked files, and hashes (see §6, §9, §10).
 
@@ -123,6 +124,7 @@ All Runs must be immutable once attested.
 The complete, chronological lineage of data, logic, parameters, and decisions leading to a result.  
 Provenance includes all intermediate steps, transformations, and validations necessary to reproduce a Run.  
 In CRI-CORE, this concept maps to the `provenance-ledger` schema.
+Provenance entries SHALL include Neurotransparency pointers when reasoning sequences are partially automated (§1.6).
 
 **Artifact**  
 Any persistent output generated within an AWO process.  
@@ -161,7 +163,11 @@ Conformance is binary (pass/fail) for each clause but may include graded complia
 
 **Attestation Record**  
 The recorded output of a completed review or validation step, stored as a structured file (`approval.json`) under the corresponding Run directory.  
-It includes participant identity, timestamp, and signature or digital hash.
+It includes participant identity, timestamp, and signature or digital hash.  
+
+**Neurotransparency Evidence Pointer**  
+A durable reference to the reasoning context that influenced a claim (e.g., prompt/run IDs, diff snippets, log anchors).  
+A pointer MUST cite a file path under `/logs/workflow/`, `/logs/audits/`, or an ADR in `/decisions/`, and SHOULD include a stable anchor (line range, heading, or block ID).
 
 ---
 
@@ -206,6 +212,8 @@ Multiple roles MAY be fulfilled by a single agent if traceability and attestatio
 - **Non-Circular Validation:** The same agent MUST NOT serve as both Orchestrator and Auditor within the same Run unless explicitly justified and recorded in the attestation log.
 - **Attestation Requirements:** Each Run MUST include a record of which roles were fulfilled, by whom, and under what authority.
 - **Traceability Obligation:** Artifacts and logs MUST explicitly reference the roles responsible for their generation or validation.
+Neurotransparency (§1.6) applies to any role that generates, evaluates, or verifies a claim-affecting artifact.  
+Missing or unverifiable evidence pointers SHALL be treated as a non-conformance (§7.5).
 
 ---
 
@@ -301,7 +309,8 @@ Each AWO-compliant repository **MUST** implement the following substructure with
 |------------|--------------|------------|
 | `/logs/workflow/` | Chronological records of human and agent activity, covering decisions, forks, merges, and context. | ADR-0004 |
 | `/logs/audits/` | Independent audit results, rejection events, or revalidation findings. | ADR-0003 |
-| `/logs/overrides/` | Manual interventions, rationale, and signatures for non-automated overrides. | ADR-0004, ADR-0012 |
+| `/logs/overrides/` | Manual interventions, rationale, and signatures for non-automated overrides. | ADR-0004, ADR-0012 | `/logs/governance/` | Governance records of approvals, rejections, and release decisions. | ADR-0017 |
+| `/logs/attestation_failures/` | Permanent records of failed or rejected attestations with reasons and run IDs. | ADR-0003 |  
 
 Log entries **MUST** follow the schema outlined in ADR-0004, including timestamps, participant IDs, impacted artifacts, and outcome codes.  
 Each log file **MUST NOT** be modified retroactively after attestation.
@@ -422,8 +431,9 @@ Fan-out begins the epistemic process by expanding a single research goal into a 
 #### Outputs
 - Updated or new manifest.  
 - Associated ADR (e.g., “ADR-NNNN — Run Plan vX”).  
-- Planning log entries.  
-
+- Planning log entries.
+- Initial neurotransparency pointer(s) recorded under `/logs/workflow/` referencing planned claims or falsifiability clauses.  
+ 
 #### Trigger for Next Phase
 Orchestrator approval of the manifest and human sign-off per **ADR-0012 (Human-in-Loop Validation)**.
 
@@ -439,7 +449,8 @@ To perform reasoning, model inference, or experimental execution under the condi
 - Collect generated outputs, intermediate data, and system logs.  
 - Optionally employ multiple agents or parameter sweeps to create a **fan-out of reasoning paths.**  
 - Evaluate preliminary consistency via internal scoring or evaluator votes.  
-- Record all contextual metadata (versions, seeds, hashes) in `/runs/<RUN_ID>/metadata.json`.  
+- Record all contextual metadata (versions, seeds, hashes) in `/runs/<RUN_ID>/metadata.json`.
+- Capture reasoning context identifiers (e.g., prompt IDs, model/version, seeds, diff anchors) and store durable pointers under `/logs/workflow/`.  
 
 #### Inputs
 - Manifest and ADR definitions.  
@@ -466,7 +477,8 @@ This phase converts raw outputs into **attested knowledge.**
 - Auditors perform validation checks:
   - Schema compliance (structure, completeness).  
   - Logical falsifiability (did any counterexample occur?).  
-  - Provenance linkage (data lineage intact).  
+  - Provenance linkage (data lineage intact).
+  - Neurotransparency linkage (evidence pointers present and resolvable to `/logs/workflow/`, `/logs/audits/`, or `/decisions/`).  
 - Record results in `/logs/audits/`.  
 - If human validation is required, document it in `/logs/overrides/` referencing **ADR-0012.**  
 - Generate `approval.json` containing:
@@ -764,6 +776,19 @@ adr_refs: [0002, 0012]
 sha256: "2f7b3e8e..."
 timestamp: 2025-10-28T18:21:00Z
 ```
+Example with evidence pointers:
+```yaml
+run_id: RUN_2025-10-28_001
+origin_role: Orchestrator
+verified_by: Auditor
+adr_refs: [0002, 0012]
+sha256: "2f7b3e8e..."
+evidence_pointers:
+  - path: logs/workflow/2025-10-28_plan.md#L22-L48
+  - path: decisions/ADR-0012-human-in-loop-signoff.md
+timestamp: 2025-10-28T18:21:00Z
+```
+
 ### 8.4 Attestation Logic
 
 1) **Primary Attestation**  
@@ -1088,6 +1113,7 @@ Each release **MUST** demonstrate the following before publication:
 - [x] Artifacts attached to GitHub and/or Zenodo  
 - [x] DOI record cross-linked to release tag  
 - [x] Governance logs reflect approval event
+- [x] Evidence pointers resolvable for claim-affecting artifacts (§1.6, §4.3).
 
 ---
 
@@ -1364,7 +1390,8 @@ Each repository claiming AWO compliance **MUST** satisfy the following condition
 | 10 | **PDF build workflows operational** | Confirm automated GitHub Actions produce valid PDFs. | 0016 | **MUST** |
 | 11 | **ADR citations consistent across documents** | Cross-check citations in Method Spec, Whitepaper, and ADR index. | 0017 | **SHOULD** |
 | 12 | **Repository integrity registry updated** | Ensure `SHA256SUMS.txt` includes all critical files (PDFs, manifests, governance logs). | 0015 | **MUST** |
-| 13 | **Compliance declaration committed** | Add `/docs/AWO_Compliance_Report.md` or equivalent summary signed by Orchestrator. | 0012, 0017 | **MUST** |
+| 13 | **Compliance declaration committed** | Add `/docs/AWO_Compliance_Report.md` or equivalent summary signed by Orchestrator. | 0012, 0017 | **MUST** |  
+| 14 | Evidence pointers present and resolvable | Confirm at least one pointer exists for each claim-affecting artifact and resolves to /logs/workflow/, /logs/audits/, or an ADR. | 0003, 0004 | MUST |  
 
 ---
 
