@@ -39,7 +39,7 @@ Next governance review scheduled for **2026-04-01** to coincide with the first C
 
 ### Governance Continuity Statement
 
-Under ADR-0017 (Governance Continuity), Waveframe Labs maintains long-term custodianship and audit authority for AWO and its successor standards.  
+Under ADR-0017 (Documentation Governance), Waveframe Labs maintains long-term custodianship and audit authority for AWO and its successor standards.  
 All attestation and compliance records are immutable and cryptographically verifiable via SHA256SUMS and DOI archives.
 
 **Governance Authority:** Waveframe Labs / Aurora Research Initiative (ARI)  
