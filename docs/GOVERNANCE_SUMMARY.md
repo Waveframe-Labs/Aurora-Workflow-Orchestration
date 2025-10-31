@@ -43,7 +43,7 @@ Under ADR-0017 (Documentation Governance), Waveframe Labs maintains long-term cu
 All attestation and compliance records are immutable and cryptographically verifiable via SHA256SUMS and DOI archives.
 
 **Governance Authority:** Waveframe Labs / Aurora Research Initiative (ARI)  
-**Governance Contact:** governance@waveframelabs.org  
+**Governance Contact:** swright@waveframelabs.org  
 
 ---
 
