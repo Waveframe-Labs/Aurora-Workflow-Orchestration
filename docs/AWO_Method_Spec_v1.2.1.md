@@ -579,10 +579,10 @@ Every Run **MUST** produce a verifiable and complete set of artifacts:
 | **workflow_frozen.json** | Snapshot of executed parameters, configuration state, and environment context. | Yes | Must be generated immediately before execution. |
 | **report.md** | Narrative or analytical summary describing the run outcome, metrics, and interpretations. | Yes | May be human- or model-authored but must include run ID and timestamp. |
 | **approval.json** | Signed attestation record confirming human or automated validation per ADR-0012. | Yes | Must reference corresponding manifest and checksum hashes. |
-| **SHA256SUMS.txt** | Integrity registry listing all artifact hashes within `/runs/` and `/docs/`. | Yes | Updated after each attested run. |
-| **manifest.json** or **manifest.md** | Defines falsifiability boundaries, inputs, and expected failure conditions. | Yes | Must be versioned and cross-referenced in ADRs and logs. |
+| **SHA256SUMS.txt** | Integrity registry listing artifact hashes. Each run MAY include its own `SHA256SUMS.txt`, but the root-level file remains authoritative for full-repo verification. | Yes | Updated after each attested run. |
+| **manifest.json** or **manifest.md** | Defines falsifiability boundaries, inputs, and expected failure conditions. | Yes | Root file required; per-run files optional but recommended. |  
 
-All files above **MUST** exist in each run folder (`/runs/<RUN_ID>/`).  
+All files above **MUST** exist in each run folder (`/runs/<RUN_ID>/`), except that the root-level `SHA256SUMS.txt` serves as the canonical registry for repository-wide verification (§4.6).  
 All entries **MUST** be immutable once signed and referenced in `SHA256SUMS.txt`.
 
 ---
