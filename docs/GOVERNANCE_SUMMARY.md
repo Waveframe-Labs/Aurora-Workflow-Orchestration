@@ -70,4 +70,6 @@ All attestation and compliance artifacts are **immutable and cryptographically v
 
 ---
 
+| `/schemas/ROLE_ATTESTATION_SIGNATURE.json` | Machine-verifiable attestation signature schema (ADR-0015). |
+
 **End of Governance Summary — Aurora Workflow Orchestration (AWO) v1.2.1**
