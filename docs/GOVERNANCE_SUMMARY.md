@@ -66,10 +66,8 @@ All attestation and compliance artifacts are **immutable and cryptographically v
 | `/docs/AWO_Compliance_Report.md` | Compliance certification record. |
 | `/docs/ROLE_ATTESTATION.md` | Role-level verification record. |
 | `/docs/AWO_Method_Spec_v1.2.1.md` | Authoritative procedural definition. |
-| `/decisions/ADR-0017-documentation-governance-under-ARI.md` | Foundational governance ADR. |
+| `/decisions/ADR-0017-documentation-governance-under-ARI.md` | Foundational governance ADR. | `/schemas/ROLE_ATTESTATION_SIGNATURE.json` | Machine-verifiable attestation signature schema (ADR-0015). |  
 
 ---
-
-| `/schemas/ROLE_ATTESTATION_SIGNATURE.json` | Machine-verifiable attestation signature schema (ADR-0015). |
 
 **End of Governance Summary — Aurora Workflow Orchestration (AWO) v1.2.1**
