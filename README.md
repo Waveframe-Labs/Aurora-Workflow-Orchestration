@@ -184,6 +184,25 @@ Implements the AWO method as runtime governance:
 
 ---
 
+## Common Misinterpretations
+
+**“AWO is software.”**  
+Not exactly. AWO is a **method specification** — a governance protocol for how AI-assisted research must be documented, attested, and verified.  
+The included code only demonstrates the method; the method itself is procedural, not executable.
+
+**“CRI-CORE and AWO are the same.”**  
+No. AWO defines *the rules*; CRI-CORE executes and enforces them at runtime.  
+AWO is the **constitution**, CRI is the **runtime judiciary**.
+
+**“AWO requires institutional approval.”**  
+False. AWO establishes legitimacy through **reproducibility, falsifiability, and cryptographic attestation**, not reputation.
+
+**“AWO is too heavy for individuals.”**  
+Incorrect. It scales down cleanly — a single researcher can run AWO manually with logs, manifests, and checksums,  
+and scale up later to CRI-CORE automation without changing the underlying governance model.
+
+---
+
 ## Version Boundary
 
 **AWO v1.2.1 (Documentation and Accessibility Update)** marks the finalization of the AWO methodology under Waveframe Labs governance.  
