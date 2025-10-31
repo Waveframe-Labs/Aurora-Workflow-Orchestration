@@ -1,15 +1,31 @@
 name: Build root SHA256SUMS
 
 on:
+  push:
+    paths:
+      - 'docs/**.md'
+      - 'docs/**.pdf'
+      - 'decisions/**'
+      - 'runs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'CITATION.cff'
+      - 'COMPLIANCE.md'
+      - 'LICENSE*'
+      - 'SECURITY.md'
+      - '.github/workflows/root-sha256sums.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: root-sha256sums
+  cancel-in-progress: false
+
 jobs:
   build-hashes:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,15 +41,14 @@ jobs:
           TMP="$(mktemp)"
           shopt -s globstar nullglob dotglob
 
-          echo "Collecting files..."
           > "$TMP.files"
           for pat in \
-            "docs/**/*.md" "docs/**/*.pdf" \
-            "decisions/**/*.md" \
-            "runs/**/*.md" "runs/**/*.json" "runs/**/*.yml" \
-            "README.md" "CHANGELOG.md" "COMPLIANCE.md" "CITATION.cff" \
-            "LICENSE" "LICENSE-CC-BY-4.0.md" "SECURITY.md" \
-            ; do
+            docs/**/*.md docs/**/*.pdf \
+            decisions/**/*.md \
+            runs/**/*.md runs/**/*.json runs/**/*.yml \
+            README.md CHANGELOG.md COMPLIANCE.md CITATION.cff \
+            LICENSE LICENSE-CC-BY-4.0.md SECURITY.md
+          do
             for f in $pat; do
               [[ -d "$f" ]] && continue
               [[ "$f" == runs_legacy/* ]] && continue
@@ -52,22 +67,21 @@ jobs:
             echo "# No eligible files found to hash" >> "$OUT"
           fi
 
-          echo "SHA256SUMS.txt preview:"
-          wc -l "$OUT" || true
-          head -n 20 "$OUT" || true
+          echo "Lines in SHA256SUMS.txt: $(wc -l < "$OUT")" >> $GITHUB_STEP_SUMMARY
 
-      - name: Commit & push if changed
+      - name: Skip commit if unchanged
+        id: diff
         shell: bash
         run: |
-          set -euo pipefail
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A SHA256SUMS.txt
-
-          if git diff --cached --quiet; then
-            echo "No staged changes (SHA256SUMS.txt identical)."
-            exit 0
+          if git diff --quiet -- "$GITHUB_WORKSPACE/SHA256SUMS.txt"; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-          git commit -m "Update root SHA256SUMS.txt (automated)"
-          git push
+      - name: Commit & push
+        if: steps.diff.outputs.changed == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update root SHA256SUMS.txt"
+          file_pattern: SHA256SUMS.txt
