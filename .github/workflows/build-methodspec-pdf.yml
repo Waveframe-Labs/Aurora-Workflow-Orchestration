@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4  
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -23,19 +23,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
 
-      # Safety: make sure YAML front matter isn't left open (common cause of "abstract-only" PDFs)
+      # Quick guard: front matter open/close
       - name: Sanity check — YAML front matter is closed
         working-directory: docs
         run: |
           set -euo pipefail
-          awk '
-            BEGIN{d=0}
-            NR<=200 && $0 ~ /^---[[:space:]]*$/ { d++ }
-            END {
-              if (d==1) { print "YAML front matter not closed: add a second ---"; exit 2 }
-              # d==0 or d>=2 is fine
-            }
-          ' AWO_Method_Spec_v1.2.1.md
+          awk 'BEGIN{d=0} NR<=200 && $0 ~ /^---[[:space:]]*$/ { d++ } END { if (d==1) { print "YAML front matter not closed: add a second ---"; exit 2 } }' \
+            AWO_Method_Spec_v1.2.1.md
 
       - name: Build PDF from Markdown (verbose log)
         working-directory: docs
@@ -62,10 +56,9 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit and Push PDF
-      - uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-         file_pattern: docs/AWO_Method_Spec_v1.2.1.pdf
-         commit_message: Auto-build Method Spec v1.2.1 → PDF
-         branch: ${{ github.ref_name }}
-         pull_strategy: REBASE      # or SQUASH if you prefer a single merge commit
-
+          file_pattern: docs/AWO_Method_Spec_v1.2.1.pdf
+          commit_message: Auto-build Method Spec v1.2.1 → PDF
+          branch: ${{ github.ref_name }}
+          pull_strategy: REBASE
