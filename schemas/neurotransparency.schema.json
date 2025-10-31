@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AWO Neurotransparency Evidence",
+  "type": "object",
+  "properties": {
+    "origin_role": {"type": "string"},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        },
+        "required": ["path", "sha256"]
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["origin_role", "evidence"]
+}
