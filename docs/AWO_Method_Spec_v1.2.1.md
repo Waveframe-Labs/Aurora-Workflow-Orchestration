@@ -143,7 +143,7 @@ Each Run must reference at least one ADR.
 **Manifest (Falsifiability Manifest)**  
 A declaration of the hypothesis, predicted outcomes, and explicit disproof conditions for a Run.  
 The Manifest defines what constitutes falsification before execution.    
-**Naming:** The run’s manifest **MUST** be stored as `run_manifest.json` in `/runs/<RUN_ID>/`. A template MAY exist under `/templates/run_manifest.md` for manual entry; the template is not the run record.  
+**Naming:** The run’s manifest **MUST** be stored as `run_manifest.json` in `/runs/<RUN_ID>/`. A template MAY exist under `/templates/manifest.md` for manual entry; the template is not the run record.  
 
 ---
 
