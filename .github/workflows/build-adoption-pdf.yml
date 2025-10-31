@@ -1,0 +1,44 @@
+name: Build and Commit Adoption Guide PDF
+on:
+  push:
+    paths:
+      - 'docs/AWO_Adoption_Guide.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc + TeX engine
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
+
+      - name: Build PDF from Markdown
+        working-directory: docs
+        run: |
+          set -euo pipefail
+          pandoc AWO_Adoption_Guide.md \
+            -o AWO_Adoption_Guide.pdf \
+            --standalone \
+            --pdf-engine=xelatex \
+            --metadata title="Aurora Workflow Orchestration Adoption Guide" \
+            --metadata author="Shawn C. Wright, Aurora Research Initiative / Waveframe Labs Division" \
+            --metadata date="October 2025" \
+            --metadata rights="© 2025 Aurora Research Initiative (CC BY 4.0 text · Apache-2.0 code)"
+          # mirror to repo root so the old download link updates too
+          cp AWO_Adoption_Guide.pdf ../AWO_Adoption_Guide.pdf
+
+      - name: Commit and Push PDF(s)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-build Adoption Guide → PDF"
+          file_pattern: |
+            docs/AWO_Adoption_Guide.pdf
+            AWO_Adoption_Guide.pdf
