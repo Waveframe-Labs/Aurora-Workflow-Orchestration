@@ -1,100 +1,73 @@
 name: Build root SHA256SUMS
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 permissions:
-  contents: write   # REQUIRED to push the updated file
+  contents: write
 
 jobs:
   build-hashes:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0           # so we can commit and push
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Generate SHA256SUMS.txt
         shell: bash
         run: |
           set -euxo pipefail
-          echo "PWD: $(pwd)"
-          ls -la
-
-          # Where to write
           OUT="SHA256SUMS.txt"
           TMP="$(mktemp)"
+          shopt -s globstar nullglob dotglob
 
-          # Paths to include (edit if you ever rename folders)
-          # NOTE: we explicitly exclude runs_legacy
-          include=(
-            "docs/**/*.md"
-            "docs/**/*.pdf"
-            "decisions/**/*.md"
-            "runs/**/*.md"
-            "runs/**/*.json"
-            "runs/**/*.yml"
-            "!runs_legacy/**"
-            "README.md"
-            "CHANGELOG.md"
-            "COMPLIANCE.md"
-            "CITATION.cff"
-            "LICENSE"
-            "LICENSE-CC-BY-4.0.md"
-            "SECURITY.md"
-          )
-
-          # Build a deterministic, sorted candidate list
           echo "Collecting files..."
           > "$TMP.files"
-          shopt -s globstar nullglob dotglob extglob
-          for pat in "${include[@]}"; do
-            # handle negative globs explicitly
-            if [[ "$pat" == !* ]]; then
-              pat="${pat:1}"
-              for f in $pat; do
-                sed -i "\|^$f$|d" "$TMP.files" || true
-              done
-            else
-              for f in $pat; do
-                # skip directories
-                [[ -d "$f" ]] && continue
-                echo "$f" >> "$TMP.files"
-              done
-            fi
+          for pat in \
+            "docs/**/*.md" "docs/**/*.pdf" \
+            "decisions/**/*.md" \
+            "runs/**/*.md" "runs/**/*.json" "runs/**/*.yml" \
+            "README.md" "CHANGELOG.md" "COMPLIANCE.md" "CITATION.cff" \
+            "LICENSE" "LICENSE-CC-BY-4.0.md" "SECURITY.md" \
+            ; do
+            for f in $pat; do
+              [[ -d "$f" ]] && continue
+              [[ "$f" == runs_legacy/* ]] && continue
+              echo "$f" >> "$TMP.files"
+            done
           done
-          sort -u "$TMP.files" -o "$TMP.files"
-          echo "Files to hash:"
-          cat "$TMP.files" || true
 
-          # If nothing to hash, still create an empty file so the step is not a no-op
-          > "$TMP.hashes"
+          sort -u "$TMP.files" -o "$TMP.files"
+
+          > "$OUT"
           if [[ -s "$TMP.files" ]]; then
-            # Compute hashes (stable format: "<sha256>  <path>")
             while IFS= read -r f; do
-              sha256sum "$f" >> "$TMP.hashes"
+              sha256sum "$f" >> "$OUT"
             done < "$TMP.files"
+          else
+            echo "# No eligible files found to hash" >> "$OUT"
           fi
 
-          # Write final file at repo root
-          mv "$TMP.hashes" "$OUT"
-
-          echo "SHA256SUMS.txt contents:"
+          echo "SHA256SUMS.txt preview:"
           wc -l "$OUT" || true
           head -n 20 "$OUT" || true
 
       - name: Commit & push if changed
         shell: bash
         run: |
-          set -euxo pipefail
-          git status --porcelain
-          if git diff --quiet -- SHA256SUMS.txt; then
-            echo "No changes to SHA256SUMS.txt"
-            exit 0
-          fi
+          set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add SHA256SUMS.txt
+          git add -A SHA256SUMS.txt
+
+          if git diff --cached --quiet; then
+            echo "No staged changes (SHA256SUMS.txt identical)."
+            exit 0
+          fi
+
           git commit -m "Update root SHA256SUMS.txt (automated)"
           git push
