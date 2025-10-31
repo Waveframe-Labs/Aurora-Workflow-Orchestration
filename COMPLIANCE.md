@@ -61,7 +61,7 @@ Validation included cross-verification of checksums, ADR references, licensing i
 | Field | Value |
 |-------|-------|
 | **Governance Authority** | Waveframe Labs / Aurora Research Initiative (ARI) |
-| **Governance ADR** | ADR-0017 — Governance Continuity |
+| **Governance ADR** | ADR-0017 — Documentation Governance |
 | **Last Review Date** | 2025-10-29 |
 | **Next Scheduled Review** | 2026-04-01 |
 | **Reviewer Role** | Auditor |
