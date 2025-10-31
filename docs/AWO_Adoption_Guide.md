@@ -1,3 +1,11 @@
+---
+filetype: documentation
+version: 1.2.1
+updated: 2025-10-31
+maintainer: Waveframe Labs
+contact: swright@waveframelabs.org
+---  
+
 # AWO Adoption Guide
 Version: v1.2.1
 Maintainer: Waveframe Labs
