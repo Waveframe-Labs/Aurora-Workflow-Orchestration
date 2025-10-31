@@ -23,6 +23,25 @@ AWO is the *methodology layer*; its successor, **CRI-CORE**, is the *execution l
 
 ---
 
+## What You’ll Find Here
+
+This repository serves as the **canonical reference implementation** of the *Aurora Workflow Orchestration (AWO)* method —  
+a reproducibility and falsifiability framework for AI-assisted research.
+
+| Category | Description |
+|-----------|--------------|
+| **Core Specification** | The normative definition of AWO methodology — [`docs/AWO_Method_Spec_v1.2.1.md`](docs/AWO_Method_Spec_v1.2.1.md) |
+| **Governance Artifacts** | Compliance, attestation, and verification records (`GOVERNANCE_SUMMARY.md`, `ROLE_ATTESTATION.md`, `AWO_Compliance_Report.md`) |
+| **ADR Archive** | All major design decisions (`/decisions/ADR-0001` → `/ADR-0017`) |
+| **Schemas / Templates** | Machine-readable definitions of falsifiability manifests and attestations under `/schemas/` and `/templates/` |
+| **Runs** | Example reproducible runs under `/runs/` with frozen workflows and signed approvals |
+| **Automation** | GitHub Actions workflows for PDF generation, checksum integrity, and compliance validation |
+| **Governance Logs** | Audit and continuity records under `/logs/governance/` |
+
+All content is cryptographically verified through [`SHA256SUMS.txt`](./SHA256SUMS.txt) and governed by ADR-0015–ADR-0017.
+
+---
+ 
 ### AWO Is / Isn't
 
 AWO is not a software library. It is a procedural standard — a reproducibility protocol that defines how AI–human workflows can be made falsifiable, auditable, and citable.
