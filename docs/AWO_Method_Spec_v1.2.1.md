@@ -309,7 +309,8 @@ Each AWO-compliant repository **MUST** implement the following substructure with
 |------------|--------------|------------|
 | `/logs/workflow/` | Chronological records of human and agent activity, covering decisions, forks, merges, and context. | ADR-0004 |
 | `/logs/audits/` | Independent audit results, rejection events, or revalidation findings. | ADR-0003 |
-| `/logs/overrides/` | Manual interventions, rationale, and signatures for non-automated overrides. | ADR-0004, ADR-0012 | `/logs/governance/` | Governance records of approvals, rejections, and release decisions. | ADR-0017 |
+| `/logs/overrides/` | Manual interventions, rationale, and signatures for non-automated overrides. | ADR-0004, ADR-0012 |
+| `/logs/governance/` | Governance records of approvals, rejections, and release decisions. | ADR-0017 |
 | `/logs/attestation_failures/` | Permanent records of failed or rejected attestations with reasons and run IDs. | ADR-0003 |  
 
 Log entries **MUST** follow the schema outlined in ADR-0004, including timestamps, participant IDs, impacted artifacts, and outcome codes.  
