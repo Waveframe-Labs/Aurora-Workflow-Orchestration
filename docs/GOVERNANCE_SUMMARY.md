@@ -4,7 +4,7 @@
 **Version:** 1.2.1  
 **Date:** 2025-10-29  
 **Maintainer:** Waveframe Labs  
-**Contact:** s.wright@waveframelabs.org  
+**Contact:** swright@waveframelabs.org  
 **Governance Authority:** Aurora Research Initiative (ARI)  
 
 ---
