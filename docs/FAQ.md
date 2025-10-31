@@ -3,7 +3,7 @@ filetype: documentation
 version: 1.2.1
 updated: 2025-10-31
 maintainer: Waveframe Labs
-contact: support@waveframelabs.org
+contact: swright@waveframelabs.org
 ---
 
 # Waveframe Labs — Frequently Asked Questions (FAQ)
