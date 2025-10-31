@@ -122,6 +122,6 @@ Confirmed corrections are cited and credited publicly.
 ---
 
 Still have questions?  
-Contact **support@waveframelabs.org** — or open a GitHub Discussion tagged `question`.  
+Contact **swright@waveframelabs.org** — or open a GitHub Discussion tagged `question`.  
 Either way, the response will be logged, versioned, and auditable.
 
