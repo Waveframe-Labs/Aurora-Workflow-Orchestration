@@ -221,6 +221,31 @@ Future changes occur only as errata or citation updates.
 
 ---
 
+---
+
+## Citation
+
+If you reference, replicate, or build upon the AWO method, please cite using the **concept DOI**.
+
+**APA**
+> Wright, S. C. (2025). *Aurora Workflow Orchestration (AWO): A formal framework for reproducible AI-assisted research.*  
+> Waveframe Labs / Aurora Research Initiative. https://doi.org/10.5281/zenodo.17013612
+
+**BibTeX**
+```bibtex
+@software{wright_aurora_workflow_orchestration_2025,
+  author       = {Wright, Shawn C.},
+  title        = {Aurora Workflow Orchestration (AWO): A formal framework for reproducible AI-assisted research},
+  year         = {2025},
+  version      = {1.2.1},
+  institution  = {Waveframe Labs / Aurora Research Initiative},
+  license      = {Apache-2.0 (code), CC BY 4.0 (docs)},
+  url          = {https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration},
+  doi          = {10.5281/zenodo.17013612}
+}
+```  
+---
+
 ## Licensing
 
 - **Code** → [Apache 2.0](LICENSE)  
