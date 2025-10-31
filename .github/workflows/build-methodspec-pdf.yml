@@ -14,7 +14,9 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  
+        with:
+          fetch-depth: 0
 
       - name: Install Pandoc + TeX engine
         run: |
@@ -60,7 +62,10 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit and Push PDF
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto-build Method Spec v1.2.1 → PDF"
-          file_pattern: docs/AWO_Method_Spec_v1.2.1.pdf
+         file_pattern: docs/AWO_Method_Spec_v1.2.1.pdf
+         commit_message: Auto-build Method Spec v1.2.1 → PDF
+         branch: ${{ github.ref_name }}
+         pull_strategy: REBASE      # or SQUASH if you prefer a single merge commit
+
