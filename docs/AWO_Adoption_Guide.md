@@ -90,15 +90,8 @@ my-awo-project/
 ```
 
 2) **Add a falsifiability manifest**
-Create `docs/falsifiability-manifest.md`:
-```
-Hypothesis:
-Predictions (disprovable):
-Data/Inputs:
-Procedures (what will run):
-Acceptance Criteria (pass/fail thresholds):
-Risks and Confounds:
-```
+Use the template at `/templates/falsifiability-manifest.md` to draft your hypothesis and disproof criteria.
+For each actual run, place the manifest in the run folder as `runs/<timestamp>/manifest.json` (or `runs_manifest.md`).
 
 3) **Create ADR-0001**
 Create `decisions/ADR-0001.md`:
@@ -118,7 +111,7 @@ If you cloned the AWO repo to borrow utilities, from its root:
 ```
 python cli.py --init --demo
 ```
-Otherwise, run your own script(s) and capture parameters and inputs under `runs/<timestamp>/inputs/`.
+Otherwise, run your own script(s); capture all parameters to `runs/<timestamp>/workflow_frozen.json`. (Optional: store raw inputs under `runs/<timestamp>/inputs/`.)
 
 6) **Freeze and sign the run**
 Create:
@@ -175,6 +168,8 @@ README.md
 ## 10. Decision Logging and Falsifiability Manifests
 - **ADRs** capture *why* changes happened; one ADR per substantive decision.
 - **Falsifiability manifests** define *what would disprove* the hypothesis.
+  - Template lives in `/templates/falsifiability-manifest.md`.
+  - The run’s live copy must be stored in `runs/<timestamp>/run_manifest.json` (or `run_manifest.md`) and referenced by `approval.json`.  
 - Cross-reference ADR IDs inside `report.md` and release notes.
 
 ## 11. Verification Checklist
