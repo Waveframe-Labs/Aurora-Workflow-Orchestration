@@ -1572,3 +1572,17 @@ Each AWO rule maps directly to a forthcoming compliance schema within the CRI ru
 ---
 
 **End of Specification — Aurora Workflow Orchestration (AWO) v1.2.1 Scaffold**
+
+**BibTeX**
+```bibtex
+@software{wright_aurora_workflow_orchestration_2025,
+  author       = {Wright, Shawn C.},
+  title        = {Aurora Workflow Orchestration (AWO): A formal framework for reproducible AI-assisted research},
+  year         = {2025},
+  version      = {1.2.1},
+  institution  = {Waveframe Labs / Aurora Research Initiative},
+  license      = {Apache-2.0 (code), CC BY 4.0 (docs)},
+  url          = {https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration},
+  doi          = {10.5281/zenodo.17013612}
+}
+```  
