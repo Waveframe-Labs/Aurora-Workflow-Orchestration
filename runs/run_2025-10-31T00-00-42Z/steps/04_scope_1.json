@@ -1,0 +1,40 @@
+{
+  "ts": "2025-10-31T00:00:42Z",
+  "id": "scope_1",
+  "op": "scope_validate",
+  "args": {
+    "claim": {
+      "id": "claim-hello-001",
+      "statement": "A demo claim asserting the summary mentions battery life and confusing UI.",
+      "predictions": [
+        {
+          "name": "mentions-battery",
+          "function": "text-contains('battery lasts all day')",
+          "tolerance": {
+            "metric": "boolean",
+            "max": 1
+          }
+        }
+      ],
+      "falsification_tests": [
+        {
+          "name": "mentions-ui-confusing",
+          "must_pass": true
+        }
+      ]
+    }
+  },
+  "summary": {
+    "claims_checked": 1,
+    "overall_ok": true,
+    "details": [
+      {
+        "id": "claim-hello-001",
+        "ok": true,
+        "problems": []
+      }
+    ],
+    "notes": [],
+    "ts": "2025-10-31T00:00:42Z"
+  }
+}

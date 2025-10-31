@@ -1,0 +1,19 @@
+AWO Run Attestation:  
+
+Run-ID: run_2025-10-31T00-00-42Z
+Repository: Waveframe-Labs/Aurora-Workflow-Orchestration
+Commit: 3ff0f3bdf2bb76850cb2647f56f8668648970387
+Workflow Run: https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/runs/18958390331
+Actor: Wright-Shawn
+Timestamp (UTC): 2025-10-31T00:03:16Z
+
+Bindings:  
+
+    run_manifest.json  sha256:03cfc621231c9c4845580346b470b0124e03da772921bbbe43e4f97f1ffab952
+    SHA256SUMS.txt     sha256:ec06c8219b292377db62560b9e631e25d56ac2a749858ed19dcd7e045b9cb022
+
+Statement:
+
+    This attestation binds the AWO run manifest to the file inventory recorded in
+    SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
+
