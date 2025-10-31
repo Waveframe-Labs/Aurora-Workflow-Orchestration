@@ -73,7 +73,31 @@ Where discrepancies occur, **this specification takes precedence**.
 
 ---
 
-### 1.6 Status of This Version
+### 1.6 Principle of Neurotransparency (Normative)
+
+Neurotransparency is the requirement that every inference influencing a claim is attributable to a declared role and recorded in a durable artifact such that the reasoning sequence can be deterministically reconstructed.
+
+**MUST**
+
+Record role-attribution and traceable evidence for all claim-affecting inferences in one of: /logs/workflow/, /logs/audits/, ADRs, manifests, or approval.json.
+
+Ensure each attested artifact cites the originating role, linked files, and hashes (see §6, §9, §10).
+
+Fail attestation if any claim-affecting inference lacks a recorded origin, evidence link, or hash reference.
+
+**SHOULD**
+
+Include concise “reasoning excerpts” or pointers (e.g., prompt IDs, model run IDs, diff snippets) to minimize ambiguity.
+
+**MAY**
+
+Use automated capture (CRI-CORE) to serialize reasoning steps; manual projects can summarize via structured bullets.  
+
+<!-- CRI-CORE:placeholder:neurotransparency.schema -->
+
+---
+
+### 1.7 Status of This Version
 Version 1.2.1 represents the **finalized methodological form** of AWO under Waveframe Labs governance.  
 Future revisions may clarify or extend definitions for CRI-CORE compatibility but will not alter the normative logic without an explicit version increment.
 
