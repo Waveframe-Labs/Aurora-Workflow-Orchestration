@@ -142,8 +142,8 @@ Each Run must reference at least one ADR.
 
 **Manifest (Falsifiability Manifest)**  
 A declaration of the hypothesis, predicted outcomes, and explicit disproof conditions for a Run.  
-The Manifest defines what constitutes falsification before execution.  
-It serves as the precondition for attestation and MUST be stored under `/runs/<RUN_ID>/` (see §12.4).  
+The Manifest defines what constitutes falsification before execution.    
+**Naming:** The run’s manifest **MUST** be stored as `run_manifest.json` in `/runs/<RUN_ID>/`. A template MAY exist under `/templates/manifest.md` for manual entry; the template is not the run record.  
 
 ---
 
@@ -423,7 +423,7 @@ To define *what will be tested, how it could fail,* and *who will oversee verifi
 Fan-out begins the epistemic process by expanding a single research goal into a set of structured, falsifiable hypotheses.
 
 #### Activities
-- Create or update the **Run Manifest** (`manifest.md` or `.json`) describing:
+- Create or update the **Run Manifest** (`run_manifest.md` or `.json`) describing:
   - Objective, assumptions, and falsifiability criteria.
   - Expected inputs, data sources, and transformation paths.
   - Defined roles (Orchestrator, Evaluator, Auditor, Synthesizer).
@@ -579,16 +579,19 @@ All artifacts must be uniquely identifiable, cryptographically verifiable, and c
 
 Every Run **MUST** produce a verifiable and complete set of artifacts:
 
-| File | Description | Required | Notes |
-|------|--------------|-----------|-------|
-| **workflow_frozen.json** | Snapshot of executed parameters, configuration state, and environment context. | Yes | Must be generated immediately before execution. |
-| **report.md** | Narrative or analytical summary describing the run outcome, metrics, and interpretations. | Yes | May be human- or model-authored but must include run ID and timestamp. |
-| **approval.json** | Signed attestation record confirming human or automated validation per ADR-0012. | Yes | Must reference corresponding manifest and checksum hashes. |
-| **SHA256SUMS.txt** | Integrity registry listing artifact hashes. Each run MAY include its own `SHA256SUMS.txt`, but the root-level file remains authoritative for full-repo verification. | Yes | Updated after each attested run. |
-| **manifest.json** or **manifest.md** | Defines falsifiability boundaries, inputs, and expected failure conditions. | Yes | Root file required; per-run files optional but recommended. |  
-
-All files above **MUST** exist in each run folder (`/runs/<RUN_ID>/`), except that the root-level `SHA256SUMS.txt` serves as the canonical registry for repository-wide verification (§4.6).  
-All entries **MUST** be immutable once signed and referenced in `SHA256SUMS.txt`.
+ | File | Description | Required | Notes |
+|------|-------------|----------|-------|
+| **run_manifest.json** | Canonical description of the run configuration and declared claims. | Yes | The run’s manifest (not the template). |
+| **workflow_frozen.json** | Snapshot of parameters, environment, and config immediately **before** execution. | Yes | Canonical pre-execution record. |
+| **environment.json** | Expanded environment details (deps, versions). | Should | Auto-generated if available. |
+| **provenance.json** | Lineage map of inputs → outputs. | Yes | Must reference log anchors/ADRs. |
+| **gate_decision.yml** | Structured pass/fail decisions and rationale. | Yes | Source for attestation verdicts. |
+| **report.md** | Human-readable summary and evaluation notes. | Should | Include run ID and timestamp. |
+| **approval.json** | Signed attestation per ADR-0012/0015. | Yes | Must cite manifest + hashes. |
+| **SHA256SUMS.txt** | Integrity registry for files in this run folder. | Yes | Per-run file; immutable post-sign. |
+| **ATTESTATION.txt (.sig/.cert)** | Signature artifacts from Attestation Gate. | Should | Present when gate is active. |
+ 
+Each run folder **MUST** contain the required artifacts above. `workflow_frozen.json` is the authoritative pre-execution snapshot. Per-run `SHA256SUMS.txt` files are maintained **in addition to** the root `SHA256SUMS.txt` used for releases.
 
 ---
 
@@ -1047,8 +1050,8 @@ Before final tagging, the following checksum verification process **MUST** occur
    ```
 2. Verify against any previous version to confirm consistency.  
 3. Commit updated `SHA256SUMS.txt` prior to tagging.  
-4. Attest checksum integrity via `approval.json` (§9).
-
+4. Attest checksum integrity via `approval.json` (§9).  
+**Run-level integrity:** Each `/runs/<RUN_ID>/` directory maintains its own `SHA256SUMS.txt` for intra-run artifacts. The repository root `SHA256SUMS.txt` aggregates **release-distributed** artifacts (e.g., PDFs, CITATION.cff, top-level docs) and MAY include run hashes when the release bundles a specific run.  
 The checksum process ensures content-addressable integrity across all archived artifacts.
 
 ---
@@ -1245,7 +1248,7 @@ The falsifiability manifest ensures each run begins with explicit hypotheses, bo
 
 | Requirement | Description | Governing ADRs | Compliance Level |
 |--------------|--------------|----------------|------------------|
-| **Manifest Presence** | Each run **MUST** include a `manifest.json` or `manifest.md` file in its directory. | 0002 | **MUST** |
+| **Manifest Presence** | Each run **MUST** include a `run_manifest.json` or `run_manifest.md` file in its directory. | 0002 | **MUST** |
 | **Disproof Criteria** | Each manifest **MUST** define falsification conditions for all primary claims. | 0002 | **MUST** |
 | **Hypothesis Statement** | Each manifest **MUST** declare the specific hypothesis being tested. | 0002 | **MUST** |
 | **Acceptance Thresholds** | The manifest **MUST** define quantitative or qualitative acceptance boundaries. | 0002 | **MUST** |
