@@ -14,3 +14,8 @@ severity: HIGH
 timestamp: 2025-10-31T23:05Z
 resolution_status: Open
 linked_adrs: [0003, 0012, 0015]
+```
+---
+
+**Reference:** ADR-0003, ADR-0015  
+**Governance Role:** Auditor  
