@@ -14,15 +14,14 @@ Each entry serves as an immutable audit event under AWO’s Attestation and Acco
 
 ---
 
-## Structure
+### Governance Substructure
 
-| File / Folder | Description |
-|----------------|-------------|
-| **2025-10-31_root-sha256sums.md** | Record of the first automated generation of the root integrity registry (`SHA256SUMS.txt`). |
-| **attestation_failures/** | (Optional) Logs of attestation or approval anomalies detected by validation workflows. |
-| **role_attestations/** | Signed declarations by human or synthetic participants affirming their roles and responsibilities under AWO. |
-| **release_governance/** | Historical release governance entries aligned to CHANGELOG and version tags. |
-| **integrity_events/** | Machine or workflow-generated logs related to validation or integrity enforcement. |
+| Subfolder | Description | Reference |
+|------------|--------------|------------|
+| `attestation_failures/` | Logs of attestation or approval anomalies detected by validation workflows. | ADR-0003 |
+| `role_attestations/` | Signed declarations by participants affirming their roles and responsibilities. | ADR-0012, ADR-0017 |
+| `release_governance/` | Historical release governance entries aligned to CHANGELOG and version tags. | ADR-0017 |
+| `integrity_events/` | Machine or workflow-generated logs related to validation or integrity enforcement. | ADR-0015, ADR-0016 |  
 
 ---
 
