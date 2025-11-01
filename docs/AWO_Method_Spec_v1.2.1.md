@@ -191,6 +191,21 @@ Roles may be embodied by humans, AI systems, or hybrid arrangements, but the **r
 Every AWO-compliant Run MUST declare the roles involved and the corresponding participants (human or synthetic).  
 Multiple roles MAY be fulfilled by a single agent if traceability and attestation integrity are preserved.
 
+---  
+
+### 3.1.1 Role Separation Clause
+
+To maintain epistemic integrity, no single actor (human or synthetic) may occupy more than one *governance-critical* role within the same Run.
+
+| Governance-Critical Roles | Separation Required From | Rationale |
+|---------------------------|--------------------------|------------|
+| **Orchestrator** | Auditor, Critic | Prevents self-attestation or self-review. |
+| **Auditor** | Orchestrator, Maintainer | Ensures independent verification of outcomes and compliance. |
+| **Maintainer** | Auditor | Avoids merge bias following validation. |
+
+Roles may collaborate asynchronously but must preserve distinct cryptographic identities in all attestation records (`approval.json`, `run_manifest.json`).  
+Violation of this clause automatically downgrades compliance status to *Conditional* until corrected and re-attested.
+
 ---
 
 ### 3.2 Canonical Roles
@@ -1489,7 +1504,8 @@ All required AWO compliance checks completed. Repository verified as reproducibl
 
 ---
 
-## Appendix C — Rationale Summary
+## Appendix C  
+*(This appendix is **non-normative** and provided for illustrative context only.)*
 
 ### Purpose
 This appendix provides concise justifications for the normative rules defined in the Aurora Workflow Orchestration (AWO) Method Specification v1.2.1.  
