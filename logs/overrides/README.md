@@ -26,3 +26,8 @@ linked_adrs: [0004, 0012]
 timestamp: 2025-10-31T18:42Z
 signature: "SHA256:ecc1b6b8f..."
 status: Approved
+```
+---
+
+## Governance Note:
+All overrides must be reviewed and counter-signed by an independent Auditor during the next attestation cycle. Persistent or repeated overrides trigger a governance review per ADR-0017.  
