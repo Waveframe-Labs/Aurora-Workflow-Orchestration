@@ -1,66 +1,88 @@
 ---
-filetype: audit_logs
+filetype: logs_index
 version: 1.2.1
 updated: 2025-10-31
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 ---
 
-# Audit Logs — Aurora Workflow Orchestration (AWO)
+# Logs — Aurora Workflow Orchestration (AWO)
 
-**Purpose**  
-This directory houses all independent audit records generated during AWO verification cycles.  
-Each file documents review findings, rejection events, and compliance evaluations tied to specific runs, artifacts, or governance actions.  
-Audit logs ensure transparent validation of every material claim and form part of AWO’s falsifiability backbone.
+## Purpose
+The `/logs/` directory serves as the **central provenance ledger** for all activity, governance, and validation records in an AWO-compliant repository.  
+Every subfolder captures a specific dimension of reproducibility — workflow traces, audits, governance actions, overrides, and attestation results.
 
----
-
-## Structure
-
-| File / Folder | Description |
-|----------------|-------------|
-| **YYYY-MM-DD_audit_<run_id>.md** | Audit report for a specific run or process, including reviewer findings and verdicts. |
-| **rejections/** | Contains rejection reports for artifacts or runs that failed validation gates. |
-| **summaries/** | Aggregated audit summaries grouped by version or release cycle. |
-| **index.json** | (Optional) Machine-readable audit index consumed by CRI-CORE for compliance scoring. |
+Each log entry must:
+- Be timestamped in ISO 8601 format.  
+- Reference at least one Architecture Decision Record (ADR).  
+- Include the originating role (Orchestrator, Auditor, Synthesizer, Critic, or CI Validator).  
+- Be immutable once committed, except for appended status updates (tracked via ADR-0017).
 
 ---
 
-## Logging Schema
+## Directory Overview
 
-Each audit entry **MUST** include the following metadata fields:
-
-| Field | Requirement | Description |
-|--------|--------------|-------------|
-| **Date** | Required | UTC timestamp of audit review. |
-| **Actor (Role)** | Required | Role of the reviewing entity (Auditor, Peer Reviewer, Red Team). |
-| **Scope** | Required | The subsystem or process audited (e.g., Attestation, Governance, Run Integrity). |
-| **Findings** | Required | Detailed observations, including supporting evidence. |
-| **Artifacts** | Required | Files or reports under review. |
-| **Linked ADRs** | Optional | Policy or procedural ADRs relevant to the audit. |
-| **Verdict** | Required | One of: `Approved`, `Conditionally Approved`, `Rejected`, or `Deferred`. |
-| **Follow-up Actions** | Optional | Steps required for correction or further verification. |
-
----
-
-## Policy
-
-- Audit logs are **immutable** once finalized and approved.  
-- Every release or attestation event MUST be traceable to at least one corresponding audit log.  
-- Rejected or deferred audits trigger entries in `/logs/governance/` and `/logs/attestation_failures/`.  
-- Audits may be human-authored, AI-generated, or hybrid, but all entries require role and time provenance.
+| Subfolder | Description | Reference |
+|------------|--------------|------------|
+| `/logs/workflow/` | Chronological records of human and agent activity covering decisions, forks, merges, and context. | ADR-0004 |
+| `/logs/audits/` | Independent audit results, rejection events, and compliance findings. | ADR-0003 |
+| `/logs/audits/rejections/` | Reports for artifacts or runs that failed validation gates. | ADR-0003 |
+| `/logs/audits/summaries/` | Aggregated audit summaries grouped by release cycle. | ADR-0003, ADR-0017 |
+| `/logs/overrides/` | Manual interventions and rationale for non-automated overrides. | ADR-0004, ADR-0012 |
+| `/logs/governance/` | Governance-level decisions, approvals, and oversight logs. | ADR-0017 |
+| `/logs/governance/attestation_failures/` | Attestation or approval anomalies detected by validation workflows. | ADR-0003 |
+| `/logs/governance/role_attestations/` | Signed declarations affirming participant roles and responsibilities. | ADR-0012, ADR-0017 |
+| `/logs/governance/release_governance/` | Historical release governance entries aligned to CHANGELOG and version tags. | ADR-0017 |
+| `/logs/governance/integrity_events/` | Machine or workflow-generated logs for integrity enforcement. | ADR-0015, ADR-0016 |
 
 ---
 
-## Integration
+## Schema Requirements
 
-- Used by CRI-CORE to calculate repository trust metrics and audit chain completeness.  
-- Cross-linked in Compliance Reports and Governance Summaries.  
-- Serves as the normative record for external reproducibility verification.
+Each log file (YAML or Markdown front matter) must include:
+```yaml
+log_id: LOG_YYYYMMDD_<unique_suffix>
+run_id: RUN_YYYY-MM-DDTHH-MM-SSZ
+actor_role: <Orchestrator | Auditor | Synthesizer | Critic | Validator>
+action: <short description>
+timestamp: <ISO 8601>
+linked_adrs: [0004, 0017]
+sha256: <optional hash for binary or external reference>
+status: <OPEN | CLOSED | RESOLVED | REJECTED>
+```
+
+**All logs MUST:**
+- Include a clear causal link to a run, artifact, or governance event.  
+- Be registered in the root-level `SHA256SUMS.txt` file.  
+- Be readable in plain text (no binary formats).  
 
 ---
 
-## Contact  
+## Governance Integration
+The `/logs/` hierarchy underpins AWO’s falsifiability and provenance framework.  
+Each subfolder maps to a procedural enforcement layer defined in the **Method Spec §4.3** and the following ADRs:
 
-Waveframe Labs  
-swright@waveframelabs.org
+| Function | ADR Reference |
+|-----------|----------------|
+| Workflow logging | ADR-0004 |
+| Audit verification | ADR-0003 |
+| Manual override policy | ADR-0012 |
+| Governance continuity | ADR-0017 |
+| Integrity enforcement | ADR-0015, ADR-0016 |
+
+Logs are periodically validated and hashed by the **root SHA256SUMS workflow**, ensuring cryptographic traceability for every claim and run artifact.
+
+---
+
+## Update Protocol
+When adding new logs:
+1. Place the entry in the correct subfolder based on purpose.  
+2. Use the standardized YAML schema shown above.  
+3. Reference all relevant ADRs.  
+4. Commit and trigger the `root-sha256sums.yml` workflow to update hashes.  
+5. Document the addition in `GOVERNANCE_SUMMARY.md`.
+
+---
+
+**End of File — Logs Index v1.2.1**  
+Maintained by **Waveframe Labs / Aurora Research Initiative (ARI)**.
