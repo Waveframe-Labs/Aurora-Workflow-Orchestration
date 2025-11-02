@@ -58,3 +58,9 @@ All required artifacts have been reviewed for:
 _Machine-readable counterpart: [`/schemas/ROLE_ATTESTATION_SIGNATURE.json`](../schemas/ROLE_ATTESTATION_SIGNATURE.json)_  
 
 **End of ROLE_ATTESTATION.md — Aurora Workflow Orchestration v1.2.1**
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
