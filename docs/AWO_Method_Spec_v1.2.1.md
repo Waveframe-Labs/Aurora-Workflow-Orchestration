@@ -1602,3 +1602,8 @@ Each AWO rule maps directly to a forthcoming compliance schema within the CRI ru
   doi          = {10.5281/zenodo.17013612}
 }
 ```  
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
