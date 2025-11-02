@@ -30,3 +30,9 @@ Neurotransparency requires that every claim-affecting inference is attributable 
 
 ## Future Integration
 <!-- CRI-CORE:placeholder:neurotransparency.schema -->
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
