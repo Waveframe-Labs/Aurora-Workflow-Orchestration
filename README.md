@@ -283,4 +283,11 @@ To verify locally:
 sha256sum --check SHA256SUMS.txt
 ```  
 
-AWO is the standard. CRI is the system.  
+AWO is the standard. CRI is the system.   
+
+---
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
+
