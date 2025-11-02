@@ -71,3 +71,9 @@ All attestation and compliance artifacts are **immutable and cryptographically v
 ---
 
 **End of Governance Summary — Aurora Workflow Orchestration (AWO) v1.2.1**
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
