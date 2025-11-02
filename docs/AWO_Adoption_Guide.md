@@ -212,3 +212,9 @@ Full runtime automation is demonstrated in the CRI-CORE repository and will be e
 ## 15. License
 - Documentation: CC BY 4.0
 - Code: Apache 2.0
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
