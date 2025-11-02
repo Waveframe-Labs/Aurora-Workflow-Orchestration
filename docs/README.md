@@ -34,3 +34,9 @@ Authoritative documentation for AWO (whitepaper, method spec, citation files).
 
 **Contact**  
 Waveframe Labs — swright@waveframelabs.org
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
