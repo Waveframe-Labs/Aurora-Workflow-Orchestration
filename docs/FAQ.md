@@ -121,3 +121,9 @@ Still have questions?
 Contact **swright@waveframelabs.org** — or open a GitHub Discussion tagged `question`.  
 Either way, the response will be logged, versioned, and auditable.
 
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
+
