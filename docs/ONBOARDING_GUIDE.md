@@ -100,3 +100,8 @@ A contribution will not be merged unless:
 Welcome aboard.  
 If you can prove it, you belong here.
 
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
