@@ -188,4 +188,11 @@ By making reasoning itself falsifiable, it closes the loop between thought, exec
 
 ---
 
-**End of Whitepaper — Aurora Workflow Orchestration (AWO) v1.2.1**
+**End of Whitepaper — Aurora Workflow Orchestration (AWO) v1.2.1**  
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
+
