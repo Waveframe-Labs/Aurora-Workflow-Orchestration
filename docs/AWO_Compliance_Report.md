@@ -36,4 +36,11 @@ This report certifies that the Aurora Workflow Orchestration (AWO) repository sa
 
 ### Governance Confirmation
 All attested runs, ADRs, and artifacts comply with falsifiability, provenance, and reproducibility standards as of this report date.  
-Governance continuity and archival checksum verification were executed per ADR-0017.
+Governance continuity and archival checksum verification were executed per ADR-0017.  
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
+
