@@ -8,6 +8,12 @@
 
 ![AURORA WORKFLOW ORCHESTRATION](figures/awo_banner_cri.PNG)
 
+> **Aurora Workflow Orchestration (AWO)**  
+> A formal method for reproducible AI-assisted research  
+> → Falsifiability • Provenance • Attestation • Auditability  
+> → Works manually or via **CRI-CORE** automation  
+> → Every artifact is signed, structured, and verifiable
+
 AWO is a reproducibility framework for AI-assisted research — turning every run into a verifiable scientific artifact.
 
 ---
@@ -19,14 +25,16 @@ It converts reasoning, version control, and auditability into one governed workf
 
 AWO is the *methodology layer*; its successor, **CRI-CORE**, is the *execution layer*. Together they form a continuum:  
 
-> **AWO defines the rules. CRI enforces them.**
-
 ---
 
 ## What You’ll Find Here
 
-This repository serves as the **canonical reference implementation** of the *Aurora Workflow Orchestration (AWO)* method —  
-a reproducibility and falsifiability framework for AI-assisted research.
+This repository contains the complete AWO governance layer:
+- **Whitepaper** — conceptual rationale (“why”)  
+- **Method Specification** — normative rules (“how”)  
+- **Adoption Guide** — step-by-step usage (“apply”)  
+- **Compliance and Governance Records** — proof of adherence  
+- **Automated Workflows** — reproducibility and integrity checks
 
 | Category | Description |
 |-----------|--------------|
@@ -38,13 +46,9 @@ a reproducibility and falsifiability framework for AI-assisted research.
 | **Automation** | GitHub Actions workflows for PDF generation, checksum integrity, and compliance validation |
 | **Governance Logs** | Audit and continuity records under `/logs/governance/` |
 
-All content is cryptographically verified through [`SHA256SUMS.txt`](./SHA256SUMS.txt) and governed by ADR-0015–ADR-0017.
+All content is cryptographically verified through [`SHA256SUMS.txt`](./SHA256SUMS.txt) and governed by ADR-0015–ADR-0018.
 
----
- 
-### AWO Is / Isn't
-
-AWO is not a software library. It is a procedural standard — a reproducibility protocol that defines how AI–human workflows can be made falsifiable, auditable, and citable.
+---  
 
 ```
 +--------------------+
@@ -90,7 +94,7 @@ AWO treats the *scientific method* as executable code.
 3. **Inspect provenance**  
    Each output is cryptographically signed and archived for audit.
 
-For a complete walkthrough, see the [Adoption Guide](docs/AWO_Adoption_Guide.md).
+For a complete walkthrough, see the [Adoption Guide](docs/AWO_Adoption_Guide.md)  
 
 ---
 
@@ -101,7 +105,7 @@ For a complete walkthrough, see the [Adoption Guide](docs/AWO_Adoption_Guide.md)
 | Vision & rationale | [AWO Whitepaper v1.1](docs/AWO_Whitepaper_v1.1.md) | Philosophical and historical foundation for AWO. |
 | Formal rules | [AWO Method Spec v1.2](docs/AWO_Method_Spec_v1.2.md) | Normative specification defining AWO compliance. |
 | Adoption & onboarding | [AWO Adoption Guide](docs/AWO_Adoption_Guide.md) | Step-by-step handbook for individuals and teams. |
-| Governance & decisions | [ADRs 0001-0017](decisions/) | Formal design records for all major changes. |
+| Governance & decisions | [ADRs 0001-0018](decisions/) | Formal design records for all major changes. |
 
 ---
 
@@ -181,25 +185,6 @@ Implements the AWO method as runtime governance:
 - Cryptographic audit trails  
 
 [View CRI-CORE Repository](https://github.com/Waveframe-Labs/CRI-CORE)
-
----
-
-## Common Misinterpretations
-
-**“AWO is software.”**  
-Not exactly. AWO is a **method specification** — a governance protocol for how AI-assisted research must be documented, attested, and verified.  
-The included code only demonstrates the method; the method itself is procedural, not executable.
-
-**“CRI-CORE and AWO are the same.”**  
-No. AWO defines *the rules*; CRI-CORE executes and enforces them at runtime.  
-AWO is the **constitution**, CRI is the **runtime judiciary**.
-
-**“AWO requires institutional approval.”**  
-False. AWO establishes legitimacy through **reproducibility, falsifiability, and cryptographic attestation**, not reputation.
-
-**“AWO is too heavy for individuals.”**  
-Incorrect. It scales down cleanly — a single researcher can run AWO manually with logs, manifests, and checksums,  
-and scale up later to CRI-CORE automation without changing the underlying governance model.
 
 ---
 
@@ -283,8 +268,12 @@ To verify locally:
 sha256sum --check SHA256SUMS.txt
 ```  
 
-AWO is the standard. CRI is the system.   
+## Common Misinterpretations
 
+AWO isn’t a belief system or manifesto.  
+It’s a formal structure for making AI-assisted research **provably reproducible**.  
+If it seems strict, that’s by design — rigor is the whole point.
+   
 ---
 
 <p align="center">
