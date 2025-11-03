@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.waveframe.org/awo/redaction_pointer.schema.json",
+  "title": "AWO Redaction Pointer",
+  "type": "object",
+  "required": [
+    "evidence_type",
+    "proof_hash",
+    "policy_id",
+    "location",
+    "access_tier",
+    "zero_knowledge",
+    "created_at"
+  ],
+  "properties": {
+    "evidence_type": {
+      "type": "string",
+      "enum": ["dataset","prompt","response","code","config","log","report","other"]
+    },
+    "proof_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of the redacted content"
+    },
+    "policy_id": { "type": "string", "description": "Reference to org privacy/IRB policy" },
+    "location": {
+      "type": "string",
+      "description": "Opaque URI or vault path (may be private)",
+      "examples": ["vault://project/secret/123", "s3://private-bucket/key"]
+    },
+    "access_tier": {
+      "type": "string",
+      "enum": ["public","internal","restricted","confidential","highly-confidential"]
+    },
+    "zero_knowledge": {
+      "type": "boolean",
+      "description": "If true, only proof + verifier hash are public; content never leaves enclave"
+    },
+    "classifier_labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional sensitivity tags (e.g., PII, PHI, ITAR)"
+    },
+    "retention_policy": { "type": "string" },
+    "reviewer_identity": { "type": "string" },
+    "last_accessed_at": { "type": "string", "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}
