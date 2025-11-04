@@ -24,6 +24,11 @@ AWO (Aurora Workflow Orchestration) responds by redefining reproducibility as **
 **Neurotransparency** is the condition under which synthetic reasoning becomes empirically auditable.  
 AWO ensures every inference, human or AI-generated, leaves a verifiable trail of evidence.
 
+### Purpose and Scope
+This whitepaper is explanatory, not normative.  
+It exists to justify the structural choices codified in the AWO Method Specification v1.2.1, translating procedural rules into conceptual rationale.  
+Where the Method Spec enforces compliance, this document explains why those rules exist and how they restore scientific credibility in AI-assisted research.
+
 ---
 
 ## 1. Context: The Post-AI Reproducibility Crisis
@@ -50,7 +55,8 @@ Each claim, assumption, and inference becomes a file, a hash, and a traceable de
 
 ### 2.2 Separation of Roles  
 To avoid epistemic circularity, AWO divides cognition into roles: Orchestrator, Evaluator, Auditor, Synthesizer, and Critic.  
-Each role produces artifacts reviewed by others—an internal peer review encoded into code and version control.
+Each role produces artifacts reviewed by another role, ensuring that no single cognitive agent—human or synthetic—controls hypothesis, execution, and verification simultaneously.  
+This enforced separation of duties replaces subjective peer review with reproducible epistemic independence.
 
 ### 2.3 The Provenance Chain  
 Every artifact references its origin and verifier, forming an immutable **chain of custody**.  
@@ -62,6 +68,10 @@ Nothing enters the research record without a falsifiability manifest and corresp
 
 Neurotransparency extends scientific falsifiability to synthetic reasoning.  
 Every AI-assisted inference must leave a reconstructable trace—either as logs, ADRs, or evidence pointers.  
+
+In the AWO Method Spec (§1.6 and §9), neurotransparency becomes a measurable requirement:  
+every inference that affects a claim must include a pointer, checksum, and origin role.  
+This whitepaper articulates its philosophical necessity — that visibility into synthetic reasoning is the new prerequisite for scientific legitimacy.
 
 | Term | Definition |
 |------|-------------|
@@ -82,11 +92,15 @@ AWO operates on four design laws:
 3. **Immutable Provenance** — Each artifact carries a verifiable checksum and role signature.  
 4. **AI Accountability** — Synthetic reasoning must self-document its decision chain.
 
-These principles transform reproducibility from culture to protocol.
+These four design laws emerged from observing that reproducibility collapses when governance depends on social trust.  
+AWO therefore encodes these values into automation and file structure, converting cultural expectations into verifiable process control.
 
 ---
 
 ## 5. Architecture Overview
+
+The AWO repository is not just an organizational convenience; it is the physical embodiment of the scientific method.  
+Its structure turns abstract epistemology into enforceable digital protocol.
 
 AWO is structured around a version-controlled ecosystem of roles, logs, and attestations.  
 
@@ -104,6 +118,9 @@ The repository itself is the experiment—each commit, log, and artifact forms a
 ---
 
 ## 6. Empirical Impact and Use Cases
+
+The practical effects of AWO extend beyond academia.  
+Its architecture enables any actor—from solo researcher to regulator—to perform auditable reasoning without institutional mediation.
 
 - **Academic Research** – Enforceable reproducibility pipelines for human–AI collaboration.  
 - **Independent Verification** – Public audit trails replacing opaque institutional oversight.  
@@ -142,7 +159,8 @@ AWO is the method. CRI is the machine that upholds it.
 - **Entropy-based metrics** to quantify epistemic compression and novelty.  
 - **Integration with decentralized archival (Zenodo, OSF)** to ensure permanence of artifacts.
 
-AWO will remain stable as the normative layer for reproducible AI research governance.
+AWO v1.2.1 remains frozen as the canonical governance layer; future development occurs only in its runtime enforcement (CRI-CORE).  
+This ensures all derivative frameworks inherit a stable epistemic contract.
 
 ---
 
@@ -186,13 +204,11 @@ By making reasoning itself falsifiable, it closes the loop between thought, exec
 }
 ```
 
----
+## Normative Reference: *Aurora Workflow Prchestration (AWO)-Method Specification v1.2.1 (Waveframe Labs, 2025)*  
 
-**End of Whitepaper — Aurora Workflow Orchestration (AWO) v1.2.1**  
-
+**End of Whitepaper -- Aurora Workflow Orchestration (AWO) v1.2.1
 ---  
 
 <p align="center">
   <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
 </p>  
-
