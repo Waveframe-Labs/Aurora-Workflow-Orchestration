@@ -1,58 +1,91 @@
-# ADR-0018 — Model Drift & Fingerprinting
-**Status:** Accepted  
-**Date:** 2025-11-02  
+# ADR-0018 — Model Drift & Fingerprinting  
+**Status:** Accepted (Revised v1.1 — 2025-11-03)  
+**Supersedes:** ADR-0018 (v1.0)  
 **Applies to:** AWO v1.2.1+ (all runs)  
 **Owner:** Orchestrator; enforced by Auditor / CRI-CORE (future)
 
+---
+
 ## Context
-AI models mutate over time (vendor updates, hidden training deltas, routing changes). Freezing config is not enough; we must freeze **behavior** and **inputs** and detect drift deterministically.
+AI model behavior can change without notice. Configuration freezing alone doesn’t guarantee reproducibility when model weights, routing, or SDK logic drift.  
+We require a formal fingerprint and behavioral reference to detect those changes deterministically and proportionally.
+
+---
 
 ## Decision
-1) **Model Fingerprint (MF)** is **MUST** for every run:
-   - Captured to `/runs/<RUN_ID>/workflow_frozen.json#model_fingerprint` at execution start.
-   - Same object echoed in `/runs/<RUN_ID>/approval.json#model_fingerprint`.
 
-2) **Prompt/Context Hashing** is **MUST**:
-   - Hash the full serialized inference request (system+tools+user+files) → `prompt_serialization_hash`.
+### 1. Model Fingerprinting (unchanged)
+Each run **MUST** record a `model_fingerprint` object in `/runs/<RUN_ID>/workflow_frozen.json` and echo it in `/runs/<RUN_ID>/approval.json`.
 
-3) **Behavior Canaries (Goldens)** are **SHOULD**:
-   - Maintain a private, fixed eval set; store scores and deltas in `/logs/audits/<date>_drift_report.json`.
+### 2. Prompt Serialization Hash (unchanged)
+Each inference request **MUST** produce a SHA-256 hash of the full serialized context (`system + tools + user`), stored as `prompt_serialization_hash`.
 
-4) **Drift Policy** is **MUST**:
-   - A run **fails attestation** if `drift_decision == "fail"` in the associated drift report (when present).
+### 3. Tiered Behavioral Canaries (new)
+AWO adopts a **three-tier “Goldens” model** for behavioral stability testing.
 
-5) **Cross-echo**:
-   - `model_fingerprint` and `drift_report` entries are referenced in `SHA256SUMS.txt`.
+| Tier | Description | Typical Count | Trigger | Purpose |
+|------|--------------|---------------|----------|----------|
+| 🟢 Tier 1 | Smoke tests (basic CI) | ~5 | Every push | Rapid regression signal |
+| 🟡 Tier 2 | Drift suite | ~20 | Daily or on model update | Detect subtle semantic drift |
+| 🔴 Tier 3 | Edge coverage / regression guard | 30–50 + | Major releases or tagged runs | Full behavioral assurance |
 
-## Details
-- **Minimal MF fields (normative)**  
-  `provider, model_id, endpoint, engine_build, created_at, context_window, temperature, top_p, max_output_tokens, seed, stop_tokens[], system_prompt_hash, tool_schema_hash, prompt_serialization_hash, sdk_name, sdk_version, runtime_env (python,node), hardware_hint, privacy_mode`
-- **Optional MF fields (advisory)**  
-  `top_k, frequency_penalty, presence_penalty, tool_plugins[], cost_estimate, latency_ms`
+- Each golden test is a prompt–response pair stored under `/goldens/<tier>/`.  
+- Evaluation output is written to `/logs/audits/<date>_tierX_report.json`.  
+- Failure thresholds are defined in `/docs/drift_policy.yml` (or JSON equivalent).
 
-- **Drift report (normative)** must include:  
-  `baseline_id, eval_suite_id, item_count, metrics{}, deltas{}, logits_divergence (if available), decision (pass|fail), created_at`
+**Attestation Rule:**  
+If the active tier’s drift report yields `decision: fail`, attestation **MUST** be blocked until an updated baseline is accepted via a new ADR.
 
-- **Redaction**: when inputs/outputs are sensitive, store **hashes + policy pointers** only (see `redaction_pointer.schema.json`).
+### 4. Drift Report (clarified)
+`/logs/audits/<date>_drift_report.json` conforms to `schemas/drift_report.schema.json`.  
+The `decision` field (pass | fail) governs attestation gating.
 
-## Consequences
-- Deterministic reconstruction of requests is possible.
-- Attestation gates can block merges/releases on detectable drift.
+### 5. Cross-Echo & Checksum (unchanged)
+`model_fingerprint` and `drift_report` entries **MUST** be referenced in `SHA256SUMS.txt`.
 
-## Compliance
-- **MUST** include `model_fingerprint` in `workflow_frozen.json` and `approval.json`.
-- **MUST** include `prompt_serialization_hash`.
-- **SHOULD** produce a `drift_report.json` for repos declaring “Standard” or “Full” compliance.
+---
+
+## Rationale
+Tiering keeps evaluation proportional to intent:
+- 🟢 CI speed for routine commits.  
+- 🟡 Daily guardrails for ambient drift.  
+- 🔴 Deep verification for archival releases.
+
+This turns behavioral monitoring into a continuous signal rather than a one-time ritual, aligning AWO’s falsifiability principle with ongoing model mutability.
+
+---
+
+## Compliance Summary
+| Requirement | Level |
+|--------------|-------|
+| Fingerprint + prompt hash recorded | **MUST** |
+| At least Tier 1 goldens maintained | **MUST** |
+| Tier 2 suite executed weekly or on model change | **SHOULD** |
+| Tier 3 suite executed pre-release | **MUST** |
+| Drift decision integrated into attestation gate | **MUST** |
+
+---
 
 ## Security & Privacy
-- Never store secrets or raw sensitive payloads—store **hashes** and **redaction pointers**.
-- MF can include a `privacy_mode` flag to indicate routing through private endpoints.
+Goldens may contain sensitive prompts. If so, store only **hashes + redaction pointers** per `redaction_pointer.schema.json`.  
+Raw content may live in private mirrors with matching proof hashes.
+
+---
 
 ## Backwards Compatibility
-- Missing MF in legacy runs sets compliance to **Conditional**; future runs must comply.
+Older runs without goldens remain valid but are **Compliance = Conditional**.  
+Future AWO releases expect at least Tier 1 tests.
+
+---
 
 ## References
-- AWO §1.6 Neurotransparency; §6 Artifacts; §9 Attestation.
+- AWO §1.6 Neurotransparency  
+- AWO §6 Artifacts  
+- AWO §9 Attestation  
+- Schemas: `model_fingerprint.schema.json`, `drift_report.schema.json`, `redaction_pointer.schema.json`
+
+---
 
 ## Changelog
-- 2025-11-02: Initial acceptance.
+- **2025-11-03:** Added tiered behavioral canaries, clarified attestation gating.  
+- **2025-11-02:** Initial acceptance (v1.0).
