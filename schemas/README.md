@@ -1,29 +1,77 @@
+# Aurora Workflow Orchestration (AWO)
+## Schema Directory — v1.2.2  
+Maintainer: Waveframe Labs  
+Version: 1.2.2 (Constitutional Freeze)  
+Revision Date: 2025-11-04  
+License: CC BY 4.0  
+
 ---
-filetype: schema_suite
-version: 1.1.1
-updated: 2025-10
-maintainer: Waveframe Labs
-contact: swright@waveframelabs.org
+
+### Purpose
+This directory contains the **canonical schema definitions** governing all Aurora Workflow Orchestration (AWO) artifacts.  
+Schemas formalize the structure, metadata, and validation rules for reproducible AI-assisted research workflows.  
+
+These files define **what valid AWO artifacts look like** — not how they are executed.  
+Runtime enforcement and automated validation belong to **CRI-CORE** (forthcoming).
+
 ---
-# Schemas — Validation Contracts
 
-**Purpose**  
-JSON Schemas that enforce structure and traceability for AWO runs.
+### Scope
+The schemas herein cover static method-level artifacts:
+- Research claims and falsifiability manifests  
+- Provenance and lineage records  
+- Workflow logs and environment snapshots  
+- Neurotransparency references and evidence pointers  
 
-**Key files (typical):**
-- `run_manifest.schema.json` — lifecycle state, timestamps, steps list.
-- `provenance.schema.json` — model/tool records, artifacts, hashes.
-- `claim.schema.json` — falsifiable claims with tests and evidence.
-- `environment.schema.json` (optional) — runtime/environment snapshot format.
+These files are **normative** within AWO; all AWO-compliant repositories MUST conform to them unless explicitly superseded by later governance.
 
-**Usage**
-- Scripts validate run artifacts against these schemas during the pipeline.
-- Schemas are versioned; breaking changes should increment schema versions and be captured in ADRs.
+---
 
-**Conventions**
-- Draft: JSON Schema 2020-12.
-- Prefer explicit `required` fields and `additionalProperties: false`.
-- Document examples for quick adoption.
+### File Index
 
-**Contact**  
-Waveframe Labs — swright@waveframelabs.org
+| File | Description | Status | Notes |
+|------|--------------|---------|-------|
+| `claim.schema.json` | Structure for formal research claims and falsifiability criteria. | ✅ Active | Defines minimal claim format for AWO manifests. |
+| `environment.schema.json` | Defines environmental and dependency metadata for reproducibility. | ✅ Active | Must be included in every run folder. |
+| `neurotransparency.schema.json` | Governs attribution and traceability of reasoning steps (§1.6). | ✅ Active | Core to AWO’s epistemic integrity. |
+| `provenance.schema.json` | Specifies lineage and evidence relationships between artifacts. | ✅ Active | Mandatory for all runs (§6.4). |
+| `run_manifest.schema.json` | Canonical structure for falsifiability manifests. | ✅ Active | Used by all run records. |
+| `workflow_schema.json` | Defines event and log record format for AWO lifecycle phases. | ✅ Active | References ADR-0004 and ADR-0012. |
+| `redaction_pointer.schema.json` | Placeholder for selective provenance obfuscation (privacy). | ⚪ Reserved | Implementation deferred to CRI-CORE (ADR-0018 §Security). |
+
+---
+
+### Compliance
+All schema files are version-locked to **AWO v1.2.2** and SHOULD NOT be modified post-freeze.  
+Future schema extensions (e.g., for model drift or data redaction enforcement) will reside under CRI-CORE.  
+
+Repositories claiming AWO compliance MUST validate manifests, logs, and approvals against the active schemas in this directory prior to attestation.
+
+---
+
+### Governance References
+- **ADR-0002** — Falsifiability Manifest Standard  
+- **ADR-0003** — Audit and Attestation Requirements  
+- **ADR-0004** — Logging and Provenance  
+- **ADR-0012** — Human-in-the-Loop Validation  
+- **ADR-0015** — Cryptographic Signatures and Checksum Policy  
+- **ADR-0017** — Governance Continuity (Aurora Research Initiative)  
+- **ADR-0018** *(Reserved)* — Model Drift and Privacy Controls *(Deferred to CRI-CORE)*  
+
+---
+
+### License
+All schema files are distributed under the **Creative Commons Attribution 4.0 International License (CC BY 4.0)**.  
+Use, adaptation, and redistribution are permitted with proper attribution to:  
+**Waveframe Labs / Aurora Research Initiative**  
+Author: *Shawn C. Wright (ORCID: 0009-0006-6043-9295)*
+
+---
+
+**End of Document — /schemas/README.md (AWO v1.2.2)**
+
+---  
+
+<p align="center">
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
+</p>  
