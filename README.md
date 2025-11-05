@@ -174,18 +174,8 @@ Yes. Include the AWO concept DOI (10.5281/zenodo.17013612) in your Methods or re
 **AWO v1.2.1 (Documentation and Accessibility Update)** marks the finalization of the AWO methodology under Waveframe Labs governance.  
 Future updates appear only as errata or citation additions.
 
-**Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
-
+**Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)  
 </details>
-
----
-
-## Maintainer
-
-**Shawn C. Wright** — Independent Researcher, Waveframe Labs  
-- ORCID [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)  
-- Email s wright@waveframelabs.org  
-- GitHub [Waveframe-Labs](https://github.com/Waveframe-Labs)
 
 ---
 
