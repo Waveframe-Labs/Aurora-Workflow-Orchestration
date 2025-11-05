@@ -20,81 +20,72 @@ AWO is a reproducibility framework for AI-assisted research — turning every ru
 
 ## Overview
 
-**Aurora Workflow Orchestration (AWO)** defines a reproducible-research methodology for AI–human collaboration.  
-It converts reasoning, version control, and auditability into one governed workflow — making every research run **verifiable, citable, and falsifiable**.
+**Aurora Workflow Orchestration (AWO)** defines how AI-assisted research can be made reproducible and auditable.  
+It translates reasoning steps, decisions, and evidence into structured files that anyone can verify.
 
-AWO is the *methodology layer*; its successor, **CRI-CORE**, is the *execution layer*. Together they form a continuum:  
+AWO is the **methodology layer** — it governs how reproducibility works.  
+**CRI-CORE** is the **execution layer** — it automates that governance.  
+Together they form a single, evidence-based research system.
 
 ---
 
 ## What You’ll Find Here
 
 This repository contains the complete AWO governance layer:
+
 - **Whitepaper** — conceptual rationale (“why”)  
-- **Method Specification** — normative rules (“how”)  
+- **Method Specification** — enforceable rules (“how”)  
 - **Adoption Guide** — step-by-step usage (“apply”)  
-- **Compliance and Governance Records** — proof of adherence  
-- **Automated Workflows** — reproducibility and integrity checks
+- **Governance Records** — proof of adherence and integrity  
+- **Automated Workflows** — reproducibility and checksum validation  
 
 | Category | Description |
-|-----------|--------------|
-| **Core Specification** | The normative definition of AWO methodology — [`docs/AWO_Method_Spec_v1.2.1.md`](docs/AWO_Method_Spec_v1.2.1.md) |
-| **Governance Artifacts** | Compliance, attestation, and verification records (`GOVERNANCE_SUMMARY.md`, `ROLE_ATTESTATION.md`, `AWO_Compliance_Report.md`) |
-| **ADR Archive** | All major design decisions (`/decisions/ADR-0001` → `/ADR-0017`) |
-| **Schemas / Templates** | Machine-readable definitions of falsifiability manifests and attestations under `/schemas/` and `/templates/` |
-| **Runs** | Example reproducible runs under `/runs/` with frozen workflows and signed approvals |
-| **Automation** | GitHub Actions workflows for PDF generation, checksum integrity, and compliance validation |
-| **Governance Logs** | Audit and continuity records under `/logs/governance/` |
+|-----------|-------------|
+| **Whitepaper** | [AWO Whitepaper v1.2.1](docs/AWO_Whitepaper_v1.2.1.md) ([PDF](docs/AWO_Whitepaper_v1.2.1.pdf)) — Rationale and design philosophy |
+| **Method Spec** | [AWO Method Spec v1.2.1](docs/AWO_Method_Spec_v1.2.1.md) ([PDF](docs/AWO_Method_Spec_v1.2.1.pdf)) — Normative definition of compliance |
+| **Adoption Guide** | [AWO Adoption Guide](docs/AWO_Adoption_Guide.md) ([PDF](docs/AWO_Adoption_Guide.pdf)) — Practical onboarding |
+| **Governance Records** | [`GOVERNANCE_SUMMARY.md`](docs/GOVERNANCE_SUMMARY.md), [`ROLE_ATTESTATION.md`](docs/ROLE_ATTESTATION.md), [`AWO_Compliance_Report.md`](docs/AWO_Compliance_Report.md) |
+| **ADR Archive** | Sequential decision history (`decisions/ADR-0001 → ADR-0018`) |
+| **Schemas / Templates** | Definitions for falsifiability manifests and attestations (`/schemas/`, `/templates/`) |
+| **Runs** | Example reproducible runs with signed approvals (`/runs/`) |
 
-All content is cryptographically verified through [`SHA256SUMS.txt`](./SHA256SUMS.txt) and governed by ADR-0015–ADR-0018.
-
----  
-
-```
-+--------------------+
-|  Aurora (AWO)      |  ← Defines structure
-+--------------------+
-|  CRI-CORE Runtime  |  ← Executes and validates
-+--------------------+
-```
+All content is cryptographically verified through [`SHA256SUMS.txt`](./SHA256SUMS.txt)  
+and governed by **ADR-0015 → ADR-0018** under the Aurora Research Initiative.
 
 ---
 
 ## Why AWO Exists
 
-AI accelerates discovery faster than verification can follow.  
-AWO closes that gap by formalizing reproducibility as governance, not suggestion.
+AI now produces ideas faster than science can verify them.  
+AWO closes that gap by making reproducibility a **governance system**, not a guideline.
 
 **Core Principles**
 
-1. **Falsifiability First** – every claim must be disprovable.  
-2. **Human-in-the-Loop Rigor** – AI output is a hypothesis until verified.  
-3. **Immutable Provenance** – every run is signed, hashed, and auditable.  
+1. **Falsifiability First** – every claim must define how it can fail.  
+2. **Human-in-the-Loop Rigor** – AI output remains a hypothesis until verified.  
+3. **Immutable Provenance** – every artifact is signed, hashed, and auditable.  
 4. **Transparent Governance** – reproducibility replaces reputation.
 
-AWO treats the *scientific method* as executable code.
+AWO turns the scientific method into a living protocol for evidence.
 
 ---
 
 ## Quick Start
 
-1. **Clone this repository**  
+You don’t need special tools or coding background to use AWO.
+
+1. **Clone or fork the repository**  
    ```bash
    git clone https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration.git
    cd Aurora-Workflow-Orchestration
    ```
 
-2. **Run a minimal test**  
-   ```bash
-   python cli.py --init --demo
-   ```
+2. **Open the Adoption Guide**  
+   → [`docs/AWO_Adoption_Guide.md`](docs/AWO_Adoption_Guide.md)  
+   It walks you through creating a falsifiability manifest and running your first attested experiment.
 
-   This creates a signed, reproducible run under `/runs/`, including frozen workflows, reports, and approval records.
-
-3. **Inspect provenance**  
-   Each output is cryptographically signed and archived for audit.
-
-For a complete walkthrough, see the [Adoption Guide](docs/AWO_Adoption_Guide.md)  
+3. **View a verified run**  
+   Browse `/runs/` to see how manifests, approvals, and logs form a reproducible record.
 
 ---
 
@@ -102,10 +93,10 @@ For a complete walkthrough, see the [Adoption Guide](docs/AWO_Adoption_Guide.md)
 
 | Purpose | Document | Description |
 |----------|-----------|-------------|
-| Vision & rationale | [AWO Whitepaper v1.1](docs/AWO_Whitepaper_v1.1.md) | Philosophical and historical foundation for AWO. |
-| Formal rules | [AWO Method Spec v1.2](docs/AWO_Method_Spec_v1.2.md) | Normative specification defining AWO compliance. |
-| Adoption & onboarding | [AWO Adoption Guide](docs/AWO_Adoption_Guide.md) | Step-by-step handbook for individuals and teams. |
-| Governance & decisions | [ADRs 0001-0018](decisions/) | Formal design records for all major changes. |
+| Vision & Rationale | [Whitepaper v1.2.1](docs/AWO_Whitepaper_v1.2.1.md) ([PDF](docs/AWO_Whitepaper_v1.2.1.pdf)) | Conceptual and historical background |
+| Formal Rules | [Method Spec v1.2.1](docs/AWO_Method_Spec_v1.2.1.md) ([PDF](docs/AWO_Method_Spec_v1.2.1.pdf)) | Normative specification for AWO compliance |
+| Adoption & Onboarding | [Adoption Guide](docs/AWO_Adoption_Guide.md) ([PDF](docs/AWO_Adoption_Guide.pdf)) | Practical steps for individuals and teams |
+| Governance & Decisions | [ADRs 0001-0018](decisions/) | Formal design records and reasoning lineage |
 
 ---
 
@@ -113,85 +104,56 @@ For a complete walkthrough, see the [Adoption Guide](docs/AWO_Adoption_Guide.md)
 
 | Tier | Audience | What It Includes |
 |------|-----------|------------------|
-| **Minimum** | Individual researchers | Manual logs, falsifiability manifests, and local audit records. |
-| **Standard** | Small teams | Integrated CI pipelines and attestation workflows. |
-| **Full** | Institutions / public research | Automated reproducibility via CRI-CORE runtime. |
+| **Minimum** | Individuals | Manual logs + falsifiability manifests |
+| **Standard** | Small teams | CI pipelines + attestation workflows |
+| **Full** | Institutions / public research | Automated reproducibility via CRI-CORE |
 
-For a preconfigured starting point, see the [AWO Template Repository](https://github.com/Waveframe-Labs/AWO-Template).
+For a ready-to-use template, see the  
+[**AWO Template Repository**](https://github.com/Waveframe-Labs/AWO-Template).
 
 ---
 
 ## Example Projects Using AWO
 
-| Project | Domain | AWO Usage | Notes |
-|----------|---------|------------|--------|
-| [Waveframe v4.0](https://github.com/Wright-Shawn/Waveframe-v4.0-XR) | Cosmology | Manual orchestration | Follows AWO v1.2 structure with falsifiability logs, ADRs, and reproducible documentation. |
-| [Societal Simulator (Black Mirror Edition)](https://github.com/Wright-Shawn/Societal-Progress-Simulator) | Systems modeling | Manual orchestration | Demonstrates AWO principles without automated CI; all provenance, audit, and decision artifacts managed manually per AWO v1.2. |
-| [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE) | Research runtime | Automated orchestration | Demonstrates CI/CD enforcement, schema validation, and provenance automation. |
+| Project | Domain | Mode of Use |
+|----------|---------|-------------|
+| [Waveframe v4.0](https://github.com/Wright-Shawn/Waveframe-v4.0-XR) | Cosmology | Manual orchestration with falsifiability logs and ADRs |
+| [Societal Simulator (Black Mirror Edition)](https://github.com/Wright-Shawn/Societal-Progress-Simulator) | Systems modeling | Manual orchestration; demonstrates reproducibility without CI |
+| [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE) | Research runtime | Automated orchestration, schema validation, and provenance automation |
 
-These are manual orchestration examples — built before CRI-CORE was available.  
-They show how AWO principles work without automated CI.  
-All provenance, audit, and decision artifacts were managed by hand and logged per AWO v1.2.
-
-Full runtime automation is demonstrated in the **CRI-CORE** repository and upcoming template kits.
+These examples show AWO in both manual and automated modes.  
+Full runtime automation is implemented in **CRI-CORE**.
 
 ---
 
 ## Common Questions
 
-**Is AWO useful if I work alone?**  
-Yes. AWO supports solo workflows with manual logs and falsifiability manifests. It scales up to teams, but scales down just as well.
+<details>
+<summary><strong>Is AWO useful if I work alone?</strong></summary>
+Yes. AWO scales down to a single researcher using manual manifests and logs, and scales up to teams or institutions.
+</details>
 
-**Do I need CRI-CORE to use AWO?**  
-No. AWO is fully usable without it. CRI-CORE simply automates enforcement.
+<details>
+<summary><strong>Do I need CRI-CORE to use AWO?</strong></summary>
+No. CRI-CORE automates enforcement, but AWO is fully functional on its own.
+</details>
 
-**Does AWO replace peer review?**  
-No. It strengthens it — by making each claim, revision, and artifact traceable before publication.
+<details>
+<summary><strong>Does AWO replace peer review?</strong></summary>
+No. It strengthens it — by ensuring every claim and artifact is traceable before publication.
+</details>
 
-**Is AWO a software package?**  
-Partially. The included code demonstrates the method, but AWO itself is a procedural governance system.
-
-**Can I submit AWO-based research to journals?**  
-Yes. AWO-compliant projects can accompany conventional papers, citing this repository’s DOI as the reproducibility reference.
-
-**Where should I publish AWO-based results?**  
-Include the concept DOI (10.5281/zenodo.17013612) in your reproducibility statement or Methods section.
-
----
-
-## Repository Layout
-
-```
-/docs/       → Whitepaper, Method Spec, Adoption Guide, and handoff records  
-/decisions/  → Architecture Decision Records (ADR-0001–0017)  
-/logs/       → Workflow logs and provenance entries  
-/figures/    → Diagrams and lifecycle visuals  
-/runs/       → Attested, immutable research runs  
-/core/       → Core runtime scripts (non-CRI implementation)  
-```
-
-"If it can’t be audited, it doesn’t count." — Waveframe Labs
-
----
-
-## Successor Project
-
-### CRI-CORE — Continuous Research Integration
-
-Implements the AWO method as runtime governance:
-- Provenance verification  
-- Schema validation and falsifiability gates  
-- Continuous research integration automation  
-- Cryptographic audit trails  
-
-[View CRI-CORE Repository](https://github.com/Waveframe-Labs/CRI-CORE)
+<details>
+<summary><strong>Can I publish AWO-based research?</strong></summary>
+Yes. Include the AWO concept DOI (10.5281/zenodo.17013612) in your Methods or reproducibility statement.
+</details>
 
 ---
 
 ## Version Boundary
 
 **AWO v1.2.1 (Documentation and Accessibility Update)** marks the finalization of the AWO methodology under Waveframe Labs governance.  
-Future changes occur only as errata or citation updates.
+Future updates will appear only as errata or citation additions.
 
 **Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
 
@@ -206,17 +168,17 @@ Future changes occur only as errata or citation updates.
 
 ---
 
----
-
 ## Citation
 
-If you reference, replicate, or build upon the AWO method, please cite using the **concept DOI**.
+If you reference or build upon AWO, please cite using the **concept DOI**.
 
 **APA**
+
 > Wright, S. C. (2025). *Aurora Workflow Orchestration (AWO): A formal framework for reproducible AI-assisted research.*  
 > Waveframe Labs / Aurora Research Initiative. https://doi.org/10.5281/zenodo.17013612
 
 **BibTeX**
+
 ```bibtex
 @software{wright_aurora_workflow_orchestration_2025,
   author       = {Wright, Shawn C.},
@@ -228,7 +190,8 @@ If you reference, replicate, or build upon the AWO method, please cite using the
   url          = {https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration},
   doi          = {10.5281/zenodo.17013612}
 }
-```  
+```
+
 ---
 
 ## Licensing
@@ -240,43 +203,40 @@ If you reference, replicate, or build upon the AWO method, please cite using the
 
 ## Repository Status
 
-This repository is an archival reference artifact — stable, verifiable, and citable.  
-All enforcement and runtime development continues in **CRI-CORE**, the operational extension of AWO.  
+This repository is an **archival reference artifact** — stable, verifiable, and citable.  
+All new runtime development continues in **CRI-CORE**, which automates AWO’s governance logic.
 
----  
+---
 
 ## Integrity and Verification
 
-This repository maintains a cryptographic integrity registry (`SHA256SUMS.txt`) at the root level.  
-The registry is automatically rebuilt and committed by the **Build root SHA256SUMS** workflow.
+This repository maintains a cryptographic integrity registry (`SHA256SUMS.txt`) at the root.  
+It is automatically rebuilt and committed by the **Build root SHA256SUMS** workflow.
 
 [![Integrity Registry](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha256sums.yml/badge.svg)](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration/actions/workflows/root-sha256sums.yml)
 
-**Scope:**  
-- All primary specification, whitepaper, and adoption guide files under `/docs/`.  
-- All Architecture Decision Records under `/decisions/`.  
-- Core compliance, license, and governance files at repository root.  
-- All current (non-legacy) run artifacts under `/runs/`.
-
-**Exclusions:**  
-- `/runs_legacy/` (archived data)  
-- Workflow files and `.git` internals
+**Scope**  
+- All core documents under `/docs/` (whitepaper, spec, guide)  
+- All ADRs under `/decisions/`  
+- Compliance and governance files at root  
+- Current attested runs under `/runs/`
 
 To verify locally:
 
 ```bash
 sha256sum --check SHA256SUMS.txt
-```  
+```
+
+---
 
 ## Common Misinterpretations
 
 AWO isn’t a belief system or manifesto.  
-It’s a formal structure for making AI-assisted research **provably reproducible**.  
-If it seems strict, that’s by design — rigor is the whole point.
-   
+It’s a **formal structure** for making AI-assisted research provably reproducible.  
+If it feels strict, that’s intentional — rigor is the point.
+
 ---
 
 <p align="center">
   <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
-</p>  
-
+</p>
