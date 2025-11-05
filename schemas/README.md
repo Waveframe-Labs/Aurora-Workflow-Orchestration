@@ -1,7 +1,7 @@
 # Aurora Workflow Orchestration (AWO)
 ## Schema Directory — v1.2.2  
 Maintainer: Waveframe Labs  
-Version: 1.2.2 (Constitutional Freeze)  
+Version: 1.2.2  
 Revision Date: 2025-11-04  
 License: CC BY 4.0  
 
@@ -36,8 +36,7 @@ These files are **normative** within AWO; all AWO-compliant repositories MUST co
 | `neurotransparency.schema.json` | Governs attribution and traceability of reasoning steps (§1.6). | ✅ Active | Core to AWO’s epistemic integrity. |
 | `provenance.schema.json` | Specifies lineage and evidence relationships between artifacts. | ✅ Active | Mandatory for all runs (§6.4). |
 | `run_manifest.schema.json` | Canonical structure for falsifiability manifests. | ✅ Active | Used by all run records. |
-| `workflow_schema.json` | Defines event and log record format for AWO lifecycle phases. | ✅ Active | References ADR-0004 and ADR-0012. |
-| `redaction_pointer.schema.json` | Placeholder for selective provenance obfuscation (privacy). | ⚪ Reserved | Implementation deferred to CRI-CORE (ADR-0018 §Security). |
+| `workflow_schema.json` | Defines event and log record format for AWO lifecycle phases. | ✅ Active | References ADR-0004 and ADR-0012. |  
 
 ---
 
@@ -55,8 +54,7 @@ Repositories claiming AWO compliance MUST validate manifests, logs, and approval
 - **ADR-0004** — Logging and Provenance  
 - **ADR-0012** — Human-in-the-Loop Validation  
 - **ADR-0015** — Cryptographic Signatures and Checksum Policy  
-- **ADR-0017** — Governance Continuity (Aurora Research Initiative)  
-- **ADR-0018** *(Reserved)* — Model Drift and Privacy Controls *(Deferred to CRI-CORE)*  
+- **ADR-0017** — Governance Continuity (Aurora Research Initiative)     
 
 ---
 
