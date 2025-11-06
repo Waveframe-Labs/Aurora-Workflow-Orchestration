@@ -129,8 +129,8 @@ For a preconfigured starting point, see the
 
 | Project | Domain | Mode of Use |
 |----------|---------|-------------|
-| [Waveframe v4.0](https://github.com/Wright-Shawn/Waveframe-v4.0-XR) | Cosmology | Manual orchestration with falsifiability logs and ADRs |
-| [Societal Simulator](https://github.com/Wright-Shawn/Societal-Progress-Simulator) | Systems modeling | Demonstrates reproducibility without automation |
+| [Waveframe v4.0](https://github.com/Waveframe-Labs/Waveframe-v4.0) | Cosmology | Manual orchestration with falsifiability logs and ADRs |
+| [Societal Simulator](https://github.com/Waveframe-Labs/Societal-Progress-Simulator) | Systems modeling | Demonstrates reproducibility without automation |
 | [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE) | Research runtime | Automated orchestration and provenance enforcement |
 
 ---
