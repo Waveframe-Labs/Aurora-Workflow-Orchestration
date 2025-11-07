@@ -11,7 +11,7 @@ jobs:
   build-pdfs:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # allow git-auto-commit to push
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -37,7 +37,7 @@ jobs:
             base=$(basename "$file" .md)
             echo "Converting $file → docs/pdf/${base}.pdf"
             pandoc "$file" \
-              --from markdown+yaml_metadata_block+smart+lists+table_captions+fenced_code_blocks \
+              --from markdown+yaml_metadata_block+smart+table_captions+fenced_code_blocks \
               --pdf-engine=xelatex \
               --standalone \
               --metadata title="$base" \
