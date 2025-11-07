@@ -1,0 +1,41 @@
+# .github/workflows/md-to-pdf.yml
+name: Convert Markdown Docs to PDF
+
+on:
+  push:
+    paths:
+      - 'docs/**/*.md'
+  workflow_dispatch:
+
+jobs:
+  build-pdfs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive texlive-xetex
+
+      - name: Create output directory
+        run: mkdir -p docs/pdf
+
+      - name: Convert all Markdown files to PDF
+        run: |
+          for file in docs/*.md; do
+            [ -f "$file" ] || continue
+            base=$(basename "$file" .md)
+            pandoc "$file" \
+              --pdf-engine=xelatex \
+              --standalone \
+              -o "docs/pdf/${base}.pdf"
+          done
+
+      - name: Commit generated PDFs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-generate PDFs from Markdown"
+          file_pattern: docs/pdf/*.pdf
