@@ -7,6 +7,12 @@ license: CC BY 4.0 (text), Apache 2.0 (code)
 doi: 10.5281/zenodo.TBD
 date: 2025-10-20
 ---
+---
+status: archived
+superseded_by: ../../docs/AWO_Whitepaper_v1.2.1.md
+archived_on: 2025-11-07
+rationale: superseded by v1.2.1 with expanded rationale and governance updates
+---
 
 # Aurora Workflow Orchestration (AWO): Framework for Reproducible AI–Human Collaboration
 
