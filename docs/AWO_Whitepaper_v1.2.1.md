@@ -1188,11 +1188,15 @@ ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
 }
 ```
 
-## Normative Reference: *Aurora Workflow Orchestration (AWO)-Method Specification v1.2.1 (Waveframe Labs, 2025)*  
+---
 
-**End of Whitepaper -- Aurora Workflow Orchestration (AWO) v1.2.1
----  
+**Normative Reference:**  
+Aurora Workflow Orchestration (AWO) — Method Specification v1.2.1 (Waveframe Labs, 2025)
+
+**End of Whitepaper — Aurora Workflow Orchestration (AWO) v1.2.1**
 
 <p align="center">
-  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub>
-</p>  
+  <sub>© 2025 Waveframe Labs · Independent Open-Science Research Entity</sub><br>
+  <sub>Maintained under the Aurora Research Initiative (ARI)</sub><br>
+  <sub>ORCID: <a href="https://orcid.org/0009-0006-6043-9295">0009-0006-6043-9295</a></sub>
+</p>
