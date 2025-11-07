@@ -9,35 +9,49 @@ on:
 
 jobs:
   build-pdfs:
-    runs-on: ubuntu-latest  
-    permissions:  
-      contents: write  
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # allow git-auto-commit to push
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Pandoc and LaTeX
+      - name: Install Pandoc and full LaTeX dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive texlive-xetex
+          sudo apt-get install -y pandoc \
+            texlive \
+            texlive-xetex \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended
 
       - name: Create output directory
         run: mkdir -p docs/pdf
 
-      - name: Convert all Markdown files to PDF
+      - name: Convert all Markdown files (recursive) to PDF
         run: |
-          for file in docs/*.md; do
+          for file in $(find docs -name '*.md'); do
             [ -f "$file" ] || continue
             base=$(basename "$file" .md)
+            echo "Converting $file → docs/pdf/${base}.pdf"
             pandoc "$file" \
+              --from markdown+yaml_metadata_block+smart+lists+table_captions+fenced_code_blocks \
               --pdf-engine=xelatex \
               --standalone \
+              --metadata title="$base" \
+              -V geometry:margin=1in \
+              -V fontsize=11pt \
+              -V colorlinks=true \
+              -V urlcolor=blue \
+              -V linkcolor=blue \
+              -V toccolor=gray \
               -o "docs/pdf/${base}.pdf"
           done
 
       - name: Commit generated PDFs
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto-generate PDFs from Markdown"
+          commit_message: "Auto-generate full multi-page PDFs from Markdown"
           file_pattern: docs/pdf/*.pdf
