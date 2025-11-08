@@ -1,4 +1,4 @@
-name: AWO Test Run (Manual Approve to Commit)
+name: AWO Run (Manual Approve to Commit)
 
 on:
   workflow_dispatch:
@@ -7,6 +7,9 @@ on:
         description: "Path to workflow JSON"
         required: true
         default: "workflows/multimodel.json"
+  push:
+    branches:
+      - governance-fix-test
 
 permissions:
   contents: write
@@ -26,7 +29,7 @@ jobs:
       RUNNER_ID: ${{ github.actor }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Display run context
@@ -39,7 +42,6 @@ jobs:
       # -------------------------------------------------------
       - name: Verify attestation independence
         id: verify_gate
-        shell: bash
         run: |
           mkdir -p governance/logs
           TS="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
@@ -49,15 +51,14 @@ jobs:
             STATUS="FAILED_SELF_APPROVAL"
             RESULT="Run halted: same identity for runner and approver."
 
-            printf '%s\n' \
-            "{" \
-            "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," \
-            "  \"runner\": \"$RUNNER_ID\"," \
-            "  \"approver\": \"$APPROVER_ID\"," \
-            "  \"status\": \"$STATUS\"," \
-            "  \"timestamp\": \"$TS\"," \
-            "  \"message\": \"$RESULT\"" \
-            "}" > governance/logs/approval.json
+            echo "{" > governance/logs/approval.json
+            echo "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," >> governance/logs/approval.json
+            echo "  \"runner\": \"$RUNNER_ID\"," >> governance/logs/approval.json
+            echo "  \"approver\": \"$APPROVER_ID\"," >> governance/logs/approval.json
+            echo "  \"status\": \"$STATUS\"," >> governance/logs/approval.json
+            echo "  \"timestamp\": \"$TS\"," >> governance/logs/approval.json
+            echo "  \"message\": \"$RESULT\"" >> governance/logs/approval.json
+            echo "}" >> governance/logs/approval.json
 
             echo "approved_by=$RUNNER_ID" >> "$GITHUB_OUTPUT"
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
@@ -67,15 +68,14 @@ jobs:
             STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
             RESULT="Runner and approver identities distinct."
 
-            printf '%s\n' \
-            "{" \
-            "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," \
-            "  \"runner\": \"$RUNNER_ID\"," \
-            "  \"approver\": \"$APPROVER_ID\"," \
-            "  \"status\": \"$STATUS\"," \
-            "  \"timestamp\": \"$TS\"," \
-            "  \"message\": \"$RESULT\"" \
-            "}" > governance/logs/approval.json
+            echo "{" > governance/logs/approval.json
+            echo "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," >> governance/logs/approval.json
+            echo "  \"runner\": \"$RUNNER_ID\"," >> governance/logs/approval.json
+            echo "  \"approver\": \"$APPROVER_ID\"," >> governance/logs/approval.json
+            echo "  \"status\": \"$STATUS\"," >> governance/logs/approval.json
+            echo "  \"timestamp\": \"$TS\"," >> governance/logs/approval.json
+            echo "  \"message\": \"$RESULT\"" >> governance/logs/approval.json
+            echo "}" >> governance/logs/approval.json
 
             echo "approved_by=$APPROVER_ID" >> "$GITHUB_OUTPUT"
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
@@ -91,7 +91,6 @@ jobs:
       # -------------------------------------------------------
       # Core Execution Steps
       # -------------------------------------------------------
-
       - name: Setup Python
         if: ${{ success() }}
         uses: actions/setup-python@v5
@@ -154,8 +153,7 @@ jobs:
 
       - name: Create payload
         if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
-        run: |
-          tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
+        run: tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
         if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
@@ -165,55 +163,22 @@ jobs:
           path: awo-run-${{ env.RUN_ID }}.tar.gz
           retention-days: 14
 
-  # -------------------------------------------------------
-  # Approval & Finalization Gates
-  # -------------------------------------------------------
-
   scope_gate:
     needs: run_awo
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
       name: awo-scope
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Await scope approval
         run: echo "Scope Gate — approve this environment to continue."
 
-  render_summary:
-    needs: [run_awo, scope_gate]
-    runs-on: ubuntu-latest
-    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
-    steps:
-      - name: Install jq CLI
-        run: sudo apt-get update && sudo apt-get install -y jq
-      - name: Download payload
-        uses: actions/download-artifact@v4
-        with:
-          name: awo-run-${{ needs.run_awo.outputs.run_id }}
-          path: artifacts
-      - name: Extract run
-        id: locate
-        run: |
-          mkdir -p extracted && tar -xzf "artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz" -C extracted
-          RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
-          echo "rd=$RD" >> "$GITHUB_OUTPUT"
-          find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
-      - name: Show report excerpt
-        run: |
-          RD="${{ steps.locate.outputs.rd }}"
-          if [ -f "$RD/report.md" ]; then
-            echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
-            head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
-          fi
-
   human_approval:
-    needs: [run_awo, scope_gate, render_summary]
+    needs: [run_awo, scope_gate]
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
       name: awo-audit
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Await merge approval
         run: |
@@ -228,7 +193,7 @@ jobs:
     env:
       RUN_ID: ${{ needs.run_awo.outputs.run_id }}
     steps:
-      - name: Checkout (with credentials)
+      - name: Checkout with credentials
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -250,7 +215,7 @@ jobs:
           echo "{\"run_id\":\"${RUN_ID}\",\"approved_by\":\"${{ github.actor }}\",\"approved_at\":\"$(date -u +%FT%TZ)\",\"workflow_run_url\":\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" > "runs/${RUN_ID}/approval.json"
       - name: Commit run to branch
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "runs/${RUN_ID}"
           if git diff --staged --quiet; then
