@@ -31,7 +31,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  
+      
+      - name: Display run context
+        env:
+          RUNNER_ID: ${{ github.actor }}
+          APPROVER_ID: Wright-Shawn
+        run: |
+          echo "Runner: $RUNNER_ID"
+          echo "Expected Approver: $APPROVER_ID"
+
 
       - name: Display run context
         run: |
