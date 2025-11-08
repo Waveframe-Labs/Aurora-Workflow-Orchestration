@@ -6,7 +6,11 @@ on:
       workflow_file:
         description: "Path to workflow JSON"
         required: true
-        default: "workflows/multimodel.json"
+        default: "workflows/multimodel.json"  
+
+  push:  
+    branches:  
+      - governance-fix-test  
 
 permissions:
   contents: write
