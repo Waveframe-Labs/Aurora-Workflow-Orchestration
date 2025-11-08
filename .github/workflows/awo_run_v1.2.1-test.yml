@@ -41,7 +41,7 @@ jobs:
       # -------------------------------------------------------
       # 🔒 Attestation Independence Enforcement (new section)
       # -------------------------------------------------------
-      - name: Verify attestation independence
+           - name: Verify attestation independence
         id: verify_gate
         run: |
           mkdir -p governance/logs
@@ -53,16 +53,16 @@ jobs:
             RESULT="Run halted: same identity for runner and approver."
             echo "$RESULT"
 
-            cat <<EOF > governance/logs/approval.json
-            {
-              "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
-              "runner": "$RUNNER_ID",
-              "approver": "$APPROVER_ID",
-              "status": "$STATUS",
-              "timestamp": "$TS",
-              "message": "$RESULT"
-            }
-            EOF
+            cat <<'EOF' > governance/logs/approval.json
+{
+  "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
+  "runner": "'"$RUNNER_ID"'",
+  "approver": "'"$APPROVER_ID"'",
+  "status": "'"$STATUS"'",
+  "timestamp": "'"$TS"'",
+  "message": "'"$RESULT"'"
+}
+EOF
 
             echo "approved_by=$RUNNER_ID" >> "$GITHUB_OUTPUT"
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
@@ -71,17 +71,18 @@ jobs:
             echo "✅ Attestation independence verified."
             STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
             RESULT="Runner and approver identities distinct."
+            echo "$RESULT"
 
-            cat <<EOF > governance/logs/approval.json
-            {
-              "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
-              "runner": "$RUNNER_ID",
-              "approver": "$APPROVER_ID",
-              "status": "$STATUS",
-              "timestamp": "$TS",
-              "message": "$RESULT"
-            }
-            EOF
+            cat <<'EOF' > governance/logs/approval.json
+{
+  "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
+  "runner": "'"$RUNNER_ID"'",
+  "approver": "'"$APPROVER_ID"'",
+  "status": "'"$STATUS"'",
+  "timestamp": "'"$TS"'",
+  "message": "'"$RESULT"'"
+}
+EOF
 
             echo "approved_by=$APPROVER_ID" >> "$GITHUB_OUTPUT"
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
