@@ -90,7 +90,7 @@ Governance operations remain subject to **Aurora Research Initiative (ARI)** ove
 
 ---
 
-### Corrective Actions Log
+### 6. Corrective Actions Log
 - [AWO-CAP-0001 — Attestation Role Separation](governance/corrective_actions/AWO-CAP-0001.md)
 
 **End of Governance Summary — Aurora Workflow Orchestration (AWO) v1.2.2**
