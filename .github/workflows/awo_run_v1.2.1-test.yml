@@ -6,15 +6,11 @@ on:
       workflow_file:
         description: "Path to workflow JSON"
         required: true
-        default: "workflows/multimodel.json"  
-
-  push:  
-    branches:  
-      - governance-fix-test  
+        default: "workflows/multimodel.json"
 
 permissions:
   contents: write
-  id-token: write   # Required for cosign keyless signing via GitHub OIDC
+  id-token: write
 
 concurrency:
   group: awo-run-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
@@ -31,16 +27,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4  
-      
-      - name: Display run context
-        env:
-          RUNNER_ID: ${{ github.actor }}
-          APPROVER_ID: Wright-Shawn
-        run: |
-          echo "Runner: $RUNNER_ID"
-          echo "Expected Approver: $APPROVER_ID"
-
+        uses: actions/checkout@v4
 
       - name: Display run context
         run: |
@@ -48,30 +35,29 @@ jobs:
           echo "Expected Approver: $APPROVER_ID"
 
       # -------------------------------------------------------
-      # 🔒 Attestation Independence Enforcement (new section)
+      # 🔒 Attestation Independence Enforcement
       # -------------------------------------------------------
-           - name: Verify attestation independence
+      - name: Verify attestation independence
         id: verify_gate
+        shell: bash
         run: |
           mkdir -p governance/logs
-          TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          TS="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
           if [ "$RUNNER_ID" = "$APPROVER_ID" ]; then
             echo "❌ Attestation independence check failed."
             STATUS="FAILED_SELF_APPROVAL"
             RESULT="Run halted: same identity for runner and approver."
-            echo "$RESULT"
 
-            cat <<'EOF' > governance/logs/approval.json
-{
-  "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
-  "runner": "'"$RUNNER_ID"'",
-  "approver": "'"$APPROVER_ID"'",
-  "status": "'"$STATUS"'",
-  "timestamp": "'"$TS"'",
-  "message": "'"$RESULT"'"
-}
-EOF
+            printf '%s\n' \
+            "{" \
+            "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," \
+            "  \"runner\": \"$RUNNER_ID\"," \
+            "  \"approver\": \"$APPROVER_ID\"," \
+            "  \"status\": \"$STATUS\"," \
+            "  \"timestamp\": \"$TS\"," \
+            "  \"message\": \"$RESULT\"" \
+            "}" > governance/logs/approval.json
 
             echo "approved_by=$RUNNER_ID" >> "$GITHUB_OUTPUT"
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
@@ -80,18 +66,16 @@ EOF
             echo "✅ Attestation independence verified."
             STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
             RESULT="Runner and approver identities distinct."
-            echo "$RESULT"
 
-            cat <<'EOF' > governance/logs/approval.json
-{
-  "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
-  "runner": "'"$RUNNER_ID"'",
-  "approver": "'"$APPROVER_ID"'",
-  "status": "'"$STATUS"'",
-  "timestamp": "'"$TS"'",
-  "message": "'"$RESULT"'"
-}
-EOF
+            printf '%s\n' \
+            "{" \
+            "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," \
+            "  \"runner\": \"$RUNNER_ID\"," \
+            "  \"approver\": \"$APPROVER_ID\"," \
+            "  \"status\": \"$STATUS\"," \
+            "  \"timestamp\": \"$TS\"," \
+            "  \"message\": \"$RESULT\"" \
+            "}" > governance/logs/approval.json
 
             echo "approved_by=$APPROVER_ID" >> "$GITHUB_OUTPUT"
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
@@ -105,24 +89,25 @@ EOF
           file_pattern: governance/logs/approval.json
 
       # -------------------------------------------------------
-      # Continue only if independence verified
+      # Core Execution Steps
       # -------------------------------------------------------
+
       - name: Setup Python
         if: ${{ success() }}
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install deps
+      - name: Install dependencies
         if: ${{ success() }}
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
+          [ -f requirements.txt ] && pip install -r requirements.txt || true
+          [ -f scripts/requirements.txt ] && pip install -r scripts/requirements.txt || true
           pip install jsonschema cyclonedx-bom || true
 
-      - name: Resolve & validate workflow file
+      - name: Resolve and validate workflow file
         if: ${{ success() }}
         id: wf
         run: |
@@ -143,40 +128,31 @@ EOF
           python scripts/awo_run.py "${{ steps.wf.outputs.wf }}"
           echo "runner_exit_code=$?" >> "$GITHUB_OUTPUT"
 
-      - name: Capture Run-ID (breadcrumb)
+      - name: Capture Run-ID
         if: ${{ success() }}
         id: capture
         run: |
           set -euo pipefail
           if [ ! -f runs/LAST_RUN ]; then
-            echo "::warning::runs/LAST_RUN missing"
             echo "run_id=none" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           RID="$(tr -d '\r\n' < runs/LAST_RUN)"
-          case "$RID" in
-            (*[!A-Za-z0-9._-]*|'')
-              echo "Invalid RID: '$RID'"; echo "::error::Invalid RUN_ID"
-              echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0;;
-          esac
-          [ -d "runs/$RID" ] || { echo "::warning::runs/$RID not found"; echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0; }
+          [ -d "runs/$RID" ] || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0; }
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
 
-      - name: Hash run folder & emit SBOM
+      - name: Hash run folder and emit SBOM
         if: ${{ steps.capture.outputs.run_id != 'none' }}
         run: |
           set -euo pipefail
           RD="runs/${RUN_ID}"
           TMP="$(mktemp)"
-          (
-            cd "$RD"
-            find . -type f ! -name 'SHA256SUMS.txt' -print0 | sort -z | xargs -0 sha256sum
-          ) > "$TMP"
+          (cd "$RD" && find . -type f ! -name 'SHA256SUMS.txt' -print0 | sort -z | xargs -0 sha256sum) > "$TMP"
           mv "$TMP" "$RD/SHA256SUMS.txt"
           cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
 
-      - name: Create payload (always)
+      - name: Create payload
         if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
         run: |
           tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
@@ -189,9 +165,9 @@ EOF
           path: awo-run-${{ env.RUN_ID }}.tar.gz
           retention-days: 14
 
-  # ------------------------------------------------------------------
-  # Approval & Finalization Gates (unchanged except identity enforcement)
-  # ------------------------------------------------------------------
+  # -------------------------------------------------------
+  # Approval & Finalization Gates
+  # -------------------------------------------------------
 
   scope_gate:
     needs: run_awo
@@ -252,7 +228,6 @@ EOF
     env:
       RUN_ID: ${{ needs.run_awo.outputs.run_id }}
     steps:
-      # (finalization steps identical to your previous version)
       - name: Checkout (with credentials)
         uses: actions/checkout@v4
         with:
@@ -272,7 +247,15 @@ EOF
       - name: Write approval record
         run: |
           mkdir -p "runs/${RUN_ID}"
-          cat > "runs/${RUN_ID}/approval.json" <<EOF
-          {"run_id":"${RUN_ID}","approved_by":"${{ github.actor }}","approved_at":"$(date -u +%FT%TZ)","workflow_run_url":"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-          EOF
-      # (rest of your attestation, signing, commit, and summary logic unchanged)
+          echo "{\"run_id\":\"${RUN_ID}\",\"approved_by\":\"${{ github.actor }}\",\"approved_at\":\"$(date -u +%FT%TZ)\",\"workflow_run_url\":\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" > "runs/${RUN_ID}/approval.json"
+      - name: Commit run to branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "runs/${RUN_ID}"
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
+          git push
