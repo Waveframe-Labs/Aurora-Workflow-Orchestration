@@ -4,7 +4,8 @@ version: 1.0
 updated: 2025-11-08
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
-authority: Aurora Research Initiative (ARI)
+authority: Aurora Research Initiative (ARI)  
+linked_run: run_2025-11-08T16-37-00Z  
 ---
 
 # Corrective Action Record — Attestation Role Separation Failure
