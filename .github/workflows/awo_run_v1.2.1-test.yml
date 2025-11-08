@@ -1,4 +1,4 @@
-name: AWO Run (Manual Approve to Commit)
+name: AWO Test Run (Manual Approve to Commit)
 
 on:
   workflow_dispatch:
@@ -81,12 +81,14 @@ jobs:
             echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit independence log (if pass)
-        if: ${{ success() }}
+            # Commit the independence result regardless of pass/fail
+      - name: Commit independence log (always)
+        if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "governance: log independence verification for run ${{ github.run_id }}"
+          commit_message: "governance: record attestation independence result for run ${{ github.run_id }}"
           file_pattern: governance/logs/approval.json
+
 
       # -------------------------------------------------------
       # Core Execution Steps
