@@ -1,8 +1,8 @@
 {
-  "run_id": "PRE_EXEC_19251528246",
+  "run_id": "PRE_EXEC_19251891576",
   "runner": "Wright-Shawn",
   "approver": "Wright-Shawn",
   "status": "FAILED_SELF_APPROVAL",
-  "timestamp": "2025-11-11T01:11:45Z",
+  "timestamp": "2025-11-11T01:31:06Z",
   "message": "Run halted: same identity for runner and approver."
 }
