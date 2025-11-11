@@ -7,13 +7,10 @@ on:
         description: "Path to workflow JSON"
         required: true
         default: "workflows/multimodel.json"
-  push:
-    branches:
-      - governance-fix-test
 
 permissions:
   contents: write
-  id-token: write
+  id-token: write   # Required for cosign keyless signing via GitHub OIDC
 
 concurrency:
   group: awo-run-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
@@ -29,19 +26,20 @@ jobs:
       RUNNER_ID: ${{ github.actor }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
+      # -------------------------------------------------------
+      # 🔒 Attestation Independence Enforcement
+      # -------------------------------------------------------
       - name: Display run context
         run: |
           echo "Runner: $RUNNER_ID"
           echo "Expected Approver: $APPROVER_ID"
 
-      # -------------------------------------------------------
-      # 🔒 Attestation Independence Enforcement
-      # -------------------------------------------------------
       - name: Verify attestation independence
         id: verify_gate
+        shell: bash
         run: |
           mkdir -p governance/logs
           TS="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
@@ -51,44 +49,26 @@ jobs:
             STATUS="FAILED_SELF_APPROVAL"
             RESULT="Run halted: same identity for runner and approver."
 
-            echo "{" > governance/logs/approval.json
-            echo "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," >> governance/logs/approval.json
-            echo "  \"runner\": \"$RUNNER_ID\"," >> governance/logs/approval.json
-            echo "  \"approver\": \"$APPROVER_ID\"," >> governance/logs/approval.json
-            echo "  \"status\": \"$STATUS\"," >> governance/logs/approval.json
-            echo "  \"timestamp\": \"$TS\"," >> governance/logs/approval.json
-            echo "  \"message\": \"$RESULT\"" >> governance/logs/approval.json
-            echo "}" >> governance/logs/approval.json
-
-            echo "approved_by=$RUNNER_ID" >> "$GITHUB_OUTPUT"
-            echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
+            printf '{"run_id":"PRE_EXEC_%s","runner":"%s","approver":"%s","status":"%s","timestamp":"%s","message":"%s"}\n' \
+              "$GITHUB_RUN_ID" "$RUNNER_ID" "$APPROVER_ID" "$STATUS" "$TS" "$RESULT" \
+              > governance/logs/approval.json
             exit 1
           else
             echo "✅ Attestation independence verified."
             STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
             RESULT="Runner and approver identities distinct."
 
-            echo "{" > governance/logs/approval.json
-            echo "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\"," >> governance/logs/approval.json
-            echo "  \"runner\": \"$RUNNER_ID\"," >> governance/logs/approval.json
-            echo "  \"approver\": \"$APPROVER_ID\"," >> governance/logs/approval.json
-            echo "  \"status\": \"$STATUS\"," >> governance/logs/approval.json
-            echo "  \"timestamp\": \"$TS\"," >> governance/logs/approval.json
-            echo "  \"message\": \"$RESULT\"" >> governance/logs/approval.json
-            echo "}" >> governance/logs/approval.json
-
-            echo "approved_by=$APPROVER_ID" >> "$GITHUB_OUTPUT"
-            echo "approval_status=$STATUS" >> "$GITHUB_OUTPUT"
+            printf '{"run_id":"PRE_EXEC_%s","runner":"%s","approver":"%s","status":"%s","timestamp":"%s","message":"%s"}\n' \
+              "$GITHUB_RUN_ID" "$RUNNER_ID" "$APPROVER_ID" "$STATUS" "$TS" "$RESULT" \
+              > governance/logs/approval.json
           fi
 
-            # Commit the independence result regardless of pass/fail
       - name: Commit independence log (always)
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "governance: record attestation independence result for run ${{ github.run_id }}"
           file_pattern: governance/logs/approval.json
-
 
       # -------------------------------------------------------
       # Core Execution Steps
@@ -99,16 +79,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install deps
         if: ${{ success() }}
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
-          [ -f requirements.txt ] && pip install -r requirements.txt || true
-          [ -f scripts/requirements.txt ] && pip install -r scripts/requirements.txt || true
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
           pip install jsonschema cyclonedx-bom || true
 
-      - name: Resolve and validate workflow file
+      - name: Resolve & validate workflow file
         if: ${{ success() }}
         id: wf
         run: |
@@ -129,33 +109,42 @@ jobs:
           python scripts/awo_run.py "${{ steps.wf.outputs.wf }}"
           echo "runner_exit_code=$?" >> "$GITHUB_OUTPUT"
 
-      - name: Capture Run-ID
+      - name: Capture Run-ID (breadcrumb)
         if: ${{ success() }}
         id: capture
         run: |
           set -euo pipefail
           if [ ! -f runs/LAST_RUN ]; then
+            echo "::warning::runs/LAST_RUN missing"
             echo "run_id=none" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           RID="$(tr -d '\r\n' < runs/LAST_RUN)"
-          [ -d "runs/$RID" ] || { echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0; }
+          case "$RID" in
+            (*[!A-Za-z0-9._-]*|'')
+              echo "Invalid RID: '$RID'"; echo "::error::Invalid RUN_ID"
+              echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0;;
+          esac
+          [ -d "runs/$RID" ] || { echo "::warning::runs/$RID not found"; echo "run_id=none" >> "$GITHUB_OUTPUT"; exit 0; }
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
 
-      - name: Hash run folder and emit SBOM
+      - name: Hash run folder & emit SBOM
         if: ${{ steps.capture.outputs.run_id != 'none' }}
+        shell: bash
+        run: |
+         set -euo pipefail
+         RD="runs/${RUN_ID}"
+         TMP="$(mktemp)"
+         (cd "$RD" && find . -type f ! -name 'SHA256SUMS.txt' -print0 | sort -z | xargs -0 sha256sum) > "$TMP"
+         mv "$TMP" "$RD/SHA256SUMS.txt"
+         cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
+
+      - name: Create payload (always)
+        if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
         run: |
           set -euo pipefail
-          RD="runs/${RUN_ID}"
-          TMP="$(mktemp)"
-          (cd "$RD" && find . -type f ! -name 'SHA256SUMS.txt' -print0 | sort -z | xargs -0 sha256sum) > "$TMP"
-          mv "$TMP" "$RD/SHA256SUMS.txt"
-          cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
-
-      - name: Create payload
-        if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
-        run: tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
+          tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
         if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
@@ -163,6 +152,7 @@ jobs:
         with:
           name: awo-run-${{ env.RUN_ID }}
           path: awo-run-${{ env.RUN_ID }}.tar.gz
+          if-no-files-found: error
           retention-days: 14
 
   scope_gate:
@@ -171,20 +161,74 @@ jobs:
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
       name: awo-scope
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Await scope approval
         run: echo "Scope Gate — approve this environment to continue."
 
-  human_approval:
+  render_summary:
     needs: [run_awo, scope_gate]
+    runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
+    steps:
+      - name: Install jq CLI
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Download payload
+        uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ needs.run_awo.outputs.run_id }}
+          path: artifacts
+
+      - name: Extract run
+        id: locate
+        run: |
+          set -euo pipefail
+          TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
+          mkdir -p extracted && tar -xzf "$TAR" -C extracted
+          RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
+          echo "rd=$RD" >> "$GITHUB_OUTPUT"
+          echo "### Files" >> "$GITHUB_STEP_SUMMARY"
+          find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Show scope summary (if present)
+        run: |
+          set -euo pipefail
+          RD="${{ steps.locate.outputs.rd }}"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "$RD/scope/summary.json" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            jq . "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "_No scope/summary.json found._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Show run report excerpt
+        run: |
+          set -euo pipefail
+          RD="${{ steps.locate.outputs.rd }}"
+          if [ -f "$RD/report.md" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
+            head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "_Full run is committed after final approval._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  human_approval:
+    needs: [run_awo, scope_gate, render_summary]
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
     environment:
       name: awo-audit
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Await merge approval
         run: |
           echo "Merge Gate — approve this environment to commit the run."
+          echo "## Audit APPROVED" >> "$GITHUB_STEP_SUMMARY"
           echo "Reviewer: ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Run-ID: ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
 
@@ -195,29 +239,122 @@ jobs:
     env:
       RUN_ID: ${{ needs.run_awo.outputs.run_id }}
     steps:
-      - name: Checkout with credentials
+      - name: Checkout (with credentials)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
+
       - name: Download payload
         uses: actions/download-artifact@v4
         with:
           name: awo-run-${{ env.RUN_ID }}
           path: artifacts
+
       - name: Extract run folder
         run: |
+          set -euo pipefail
           TAR="artifacts/awo-run-${RUN_ID}.tar.gz"
           mkdir -p extracted && tar -xzf "$TAR" -C extracted
           rsync -a extracted/runs/ runs/
           echo "Finalizing ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Write approval record
         run: |
+          set -euo pipefail
           mkdir -p "runs/${RUN_ID}"
-          echo "{\"run_id\":\"${RUN_ID}\",\"approved_by\":\"${{ github.actor }}\",\"approved_at\":\"$(date -u +%FT%TZ)\",\"workflow_run_url\":\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" > "runs/${RUN_ID}/approval.json"
+          cat > "runs/${RUN_ID}/approval.json" <<EOF
+          {"run_id":"${RUN_ID}","approved_by":"${{ github.actor }}","approved_at":"$(date -u +%FT%TZ)","workflow_run_url":"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+          EOF
+
+      - name: Mark manifest as succeeded
+        run: |
+          set -euo pipefail
+          MF="runs/${RUN_ID}/run_manifest.json"
+          test -f "$MF" || { echo "::error::run_manifest.json not found at $MF"; ls -R runs || true; exit 1; }
+          python -c "import json,sys,datetime as dt; p=sys.argv[1]; m=json.load(open(p)); m['status']='succeeded'; m['finished_at']=dt.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'); json.dump(m,open(p,'w'),indent=2,ensure_ascii=False); print('updated:',p)" "$MF"
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.4.1'
+
+      - name: Write attestation (bind manifest ↔ checksums)
+        shell: bash
+        env:
+          RUN_ID: ${{ env.RUN_ID }}
+        run: |
+          set -euo pipefail
+          RD="runs/${RUN_ID}"
+          MF="${RD}/run_manifest.json"
+          SUMS="${RD}/SHA256SUMS.txt"
+
+          test -f "$MF"   || { echo "::error::Missing $MF"; exit 1; }
+          test -f "$SUMS" || { echo "::error::Missing $SUMS"; exit 1; }
+
+          MANIFEST_SHA="$(sha256sum "$MF"   | awk '{print $1}')"
+          SUMS_SHA="$(sha256sum "$SUMS" | awk '{print $1}')"
+          NOW="$(date -u +%FT%TZ)"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          cat > "${RD}/ATTESTATION.txt" <<EOF
+          AWO Run Attestation:  
+
+          Run-ID: ${RUN_ID}
+          Repository: ${{ github.repository }}
+          Commit: ${GIT_SHA}
+          Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Actor: ${{ github.actor }}
+          Timestamp (UTC): ${NOW}
+
+          Bindings:  
+
+              run_manifest.json  sha256:${MANIFEST_SHA}
+              SHA256SUMS.txt     sha256:${SUMS_SHA}
+
+          Statement:
+
+              This attestation binds the AWO run manifest to the file inventory recorded in
+              SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
+
+          EOF
+
+      - name: Sign tarball and attestation (keyless, OIDC)
+        shell: bash
+        env:
+          RUN_ID: ${{ env.RUN_ID }}
+        run: |
+          set -euo pipefail
+          TARBALL="artifacts/awo-run-${RUN_ID}.tar.gz"
+          ATTN="runs/${RUN_ID}/ATTESTATION.txt"
+
+          # Sign tarball
+          cosign sign-blob --yes --output-signature "${TARBALL}.sig" \
+                           --output-certificate "${TARBALL}.cert" \
+                           "${TARBALL}"
+
+          # Sign attestation
+          cosign sign-blob --yes --output-signature "${ATTN}.sig" \
+                           --output-certificate "${ATTN}.cert" \
+                           "${ATTN}"
+
+      - name: Upload signatures
+        uses: actions/upload-artifact@v4
+        with:
+          name: awo-run-signatures-${{ env.RUN_ID }}
+          path: |
+            artifacts/awo-run-${{ env.RUN_ID }}.tar.gz.sig
+            artifacts/awo-run-${{ env.RUN_ID }}.tar.gz.cert
+            runs/${{ env.RUN_ID }}/ATTESTATION.txt
+            runs/${{ env.RUN_ID }}/ATTESTATION.txt.sig
+            runs/${{ env.RUN_ID }}/ATTESTATION.txt.cert
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Commit run to branch
         run: |
-          git config user.name "github-actions[bot]"
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "runs/${RUN_ID}"
           if git diff --staged --quiet; then
@@ -226,3 +363,14 @@ jobs:
           fi
           git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
           git push
+
+      - name: Post final summary
+        run: |
+          set -euo pipefail
+          COMMIT_SHA="$(git rev-parse --short HEAD)"
+          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${COMMIT_SHA}"
+          {
+            echo "## Audit: ✅ APPROVED & committed"
+            echo "- Run-ID: ${RUN_ID}"
+            echo "- Commit: [${COMMIT_SHA}](${COMMIT_URL})"
+          } >> "$GITHUB_STEP_SUMMARY"
