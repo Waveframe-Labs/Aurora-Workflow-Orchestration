@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: write
-  id-token: write
+  id-token: write  # required for cosign keyless signing via GitHub OIDC
 
 concurrency:
   group: awo-run-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
@@ -26,6 +26,9 @@ jobs:
       RUNNER_ID: ${{ github.actor }}
 
     steps:
+      # -------------------------------------------------------
+      # Checkout Repository
+      # -------------------------------------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -69,7 +72,7 @@ jobs:
             exit 1
           fi
 
-      - name: Commit independence log (always)
+      - name: Commit independence log
         if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -77,7 +80,7 @@ jobs:
           file_pattern: governance/logs/approval.json
 
       # -------------------------------------------------------
-      # Core execution (same as original)
+      # Core Execution
       # -------------------------------------------------------
       - name: Setup Python
         if: ${{ success() }}
@@ -85,7 +88,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install deps
+      - name: Install dependencies
         if: ${{ success() }}
         run: |
           set -euo pipefail
@@ -106,25 +109,26 @@ jobs:
           WF="${{ github.event.inputs.workflow_file || 'workflows/multimodel.json' }}"
           echo "wf=$WF" >> "$GITHUB_OUTPUT"
           test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
+
           if [ -f "schemas/workflow_schema.json" ]; then
             python - <<'PY'
-          import json, sys
-          from jsonschema import Draft202012Validator as V
-          schema = json.load(open("schemas/workflow_schema.json"))
-          doc = json.load(open(sys.argv[1]))
-          V(schema).validate(doc)
-          print("workflow JSON: schema OK (schemas/workflow_schema.json)")
-          PY
+            import json, sys
+            from jsonschema import Draft202012Validator as V
+            schema = json.load(open("schemas/workflow_schema.json"))
+            doc = json.load(open(sys.argv[1]))
+            V(schema).validate(doc)
+            print("workflow JSON: schema OK (schemas/workflow_schema.json)")
+            PY
             "$WF"
           elif [ -f "workflow_schema.json" ]; then
             python - <<'PY'
-          import json, sys
-          from jsonschema import Draft202012Validator as V
-          schema = json.load(open("workflow_schema.json"))
-          doc = json.load(open(sys.argv[1]))
-          V(schema).validate(doc)
-          print("workflow JSON: schema OK (workflow_schema.json)") 
-          PY
+            import json, sys
+            from jsonschema import Draft202012Validator as V
+            schema = json.load(open("workflow_schema.json"))
+            doc = json.load(open(sys.argv[1]))
+            V(schema).validate(doc)
+            print("workflow JSON: schema OK (workflow_schema.json)")
+            PY
             "$WF"
           else
             echo "Schema workflow_schema.json not found — skipping schema validation."
@@ -139,7 +143,7 @@ jobs:
           python scripts/awo_run.py "${{ steps.wf.outputs.wf }}"
           echo "runner_exit_code=$?" >> "$GITHUB_OUTPUT"
 
-      - name: Capture Run-ID (breadcrumb, resilient)
+      - name: Capture Run-ID
         if: ${{ success() }}
         id: capture
         run: |
@@ -150,11 +154,8 @@ jobs:
               echo "run_id=$RID" >> "$GITHUB_OUTPUT"
               echo "RUN_ID=$RID" >> "$GITHUB_ENV"
               exit 0
-            else
-              echo "::warning::runs/LAST_RUN present but run dir missing"
             fi
-          else
-            echo "::warning::runs/LAST_RUN missing"
+            echo "::warning::runs/LAST_RUN present but run dir missing or invalid"
           fi
 
           RID="TEST_RUN_$(date -u +%Y%m%dT%H%M%SZ)"
@@ -162,11 +163,12 @@ jobs:
           echo "$RID" > runs/LAST_RUN
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
-          echo "Created placeholder run_id: $RID"
+          echo "::notice::Created placeholder run_id: $RID"
 
       - name: Hash run folder & emit SBOM
-        if: ${{ steps.capture.outputs.run_id != 'none' }}
-        shell: bash
+        if: ${{ success() && steps.capture.outputs.run_id != 'none' }}
+        env:
+          RUN_ID: ${{ steps.capture.outputs.run_id }}
         run: |
           set -euo pipefail
           RD="runs/${RUN_ID}"
@@ -180,21 +182,26 @@ jobs:
           mv "$TMP" "$RD/SHA256SUMS.txt"
           cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
 
-      - name: Create payload (always)
-        if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
+      - name: Create payload
+        if: ${{ success() && steps.capture.outputs.run_id != 'none' }}
+        env:
+          RUN_ID: ${{ steps.capture.outputs.run_id }}
         run: |
           set -euo pipefail
           tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
 
       - name: Upload payload
-        if: ${{ always() && steps.capture.outputs.run_id != 'none' }}
+        if: ${{ success() && steps.capture.outputs.run_id != 'none' }}
         uses: actions/upload-artifact@v4
         with:
-          name: awo-run-${{ env.RUN_ID }}
-          path: awo-run-${{ env.RUN_ID }}.tar.gz
+          name: awo-run-${{ steps.capture.outputs.run_id }}
+          path: awo-run-${{ steps.capture.outputs.run_id }}.tar.gz
           if-no-files-found: error
           retention-days: 14
 
+  # -------------------------------------------------------
+  # Manual Approval Gates
+  # -------------------------------------------------------
   scope_gate:
     needs: run_awo
     runs-on: ubuntu-latest
@@ -272,6 +279,9 @@ jobs:
           echo "Reviewer: ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Run-ID: ${{ needs.run_awo.outputs.run_id }}" >> "$GITHUB_STEP_SUMMARY"
 
+  # -------------------------------------------------------
+  # Finalization and Signing
+  # -------------------------------------------------------
   finalize:
     needs: [run_awo, scope_gate, human_approval]
     runs-on: ubuntu-latest
@@ -320,9 +330,6 @@ jobs:
           cosign-release: 'v2.4.1'
 
       - name: Write attestation (bind manifest ↔ checksums)
-        shell: bash
-        env:
-          RUN_ID: ${{ env.RUN_ID }}
         run: |
           set -euo pipefail
           RD="runs/${RUN_ID}"
@@ -338,7 +345,7 @@ jobs:
           GIT_SHA="$(git rev-parse HEAD)"
 
           cat > "${RD}/ATTESTATION.txt" <<EOF
-          AWO Run Attestation:  
+          AWO Run Attestation:
 
           Run-ID: ${RUN_ID}
           Repository: ${{ github.repository }}
@@ -347,7 +354,7 @@ jobs:
           Actor: ${{ github.actor }}
           Timestamp (UTC): ${NOW}
 
-          Bindings:  
+          Bindings:
 
               run_manifest.json  sha256:${MANIFEST_SHA}
               SHA256SUMS.txt     sha256:${SUMS_SHA}
@@ -356,13 +363,9 @@ jobs:
 
               This attestation binds the AWO run manifest to the file inventory recorded in
               SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
-
           EOF
 
-      - name: Sign tarball and attestation (keyless, OIDC)
-        shell: bash
-        env:
-          RUN_ID: ${{ env.RUN_ID }}
+      - name: Sign artifacts (keyless, OIDC)
         run: |
           set -euo pipefail
           TARBALL="artifacts/awo-run-${RUN_ID}.tar.gz"
