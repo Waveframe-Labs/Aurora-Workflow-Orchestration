@@ -37,7 +37,7 @@ jobs:
           echo "Runner: $RUNNER_ID"
           echo "Expected Approver: $APPROVER_ID"
 
-      - name: Verify attestation independence
+          - name: Verify attestation independence
         id: verify_gate
         shell: bash
         run: |
@@ -49,8 +49,7 @@ jobs:
             STATUS="FAILED_SELF_APPROVAL"
             RESULT="Run halted: same identity for runner and approver."
 
-            # write pretty JSON using jq (available on GitHub ubuntu runners)
-            cat <<EOF | jq . > governance/logs/approval.json
+            cat <<'EOF' | jq . > governance/logs/approval.json
 {
   "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
   "runner": "${RUNNER_ID}",
@@ -66,7 +65,7 @@ EOF
             STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
             RESULT="Runner and approver identities distinct."
 
-            cat <<EOF | jq . > governance/logs/approval.json
+            cat <<'EOF' | jq . > governance/logs/approval.json
 {
   "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
   "runner": "${RUNNER_ID}",
