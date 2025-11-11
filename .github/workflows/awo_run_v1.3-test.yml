@@ -1,4 +1,4 @@
-name: AWO Run (Manual Approve to Commit)
+name: AWO Test Run (Manual Approve to Commit)
 
 on:
   workflow_dispatch:
