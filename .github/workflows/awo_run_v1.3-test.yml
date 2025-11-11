@@ -108,23 +108,23 @@ jobs:
           test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
           if [ -f "schemas/workflow_schema.json" ]; then
             python - <<'PY'
-import json, sys
-from jsonschema import Draft202012Validator as V
-schema = json.load(open("schemas/workflow_schema.json"))
-doc = json.load(open(sys.argv[1]))
-V(schema).validate(doc)
-print("workflow JSON: schema OK (schemas/workflow_schema.json)")
-PY
+          import json, sys
+          from jsonschema import Draft202012Validator as V
+          schema = json.load(open("schemas/workflow_schema.json"))
+          doc = json.load(open(sys.argv[1]))
+          V(schema).validate(doc)
+          print("workflow JSON: schema OK (schemas/workflow_schema.json)")
+          PY
             "$WF"
           elif [ -f "workflow_schema.json" ]; then
             python - <<'PY'
-import json, sys
-from jsonschema import Draft202012Validator as V
-schema = json.load(open("workflow_schema.json"))
-doc = json.load(open(sys.argv[1]))
-V(schema).validate(doc)
-print("workflow JSON: schema OK (workflow_schema.json)")
-PY
+          import json, sys
+          from jsonschema import Draft202012Validator as V
+          schema = json.load(open("workflow_schema.json"))
+          doc = json.load(open(sys.argv[1]))
+          V(schema).validate(doc)
+          print("workflow JSON: schema OK (workflow_schema.json)") 
+          PY
             "$WF"
           else
             echo "Schema workflow_schema.json not found — skipping schema validation."
