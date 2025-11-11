@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: write
-  id-token: write   # required for cosign keyless signing via GitHub OIDC
+  id-token: write
 
 concurrency:
   group: awo-run-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
@@ -37,7 +37,7 @@ jobs:
           echo "Runner: $RUNNER_ID"
           echo "Expected Approver: $APPROVER_ID"
 
-          - name: Verify attestation independence
+      - name: Verify attestation independence
         id: verify_gate
         shell: bash
         run: |
@@ -48,33 +48,25 @@ jobs:
             echo "❌ Attestation independence check failed."
             STATUS="FAILED_SELF_APPROVAL"
             RESULT="Run halted: same identity for runner and approver."
-
-            cat <<'EOF' | jq . > governance/logs/approval.json
-{
-  "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
-  "runner": "${RUNNER_ID}",
-  "approver": "${APPROVER_ID}",
-  "status": "${STATUS}",
-  "timestamp": "${TS}",
-  "message": "${RESULT}"
-}
-EOF
-            exit 1
           else
             echo "✅ Attestation independence verified."
             STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
             RESULT="Runner and approver identities distinct."
+          fi
 
-            cat <<'EOF' | jq . > governance/logs/approval.json
-{
-  "run_id": "PRE_EXEC_${GITHUB_RUN_ID}",
-  "runner": "${RUNNER_ID}",
-  "approver": "${APPROVER_ID}",
-  "status": "${STATUS}",
-  "timestamp": "${TS}",
-  "message": "${RESULT}"
-}
-EOF
+          {
+            echo '{'
+            echo "  \"run_id\": \"PRE_EXEC_${GITHUB_RUN_ID}\","
+            echo "  \"runner\": \"${RUNNER_ID}\","
+            echo "  \"approver\": \"${APPROVER_ID}\","
+            echo "  \"status\": \"${STATUS}\","
+            echo "  \"timestamp\": \"${TS}\","
+            echo "  \"message\": \"${RESULT}\""
+            echo '}'
+          } | jq . > governance/logs/approval.json
+
+          if [ "$STATUS" = "FAILED_SELF_APPROVAL" ]; then
+            exit 1
           fi
 
       - name: Commit independence log (always)
@@ -85,7 +77,7 @@ EOF
           file_pattern: governance/logs/approval.json
 
       # -------------------------------------------------------
-      # Core execution (only runs if independence passed)
+      # Core execution (same as original)
       # -------------------------------------------------------
       - name: Setup Python
         if: ${{ success() }}
@@ -104,7 +96,6 @@ EOF
           if [ -f scripts/requirements.txt ]; then
             pip install -r scripts/requirements.txt
           fi
-          # optional utilities
           pip install jsonschema cyclonedx-bom || true
 
       - name: Resolve & validate workflow file
@@ -115,15 +106,13 @@ EOF
           WF="${{ github.event.inputs.workflow_file || 'workflows/multimodel.json' }}"
           echo "wf=$WF" >> "$GITHUB_OUTPUT"
           test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
-
-          # schema may be in repo root or in ./schemas; name is workflow_schema.json
           if [ -f "schemas/workflow_schema.json" ]; then
             python - <<'PY'
 import json, sys
 from jsonschema import Draft202012Validator as V
-sch = json.load(open("schemas/workflow_schema.json"))
+schema = json.load(open("schemas/workflow_schema.json"))
 doc = json.load(open(sys.argv[1]))
-V(sch).validate(doc)
+V(schema).validate(doc)
 print("workflow JSON: schema OK (schemas/workflow_schema.json)")
 PY
             "$WF"
@@ -131,14 +120,14 @@ PY
             python - <<'PY'
 import json, sys
 from jsonschema import Draft202012Validator as V
-sch = json.load(open("workflow_schema.json"))
+schema = json.load(open("workflow_schema.json"))
 doc = json.load(open(sys.argv[1]))
-V(sch).validate(doc)
+V(schema).validate(doc)
 print("workflow JSON: schema OK (workflow_schema.json)")
 PY
             "$WF"
           else
-            echo "Schema file workflow_schema.json not found – skipping schema validation."
+            echo "Schema workflow_schema.json not found — skipping schema validation."
           fi
 
       - name: Execute AWO workflow
@@ -155,25 +144,24 @@ PY
         id: capture
         run: |
           set -euo pipefail
-          # normal path: script should have written runs/LAST_RUN
           if [ -f runs/LAST_RUN ]; then
             RID="$(tr -d '\r\n' < runs/LAST_RUN)"
             if [ -n "$RID" ] && [ -d "runs/$RID" ]; then
               echo "run_id=$RID" >> "$GITHUB_OUTPUT"
               echo "RUN_ID=$RID" >> "$GITHUB_ENV"
               exit 0
+            else
+              echo "::warning::runs/LAST_RUN present but run dir missing"
             fi
-            echo "::warning::runs/LAST_RUN present but run dir missing or empty"
           else
             echo "::warning::runs/LAST_RUN missing"
           fi
 
-          # fallback for test / first-time runs
           RID="TEST_RUN_$(date -u +%Y%m%dT%H%M%SZ)"
           mkdir -p "runs/$RID"
+          echo "$RID" > runs/LAST_RUN
           echo "run_id=$RID" >> "$GITHUB_OUTPUT"
           echo "RUN_ID=$RID" >> "$GITHUB_ENV"
-          echo "$RID" > runs/LAST_RUN
           echo "Created placeholder run_id: $RID"
 
       - name: Hash run folder & emit SBOM
@@ -185,13 +173,11 @@ PY
           TMP="$(mktemp)"
           (
             cd "$RD"
-            # exclude the file we are writing, then deterministic hash
             find . -type f ! -name 'SHA256SUMS.txt' -print0 \
               | sort -z \
               | xargs -0 sha256sum
           ) > "$TMP"
           mv "$TMP" "$RD/SHA256SUMS.txt"
-          # optional
           cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
 
       - name: Create payload (always)
@@ -209,9 +195,6 @@ PY
           if-no-files-found: error
           retention-days: 14
 
-  # -------------------------------------------------------
-  # Gates and human approval (same as original)
-  # -------------------------------------------------------
   scope_gate:
     needs: run_awo
     runs-on: ubuntu-latest
