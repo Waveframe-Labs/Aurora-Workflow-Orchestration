@@ -174,20 +174,21 @@ jobs:
           RD="runs/${RUN_ID}"
           mkdir -p "$RD"
           TARGET="$RD/falsifiability.json"
+
           if [ ! -f "$TARGET" ]; then
             cat > "$TARGET" <<EOF
-{
-  "run_id": "${RUN_ID}",
-  "criteria": [
-    "run_manifest.json exists",
-    "workflow JSON validated",
-    "report.md or equivalent output present"
-  ],
-  "status": "not_evaluated",
-  "evaluated_at": null,
-  "notes": "created by workflow; orchestrator/auditor should update with actual falsification outcome"
-}
-EOF
+            {
+            "run_id": "${RUN_ID}",
+            "criteria": [
+            "run_manifest.json exists",
+            "workflow JSON validated",
+            "report.md or equivalent output present"
+            ],
+            "status": "not_evaluated",
+            "evaluated_at": null,
+            "notes": "created by workflow; orchestrator/auditor should update with actual falsification outcome"
+            }
+            EOF
           fi
 
       # -------------------------------------------------------
@@ -196,21 +197,28 @@ EOF
       - name: Persist randomness metadata
         env:
           RUN_ID: ${{ steps.capture.outputs.run_id }}
+          RANDOM_SEED: ${{ steps.wf.outputs.random_seed }}
         run: |
           set -euo pipefail
           RD="runs/${RUN_ID}"
           mkdir -p "$RD"
+
           if [ -n "${RANDOM_SEED:-}" ]; then
-            cat > "${RD}/randomness.json" <<EOF
-{"run_id":"${RUN_ID}","seed":${RANDOM_SEED}}
-EOF
+           cat > "${RD}/randomness.json" <<EOF
+           {
+           "run_id": "${RUN_ID}",
+           "seed": ${RANDOM_SEED}
+           }
+          EOF
           else
-            if [ ! -f "${RD}/randomness.json" ]; then
-              cat > "${RD}/randomness.json" <<EOF
-{"run_id":"${RUN_ID}","seed":null}
-EOF
-            fi
+           cat > "${RD}/randomness.json" <<EOF
+           {
+           "run_id": "${RUN_ID}",
+           "seed": null
+           }
+           EOF
           fi
+
 
       # -------------------------------------------------------
       # 10. Hash run folder & emit SBOM
