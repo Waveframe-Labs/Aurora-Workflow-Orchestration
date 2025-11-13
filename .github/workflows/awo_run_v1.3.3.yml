@@ -295,8 +295,8 @@ jobs:
           if [ "$RUNNER_ID" = "$APPROVER_ID" ]; then
             echo "❌ Governance violation: self-attestation detected."
             cat > "${RD}/self_attestation_violation.json" <<EOF
-{"run_id":"${RUN_ID}","runner":"${RUNNER_ID}","approver":"${APPROVER_ID}","status":"SELF_ATTESTATION_BLOCKED","timestamp":"$(date -u +%FT%TZ)"}
-EOF
+            {"run_id":"${RUN_ID}","runner":"${RUNNER_ID}","approver":"${APPROVER_ID}","status":"SELF_ATTESTATION_BLOCKED","timestamp":"$(date -u +%FT%TZ)"}
+            EOF
             exit 1
           else
             echo "✅ Attestation independence verified."
@@ -359,8 +359,8 @@ EOF
           RD="runs/${RUN_ID}"
           mkdir -p "$RD"
           cat > "${RD}/approval.json" <<EOF
-{"run_id":"${RUN_ID}","approved_by":"${{ github.actor }}","approved_at":"$(date -u +%FT%TZ)","workflow_run_url":"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
-EOF
+          {"run_id":"${RUN_ID}","approved_by":"${{ github.actor }}","approved_at":"$(date -u +%FT%TZ)","workflow_run_url":"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+          EOF
 
       - name: Mark manifest as succeeded
         run: |
@@ -401,24 +401,24 @@ EOF
           GIT_SHA="$(git rev-parse HEAD)"
 
           cat > "${RD}/ATTESTATION.txt" <<EOF
-AWO Run Attestation:
+          AWO Run Attestation:
 
-Run-ID: ${RUN_ID}
-Repository: ${{ github.repository }}
-Commit: ${GIT_SHA}
-Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-Actor: ${{ github.actor }}
-Timestamp (UTC): ${NOW}
+          Run-ID: ${RUN_ID}
+          Repository: ${{ github.repository }}
+          Commit: ${GIT_SHA}
+          Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Actor: ${{ github.actor }}
+          Timestamp (UTC): ${NOW}
 
-Bindings:
-  run_manifest.json              sha256:${MANIFEST_SHA}
-  SHA256SUMS.txt                 sha256:${SUMS_SHA}${EXTRA_BINDINGS}
+          Bindings:
+          run_manifest.json              sha256:${MANIFEST_SHA}
+          SHA256SUMS.txt                 sha256:${SUMS_SHA}${EXTRA_BINDINGS}
 
-Statement:
-  This attestation binds the run manifest to the file inventory recorded in
-  SHA256SUMS.txt (and, if present, the randomness and self-attestation records).
-  Any alteration of these files will invalidate these hashes.
-EOF
+          Statement:
+          This attestation binds the run manifest to the file inventory recorded in
+          SHA256SUMS.txt (and, if present, the randomness and self-attestation records).
+          Any alteration of these files will invalidate these hashes.
+          EOF
 
       - name: Sign artifacts and approval
         run: |
