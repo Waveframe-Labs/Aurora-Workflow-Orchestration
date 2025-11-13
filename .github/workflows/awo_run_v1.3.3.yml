@@ -79,25 +79,23 @@ jobs:
           test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
 
           if [ -f "schemas/workflow_schema.json" ]; then
-            python - <<'PY'
-            import json, sys
-            from jsonschema import Draft202012Validator as V
-            schema = json.load(open("schemas/workflow_schema.json"))
-            doc = json.load(open(sys.argv[1]))
-            V(schema).validate(doc)
-            print("workflow JSON: schema OK (schemas/workflow_schema.json)")
-            PY
-            "$WF"
+            python - <<'PY' "$WF"
+          import json, sys
+          from jsonschema import Draft202012Validator as V
+          schema = json.load(open("schemas/workflow_schema.json"))
+          doc = json.load(open(sys.argv[1]))
+          V(schema).validate(doc)
+          print("workflow JSON: schema OK (schemas/workflow_schema.json)")
+          PY
           elif [ -f "workflow_schema.json" ]; then
-            python - <<'PY'
-            import json, sys
-            from jsonschema import Draft202012Validator as V
-            schema = json.load(open("workflow_schema.json"))
-            doc = json.load(open(sys.argv[1]))
-            V(schema).validate(doc)
-            print("workflow JSON: schema OK (workflow_schema.json)")
-            PY
-            "$WF"
+            python - <<'PY' "$WF"
+          import json, sys
+          from jsonschema import Draft202012Validator as V
+          schema = json.load(open("workflow_schema.json"))
+          doc = json.load(open(sys.argv[1]))
+          V(schema).validate(doc)
+          print("workflow JSON: schema OK (workflow_schema.json)")
+          PY
           else
             echo "Schema workflow_schema.json not found — skipping schema validation."
           fi
@@ -177,18 +175,18 @@ jobs:
 
           if [ ! -f "$TARGET" ]; then
             cat > "$TARGET" <<EOF
-            {
+          {
             "run_id": "${RUN_ID}",
             "criteria": [
-            "run_manifest.json exists",
-            "workflow JSON validated",
-            "report.md or equivalent output present"
+              "run_manifest.json exists",
+              "workflow JSON validated",
+              "report.md or equivalent output present"
             ],
             "status": "not_evaluated",
             "evaluated_at": null,
             "notes": "created by workflow; orchestrator/auditor should update with actual falsification outcome"
-            }
-            EOF
+          }
+          EOF
           fi
 
       # -------------------------------------------------------
@@ -204,21 +202,20 @@ jobs:
           mkdir -p "$RD"
 
           if [ -n "${RANDOM_SEED:-}" ]; then
-           cat > "${RD}/randomness.json" <<EOF
-           {
-           "run_id": "${RUN_ID}",
-           "seed": ${RANDOM_SEED}
-           }
+            cat > "${RD}/randomness.json" <<EOF
+          {
+            "run_id": "${RUN_ID}",
+            "seed": ${RANDOM_SEED}
+          }
           EOF
           else
-           cat > "${RD}/randomness.json" <<EOF
-           {
-           "run_id": "${RUN_ID}",
-           "seed": null
-           }
-           EOF
+            cat > "${RD}/randomness.json" <<EOF
+          {
+            "run_id": "${RUN_ID}",
+            "seed": null
+          }
+          EOF
           fi
-
 
       # -------------------------------------------------------
       # 10. Hash run folder & emit SBOM
@@ -295,8 +292,8 @@ jobs:
           if [ "$RUNNER_ID" = "$APPROVER_ID" ]; then
             echo "❌ Governance violation: self-attestation detected."
             cat > "${RD}/self_attestation_violation.json" <<EOF
-            {"run_id":"${RUN_ID}","runner":"${RUNNER_ID}","approver":"${APPROVER_ID}","status":"SELF_ATTESTATION_BLOCKED","timestamp":"$(date -u +%FT%TZ)"}
-            EOF
+          {"run_id":"${RUN_ID}","runner":"${RUNNER_ID}","approver":"${APPROVER_ID}","status":"SELF_ATTESTATION_BLOCKED","timestamp":"$(date -u +%FT%TZ)"}
+          EOF
             exit 1
           else
             echo "✅ Attestation independence verified."
