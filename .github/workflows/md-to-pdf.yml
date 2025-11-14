@@ -39,8 +39,7 @@ jobs:
             pandoc "$file" \
               --from markdown+yaml_metadata_block+smart+table_captions+fenced_code_blocks \
               --pdf-engine=xelatex \
-              --standalone \
-              --metadata title="$base" \
+              --standalone \  
               -V geometry:margin=1in \
               -V fontsize=11pt \
               -V colorlinks=true \
