@@ -1172,6 +1172,7 @@ Waveframe Labs / Aurora Research Initiative. https://doi.org/10.5281/zenodo.1701
 ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
  
 **BibTeX**  
+
 ```bibtex
 @misc{wright2025awo,
   author       = {Wright, Shawn C.},
@@ -1185,10 +1186,7 @@ ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
   license      = {CC BY 4.0 (docs), Apache 2.0 (code)}
 }
 
-}
 ```
-
----
 
 **Normative Reference:**  
 Aurora Workflow Orchestration (AWO) — Method Specification v1.2.1 (Waveframe Labs, 2025)
