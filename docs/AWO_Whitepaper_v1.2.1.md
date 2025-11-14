@@ -1,7 +1,7 @@
 ---
 filetype: documentation
 version: 1.2.1
-updated: 2025-11-01
+updated: 2025-11-14
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 license: CC BY 4.0
@@ -12,7 +12,7 @@ license: CC BY 4.0
 **Maintainer:** Waveframe Labs  
 **Governance Authority:** Aurora Research Initiative (ARI)  
 **License:** CC BY 4.0 (docs), Apache 2.0 (code)  
-**Release Date:** 2025-11-01
+**Release Date:** 2025-11-14
 
 ---
 
