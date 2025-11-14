@@ -1173,9 +1173,7 @@ ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
  
 ### BibTeX
 
-:::
-
-{#bibtex .latex}
+```{=latex}
 \begin{minipage}{\textwidth}
 \begin{verbatim}
 @misc{wright2025awo,
@@ -1193,8 +1191,7 @@ ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
 }
 \end{verbatim}
 \end{minipage}
-
-:::
+```  
 
 ---
 
