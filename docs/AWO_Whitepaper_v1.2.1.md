@@ -1173,26 +1173,123 @@ ORCID: [0009-0006-6043-9295](https://orcid.org/0009-0006-6043-9295)
  
 ### BibTeX
 
-<div style="page-break-inside: avoid;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BibTeX Citation</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
 
-```bibtex
-@misc{wright2025awo,
-  author       = {Wright, Shawn C.},
-  orcid        = {0009-0006-6043-9295},
-  title        = {Aurora Workflow Orchestration (AWO):
-                  Reproducibility as Governance in
-                  AI-Assisted Research},
-  year         = {2025},
-  version      = {1.2.1},
-  publisher    = {Waveframe Labs / Aurora Research Initiative},
-  doi          = {10.5281/zenodo.17013612},
-  url          = {https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration},
-  license      = {CC BY 4.0 (docs), Apache 2.0 (code)}
-}
-```
-</div>  
+        .bibtex-section {
+            margin: 30px 0;
+        }
 
-```
+        .bibtex-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .bibtex-container {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            page-break-before: auto;
+            page-break-after: auto;
+            margin: 20px 0;
+        }
+
+        .bibtex-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            white-space: pre;
+            overflow-x: auto;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .reference-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+        }
+
+        .reference-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .reference-text {
+            margin-bottom: 10px;
+        }
+
+        .copyright {
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            .bibtex-container {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            .bibtex-code {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bibtex-section">
+        <div class="bibtex-title">BibTeX</div>
+        
+        <div class="bibtex-container">
+            <pre class="bibtex-code">@misc{wright2025awo,
+  author    = {Wright, Shawn C.},
+  orcid     = {0009-0006-6043-9295},
+  title     = {Aurora Workflow Orchestration (AWO):
+               Reproducibility as Governance in
+               AI-Assisted Research},
+  year      = {2025},
+  version   = {1.2.1},
+  publisher = {Waveframe Labs / Aurora Research Initiative},
+  doi       = {10.5281/zenodo.17013612},
+  url       = {https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration},
+  license   = {CC BY 4.0 (docs), Apache 2.0 (code)}
+}</pre>
+        </div>
+    </div>
+
+    <div class="reference-section">
+        <div class="reference-title">Normative Reference:</div>
+        <div class="reference-text">
+            Aurora Workflow Orchestration (AWO) — Method Specification v1.2.1 (Waveframe Labs, 2025)
+        </div>
+        
+        <div class="reference-title">End of Whitepaper — Aurora Workflow Orchestration (AWO) v1.2.1</div>
+        
+        <div class="copyright">
+            © 2025 Waveframe Labs · Independent Open-Science Research Entity Maintained under the Aurora Research Initiative (ARI) ORCID: 0009-0006-6043-9295
+        </div>
+    </div>
+</body>
+</html> 
+
+---
 
 **Normative Reference:**  
 Aurora Workflow Orchestration (AWO) — Method Specification v1.2.1 (Waveframe Labs, 2025)
