@@ -28,14 +28,14 @@
           ]
         }
       }
-    },
+    }
     {
       "id": "fanout_1",
       "op": "fanout_generate",
       "prompt": "Summarize: The battery lasts all day but the UI is confusing.",
       "models": ["echo", "upper", "reverse"],
       "params": { "seed": 123 }
-    },
+    }
     {
       "id": "emit_fanout_texts",
       "op": "write_text",
@@ -43,12 +43,12 @@
         "path": "notes/fanout.txt",
         "from_step": "fanout_1"
       }
-    },
+    }
     {
       "id": "consensus_1",
       "op": "consensus_vote",
       "inputs_from": "fanout_1"
-    },
+    }
     {
       "id": "emit_consensus_record",
       "op": "write_text",
@@ -56,7 +56,7 @@
         "path": "notes/consensus.json",
         "from_step": "consensus_1"
       }
-    },
+    }
     {
       "id": "assert_consensus_quality",
       "op": "assert_contains",
@@ -67,14 +67,14 @@
           "ui is confusing"
         ]
       }
-    },
+    }
     {
       "id": "gate_review",
       "op": "audit_gate",
       "args": {
         "checklist": "templates/audit-checklist.md"
       }
-    },
+    }
     {
       "id": "emit_consensus_text",
       "op": "write_text",
