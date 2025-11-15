@@ -121,8 +121,6 @@ If you can commit to a Git repo, you can commit to reproducibility.
 | **Standard** | Small teams | CI pipelines + attestation workflows |
 | **Full** | Institutions | Automated reproducibility via CRI-CORE |
 
-For a preconfigured starting point, see the  
-[**AWO Template Repository**](https://github.com/Waveframe-Labs/AWO-Template).
 
 ---
 
