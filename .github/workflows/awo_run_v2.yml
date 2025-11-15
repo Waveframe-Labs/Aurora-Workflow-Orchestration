@@ -31,44 +31,6 @@ jobs:
       # ---------------------------------------------------------
       # 1. Capture Workflow Path + RUN_ID + RUN_HASH
       # ---------------------------------------------------------
-      - name: Capture run identity
-        id: capture
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # Normalize input — remove whitespace / CRLF / trailing junk
-          RAW_PATH="${{ github.event.inputs.workflow_file }}"
-          WF_PATH="$(echo "$RAW_PATH" | tr -d '\r' | sed 's/[[:space:]]*$//')"
-
-          echo "WF_PATH=$WF_PATH" >> $GITHUB_ENV
-
-          # Guard: verify workflow JSON exists
-          if [ ! -f "$WF_PATH" ]; then
-            echo "::error::Workflow file not found at '$WF_PATH'"
-            echo "Listing repo files for debugging:"
-            ls -R .
-            exit 1
-          fi
-
-          # RUN_ID: stable timestamp
-          RUN_ID="run_$(date -u +%Y-%m-%dT%H-%M-%SZ)"
-          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-
-          # RUN_HASH: cryptographic identity binding
-          RUN_HASH=$(sha256sum "$WF_PATH" | awk '{print $1}')
-          echo "RUN_HASH=$RUN_HASH" >> $GITHUB_ENV
-          echo "run_hash=$RUN_HASH" >> $GITHUB_OUTPUT
-
-          echo "Captured:"
-          echo "  WF_PATH  = $WF_PATH"
-          echo "  RUN_ID   = $RUN_ID"
-          echo "  RUN_HASH = $RUN_HASH"
-
-      # ---------------------------------------------------------
-      # 2. Validate CRI workflow JSON
-      # ---------------------------------------------------------
       - name: Validate CRI workflow JSON
         shell: bash
         run: |
@@ -76,11 +38,11 @@ jobs:
 
           SCHEMA="schemas/cri_workflow.schema.json"
 
-          # Strong existence checks
           if [ ! -f "$WF_PATH" ]; then
             echo "::error::Workflow JSON missing at '$WF_PATH'"
             exit 1
           fi
+
           if [ ! -f "$SCHEMA" ]; then
             echo "::error::Schema file missing at '$SCHEMA'"
             exit 1
@@ -93,26 +55,33 @@ jobs:
           wf_path = os.environ["WF_PATH"]
           schema_path = "schemas/cri_workflow.schema.json"
 
+# Load workflow file
         try:
          with open(wf_path, "r") as f:
-doc = json.load(f) except Exception as e:
-    print("\n::error::Error loading workflow JSON:")
-    print(str(e))
-    sys.exit(1)
+          doc = json.load(f)
+         except Exception as e:
+          print("\nERROR: Failed to parse workflow JSON:")
+          print(str(e))
+          sys.exit(1)
 
+# Load schema
 with open(schema_path, "r") as f:
     schema = json.load(f)
 
-validator = V(schema) errors = sorted(validator.iter_errors(doc), key=lambda e: e.path)
+validator = V(schema)
+errors = sorted(validator.iter_errors(doc), key=lambda e: list(e.path))
 
 if errors:
     print("\nCRI workflow validation failed:\n")
-for e in errors:
-    print(f"- {e.message} (path: {'/'.join(map(str, e.path))})")
+    for e in errors:
+        print(f"- {e.message} (path: {'/'.join(map(str, e.path))})")
     sys.exit(1)
 
 print("CRI workflow schema validation OK")
 PY
+
+
+
 
       # ---------------------------------------------------------
       # 3. Create run directory
