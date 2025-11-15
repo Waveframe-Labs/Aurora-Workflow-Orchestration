@@ -6,6 +6,7 @@ on:
       workflow_file:
         description: "Path to CRI workflow JSON"
         required: true
+        # IMPORTANT — corrected path
         default: "workflows/multimodel.json"
 
 permissions:
@@ -19,6 +20,7 @@ jobs:
     outputs:
       run_id: ${{ steps.capture.outputs.run_id }}
       run_hash: ${{ steps.capture.outputs.run_hash }}
+
     steps:
       # ---------------------------------------------------------
       # 0. Checkout repository
@@ -27,67 +29,93 @@ jobs:
         uses: actions/checkout@v4
 
       # ---------------------------------------------------------
-      # 1. Capture Workflow Path and Generate RUN_ID + RUN_HASH
+      # 1. Capture Workflow Path + RUN_ID + RUN_HASH
       # ---------------------------------------------------------
       - name: Capture run identity
         id: capture
         shell: bash
         run: |
           set -euo pipefail
-          WF_PATH="${{ github.event.inputs.workflow_file }}"
+
+          # Normalize input — remove whitespace / CRLF / trailing junk
+          RAW_PATH="${{ github.event.inputs.workflow_file }}"
+          WF_PATH="$(echo "$RAW_PATH" | tr -d '\r' | sed 's/[[:space:]]*$//')"
+
           echo "WF_PATH=$WF_PATH" >> $GITHUB_ENV
-          
-          # RUN_ID: stable, reproducible timestamp
+
+          # Guard: verify workflow JSON exists
+          if [ ! -f "$WF_PATH" ]; then
+            echo "::error::Workflow file not found at '$WF_PATH'"
+            echo "Listing repo files for debugging:"
+            ls -R .
+            exit 1
+          fi
+
+          # RUN_ID: stable timestamp
           RUN_ID="run_$(date -u +%Y-%m-%dT%H-%M-%SZ)"
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-          
+
           # RUN_HASH: cryptographic identity binding
           RUN_HASH=$(sha256sum "$WF_PATH" | awk '{print $1}')
           echo "RUN_HASH=$RUN_HASH" >> $GITHUB_ENV
           echo "run_hash=$RUN_HASH" >> $GITHUB_OUTPUT
-          
-          echo "Captured RUN_ID=$RUN_ID"
-          echo "Captured RUN_HASH=$RUN_HASH"
+
+          echo "Captured:"
+          echo "  WF_PATH  = $WF_PATH"
+          echo "  RUN_ID   = $RUN_ID"
+          echo "  RUN_HASH = $RUN_HASH"
 
       # ---------------------------------------------------------
-      # 2. Validate workflow JSON against cri_workflow.schema.json
+      # 2. Validate CRI workflow JSON
       # ---------------------------------------------------------
       - name: Validate CRI workflow JSON
         shell: bash
         run: |
           set -euo pipefail
-          WF="$WF_PATH"
+
           SCHEMA="schemas/cri_workflow.schema.json"
-          echo "Validating workflow JSON: $WF"
-          echo "Using schema: $SCHEMA"
-          
+
+          # Strong existence checks
+          if [ ! -f "$WF_PATH" ]; then
+            echo "::error::Workflow JSON missing at '$WF_PATH'"
+            exit 1
+          fi
+          if [ ! -f "$SCHEMA" ]; then
+            echo "::error::Schema file missing at '$SCHEMA'"
+            exit 1
+          fi
+
           python3 << 'PY'
-          import json, sys, os
+          import json, os, sys
           from jsonschema import Draft202012Validator as V
-          
+
           wf_path = os.environ["WF_PATH"]
           schema_path = "schemas/cri_workflow.schema.json"
-          
-          with open(wf_path, "r") as f:
-              doc = json.load(f)
-          with open(schema_path, "r") as f:
-              schema = json.load(f)
-          
-          validator = V(schema)
-          errors = sorted(validator.iter_errors(doc), key=lambda e: e.path)
-          
-          if errors:
-              print("\nCRI workflow validation failed:\n")
-              for e in errors:
-                  print(f"- {e.message} (path: {'/'.join(map(str,e.path))})")
-              sys.exit(1)
-          
-          print("CRI workflow schema validation OK")
-          PY
+
+        try:
+         with open(wf_path, "r") as f:
+doc = json.load(f) except Exception as e:
+    print("\n::error::Error loading workflow JSON:")
+    print(str(e))
+    sys.exit(1)
+
+with open(schema_path, "r") as f:
+    schema = json.load(f)
+
+validator = V(schema) errors = sorted(validator.iter_errors(doc), key=lambda e: e.path)
+
+if errors:
+    print("\nCRI workflow validation failed:\n")
+for e in errors:
+    print(f"- {e.message} (path: {'/'.join(map(str, e.path))})")
+    sys.exit(1)
+
+print("CRI workflow schema validation OK")
+PY
 
       # ---------------------------------------------------------
-      # 3. Ensure run directory exists
+      # 3. Create run directory
       # ---------------------------------------------------------
       - name: Create run directory
         shell: bash
@@ -96,56 +124,60 @@ jobs:
           echo "Created run directory runs/${RUN_ID}"
 
       # ---------------------------------------------------------
-      # 4. Run CRI operator DAG (scripts/awo_run.py)
+      # 4. Execute CRI DAG
       # ---------------------------------------------------------
       - name: Execute CRI DAG
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/awo_run.py "${WF_PATH}" "runs/${RUN_ID}"
+          python scripts/awo_run.py "$WF_PATH" "runs/${RUN_ID}"
 
       # ---------------------------------------------------------
-      # 5. Create falsifiability.json (initial placeholder)
+      # 5. Create falsifiability.json
       # ---------------------------------------------------------
       - name: Create falsifiability placeholder
         shell: bash
         run: |
           set -euo pipefail
           TARGET="runs/${RUN_ID}/falsifiability.json"
-          
+
           if [ ! -f "$TARGET" ]; then
-            python3 -c "import json; print(json.dumps({
-              'run_id': '${RUN_ID}',
-              'run_hash': '${RUN_HASH}',
-              'criteria': [
-                'CRI workflow validated',
-                'run_manifest.json exists',
-                'operator graph executed'
-              ],
-              'status': 'not_evaluated',
-              'evaluated_at': None,
-              'notes': 'Awaiting reviewer or orchestrator evaluation.'
-            }, indent=2))" > "$TARGET"
+            python3 - <<PY
+import json
+print(json.dumps({
+  "run_id": "${RUN_ID}",
+  "run_hash": "${RUN_HASH}",
+  "criteria": [
+    "CRI workflow validated",
+    "run_manifest.json exists",
+    "operator graph executed"
+  ],
+  "status": "not_evaluated",
+  "evaluated_at": None,
+  "notes": "Awaiting reviewer or orchestrator evaluation."
+}, indent=2))
+PY
+            > "$TARGET"
+
             echo "Created placeholder falsifiability.json"
           else
             echo "falsifiability.json already exists; skipping"
           fi
 
       # ---------------------------------------------------------
-      # 6. Capture randomness metadata
+      # 6. Persist randomness metadata
       # ---------------------------------------------------------
       - name: Persist randomness metadata
         shell: bash
         run: |
-          set -euo pipefail
-          TARGET="runs/${RUN_ID}/randomness.json"
-          
-          # No seed provided by CRI yet, so just mark nondeterministic
-          python3 -c "import json; print(json.dumps({
-            'run_id': '${RUN_ID}',
-            'seed': None,
-            'deterministic': False
-          }, indent=2))" > "$TARGET"
+          python3 - <<PY > "runs/${RUN_ID}/randomness.json"
+import json
+print(json.dumps({
+  "run_id": "${RUN_ID}",
+  "seed": None,
+  "deterministic": False
+}, indent=2))
+PY
           echo "Persisted randomness metadata"
 
       # ---------------------------------------------------------
@@ -154,27 +186,27 @@ jobs:
       - name: Generate provenance artifacts
         shell: bash
         run: |
-          set -euo pipefail
           cd runs/${RUN_ID}
           sha256sum * > SHA256SUMS.txt
-          
-          # SBOM: minimal CycloneDX JSON listing
+
           TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          python3 -c "import json; print(json.dumps({
-            'bomFormat': 'CycloneDX',
-            'specVersion': '1.4',
-            'version': 1,
-            'metadata': {
-              'timestamp': '${TIMESTAMP}',
-              'tools': [{'name': 'AWO Runner', 'version': '2.0'}]
-            },
-            'components': []
-          }, indent=2))" > sbom-cyclonedx.json
-          
+          python3 - <<PY > sbom-cyclonedx.json
+import json
+print(json.dumps({
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "${TIMESTAMP}",
+    "tools": [{"name": "AWO Runner", "version": "2.0"}]
+  },
+  "components": []
+}, indent=2))
+PY
           echo "Generated SBOM and SHA256SUMS"
 
       # ---------------------------------------------------------
-      # 8. Upload artifacts for review (scope gate)
+      # 8. Upload artifacts
       # ---------------------------------------------------------
       - name: Upload run artifacts
         uses: actions/upload-artifact@v4
@@ -183,7 +215,7 @@ jobs:
           path: runs/${{ env.RUN_ID }}
 
   # =============================================================
-  # HUMAN APPROVAL & ATTESTATION JOB
+  # HUMAN APPROVAL + ATTESTATION
   # =============================================================
   human_approval:
     needs: run_awo
@@ -198,31 +230,31 @@ jobs:
           approvers: Wright-Shawn
           minimum-approvals: 1
 
-      # ---------------------------------------------------------
-      # 10. Commit ATTESTATION + update run_manifest.json
-      # ---------------------------------------------------------
       - name: Commit attestation
         shell: bash
         run: |
           set -euo pipefail
           RUN_ID="${{ needs.run_awo.outputs.run_id }}"
           TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          
+
           mkdir -p ".tmp_attest/${RUN_ID}"
-          
-          python3 -c "import json; print(json.dumps({
-            'run_id': '${RUN_ID}',
-            'approved_by': 'Wright-Shawn',
-            'timestamp': '${TIMESTAMP}',
-            'notes': 'Human-approved run'
-          }, indent=2))" > ".tmp_attest/${RUN_ID}/ATTESTATION.json"
-          
+
+          python3 - <<PY > ".tmp_attest/${RUN_ID}/ATTESTATION.json"
+import json
+print(json.dumps({
+  "run_id": "${RUN_ID}",
+  "approved_by": "Wright-Shawn",
+  "timestamp": "${TIMESTAMP}",
+  "notes": "Human-approved run"
+}, indent=2))
+PY
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           mkdir -p "runs/${RUN_ID}/"
           cp ".tmp_attest/${RUN_ID}/ATTESTATION.json" "runs/${RUN_ID}/ATTESTATION.json"
-          
+
           git add "runs/${RUN_ID}/ATTESTATION.json"
           git commit -m "AWO: add attestation for ${RUN_ID}"
           git push
