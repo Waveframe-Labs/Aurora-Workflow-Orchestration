@@ -28,6 +28,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug print workflow file location + content
+        shell: bash
+        run: |
+          echo "WF_PATH=${WF_PATH}"
+          echo "--- FILE CONTENT START ---"
+          sed -n '1,200p' "${WF_PATH}"
+          echo "--- FILE CONTENT END ---"
+
       # ---------------------------------------------------------
       # 1. Capture Workflow Path + RUN_ID + RUN_HASH
       # ---------------------------------------------------------
