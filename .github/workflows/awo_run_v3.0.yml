@@ -1,0 +1,505 @@
+name: AWO Run v3.0 (Manual Approve to Commit — CRI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow_file:
+        description: "Path to CRI workflow JSON"
+        required: true
+        default: "workflows/multimodel.json"
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: awo-run-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================
+  # 1) ORCHESTRATION + CRI EXECUTION
+  #    - Orchestrator = github.actor in this job
+  #    - CRI writes runs/run_*/...
+  #    - We hash & package the run into an artifact
+  # ============================================================
+  run_awo:
+    name: Execute CRI Workflow
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.capture.outputs.run_id }}
+      orchestrator_id: ${{ steps.orchestrator.outputs.orchestrator_id }}
+      runner_exit_code: ${{ steps.execute.outputs.runner_exit_code }}
+
+    env:
+      ORCHESTRATOR_ID: ${{ github.actor }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Record orchestrator identity
+        id: orchestrator
+        run: |
+          echo "orchestrator_id=${ORCHESTRATOR_ID}" >> "$GITHUB_OUTPUT"
+          echo "Orchestrator: ${ORCHESTRATOR_ID}"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f scripts/requirements.txt ]; then
+            pip install -r scripts/requirements.txt
+          fi
+          # Utilities for schema + SBOM
+          pip install jsonschema cyclonedx-bom || true
+
+      - name: Resolve & validate CRI workflow JSON
+        id: wf
+        run: |
+          set -euo pipefail
+          WF="${{ github.event.inputs.workflow_file || 'workflows/multimodel.json' }}"
+          echo "wf=$WF" >> "$GITHUB_OUTPUT"
+
+          if [ ! -f "$WF" ]; then
+            echo "::error::CRI workflow JSON not found at $WF"
+            exit 1
+          fi
+
+          echo "Using workflow file: $WF"
+
+          # Optional schema check if present
+          if [ -f schemas/workflow.schema.json ]; then
+            python - "$WF" << 'PY'
+            import json, sys
+            from jsonschema import Draft202012Validator as V
+
+            path = sys.argv[1]
+            with open("schemas/workflow.schema.json", "r", encoding="utf-8") as f:
+              schema = json.load(f)
+            with open(path, "r", encoding="utf-8") as f:
+              doc = json.load(f)
+
+            V(schema).validate(doc)
+            print("CRI workflow JSON schema OK:", path)
+            PY
+          fi
+
+      - name: Execute CRI DAG (awo_run.py)
+        id: execute
+        run: |
+          set -euo pipefail
+          WF="${{ steps.wf.outputs.wf }}"
+          echo "Executing CRI workflow: $WF"
+
+          code=0
+          python scripts/awo_run.py "$WF" || code=$?
+
+          echo "CRI runner exit code: $code"
+          echo "runner_exit_code=$code" >> "$GITHUB_OUTPUT"
+          # IMPORTANT: do not fail job here; gating happens via environments
+          exit 0
+
+      - name: Capture Run-ID from breadcrumb
+        id: capture
+        run: |
+          set -euo pipefail
+
+          if [ ! -f runs/LAST_RUN ]; then
+            echo "::warning::runs/LAST_RUN missing (no run directory created)"
+            echo "run_id=none" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          RID="$(tr -d '\r\n' < runs/LAST_RUN)"
+
+          case "$RID" in
+            (*[!A-Za-z0-9._-]*|'')
+              echo "::error::Invalid RUN_ID in runs/LAST_RUN: '$RID'"
+              echo "run_id=none" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+
+          if [ ! -d "runs/$RID" ]; then
+            echo "::warning::Run directory runs/$RID not found"
+            echo "run_id=none" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Detected run directory: runs/$RID"
+          echo "run_id=$RID" >> "$GITHUB_OUTPUT"
+          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
+
+      - name: Generate SHA256SUMS and SBOM
+        if: ${{ steps.capture.outputs.run_id != 'none' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RD="runs/${RUN_ID}"
+
+          echo "Hashing files under ${RD}"
+
+          TMP="$(mktemp)"
+          (
+            cd "$RD"
+            find . -type f ! -name 'SHA256SUMS.txt' -print0 \
+              | sort -z \
+              | xargs -0 sha256sum
+          ) > "$TMP"
+
+          mv "$TMP" "$RD/SHA256SUMS.txt"
+
+          # Optional SBOM (best-effort)
+          if command -v cyclonedx-py >/dev/null 2>&1; then
+            cyclonedx-py -o "$RD/sbom-cyclonedx.json" || true
+          fi
+
+      - name: Create run payload tarball
+        if: ${{ steps.capture.outputs.run_id != 'none' }}
+        run: |
+          set -euo pipefail
+          tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
+          ls -lh "awo-run-${RUN_ID}.tar.gz"
+
+      - name: Upload run payload artifact
+        if: ${{ steps.capture.outputs.run_id != 'none' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: awo-run-${{ env.RUN_ID }}
+          path: awo-run-${{ env.RUN_ID }}.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  # ============================================================
+  # 2) SCOPE GATE — HUMAN REVIEWS SCOPE / CLAIMS
+  #    - MUST NOT be the orchestrator
+  # ============================================================
+  scope_gate:
+    needs: run_awo
+    runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != 'none' && needs.run_awo.outputs.run_id != '' }}
+    environment:
+      name: awo-scope
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    env:
+      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
+      ORCHESTRATOR_ID: ${{ needs.run_awo.outputs.orchestrator_id }}
+
+    outputs:
+      scope_reviewer: ${{ steps.scope_meta.outputs.scope_reviewer }}
+
+    steps:
+      - name: Enforce self-approval ban (scope)
+        id: scope_meta
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_ACTOR}" = "${ORCHESTRATOR_ID}" ]; then
+            echo "::error::Scope reviewer cannot be the orchestrator (${ORCHESTRATOR_ID})."
+            exit 1
+          fi
+
+          echo "Scope approved by ${GITHUB_ACTOR}"
+          echo "scope_reviewer=${GITHUB_ACTOR}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Scope Gate — APPROVED"
+            echo "- Run-ID: ${RUN_ID}"
+            echo "- Orchestrator: ${ORCHESTRATOR_ID}"
+            echo "- Scope Reviewer: ${GITHUB_ACTOR}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ============================================================
+  # 3) RENDER SUMMARY — MACHINE VIEW + HUMAN SUMMARY
+  # ============================================================
+  render_summary:
+    needs: [run_awo, scope_gate]
+    runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != 'none' && needs.run_awo.outputs.run_id != '' }}
+    env:
+      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
+
+    steps:
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Download run payload
+        uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ env.RUN_ID }}
+          path: artifacts
+
+      - name: Extract run folder
+        id: locate
+        run: |
+          set -euo pipefail
+          TAR="artifacts/awo-run-${RUN_ID}.tar.gz"
+          mkdir -p extracted
+          tar -xzf "$TAR" -C extracted
+          RD="extracted/runs/${RUN_ID}"
+          echo "rd=$RD" >> "$GITHUB_OUTPUT"
+          echo "### Files" >> "$GITHUB_STEP_SUMMARY"
+          find "$RD" -maxdepth 2 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Show scope summary (if present)
+        run: |
+          set -euo pipefail
+          RD="${{ steps.locate.outputs.rd }}"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Scope Gate — Machine Check" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f "$RD/scope/summary.json" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            jq . "$RD/scope/summary.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "_No scope/summary.json found._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Show run report excerpt
+        run: |
+          set -euo pipefail
+          RD="${{ steps.locate.outputs.rd }}"
+
+          if [ -f "$RD/report.md" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
+            head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "_Full run is committed after final audit approval._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  # ============================================================
+  # 4) AUDIT GATE — FINAL HUMAN APPROVAL
+  #    - MUST NOT be orchestrator
+  # ============================================================
+  human_approval:
+    needs: [run_awo, scope_gate, render_summary]
+    runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != 'none' && needs.run_awo.outputs.run_id != '' }}
+    environment:
+      name: awo-audit
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    env:
+      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
+      ORCHESTRATOR_ID: ${{ needs.run_awo.outputs.orchestrator_id }}
+
+    outputs:
+      audit_reviewer: ${{ steps.audit_meta.outputs.audit_reviewer }}
+
+    steps:
+      - name: Enforce self-approval ban (audit)
+        id: audit_meta
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_ACTOR}" = "${ORCHESTRATOR_ID}" ]; then
+            echo "::error::Audit reviewer cannot be the orchestrator (${ORCHESTRATOR_ID})."
+            exit 1
+          fi
+
+          echo "audit_reviewer=${GITHUB_ACTOR}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Audit: APPROVED"
+            echo "- Run-ID: ${RUN_ID}"
+            echo "- Orchestrator: ${ORCHESTRATOR_ID}"
+            echo "- Audit Reviewer: ${GITHUB_ACTOR}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ============================================================
+  # 5) FINALIZE — COMMIT RUN + ATTESTATION + SIGNATURES
+  #    - Re-check independence before commit
+  # ============================================================
+  finalize:
+    needs: [run_awo, scope_gate, human_approval]
+    runs-on: ubuntu-latest
+    if: ${{ needs.run_awo.outputs.run_id != 'none' && needs.run_awo.outputs.run_id != '' }}
+    env:
+      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
+      ORCHESTRATOR_ID: ${{ needs.run_awo.outputs.orchestrator_id }}
+      AUDIT_REVIEWER: ${{ needs.human_approval.outputs.audit_reviewer }}
+
+    steps:
+      - name: Enforce independence (orchestrator ≠ audit reviewer)
+        run: |
+          set -euo pipefail
+          if [ "${ORCHESTRATOR_ID}" = "${AUDIT_REVIEWER}" ]; then
+            echo "::error::Orchestrator and audit reviewer are identical (${ORCHESTRATOR_ID}); violates AWO governance."
+            exit 1
+          fi
+          echo "Independence check passed: ${ORCHESTRATOR_ID} ≠ ${AUDIT_REVIEWER}"
+
+      - name: Checkout (with credentials)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Download run payload
+        uses: actions/download-artifact@v4
+        with:
+          name: awo-run-${{ env.RUN_ID }}
+          path: artifacts
+
+      - name: Extract run folder into repo
+        run: |
+          set -euo pipefail
+          TAR="artifacts/awo-run-${RUN_ID}.tar.gz"
+          mkdir -p extracted
+          tar -xzf "$TAR" -C extracted
+          rsync -a extracted/runs/ runs/
+          echo "Finalizing run ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write approval record
+        run: |
+          set -euo pipefail
+          mkdir -p "runs/${RUN_ID}"
+          cat > "runs/${RUN_ID}/approval.json" <<EOF
+          {
+            "run_id": "${RUN_ID}",
+            "orchestrator": "${ORCHESTRATOR_ID}",
+            "audit_reviewer": "${AUDIT_REVIEWER}",
+            "approved_at": "$(date -u +%FT%TZ)",
+            "workflow_run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF
+
+      - name: Mark manifest as succeeded
+        run: |
+          set -euo pipefail
+          MF="runs/${RUN_ID}/run_manifest.json"
+
+          if [ ! -f "$MF" ]; then
+            echo "::error::run_manifest.json not found at $MF"
+            ls -R runs || true
+            exit 1
+          fi
+
+          python - "$MF" << 'PY'
+          import json, sys, datetime as dt
+
+          path = sys.argv[1]
+          with open(path, "r", encoding="utf-8") as f:
+              m = json.load(f)
+
+          m["status"] = "succeeded"
+          m["finished_at"] = dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+          with open(path, "w", encoding="utf-8") as f:
+              json.dump(m, f, indent=2, ensure_ascii=False)
+
+          print("updated:", path)
+          PY
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.4.1'
+
+      - name: Write attestation (bind manifest ↔ checksums)
+        shell: bash
+        run: |
+          set -euo pipefail
+          RD="runs/${RUN_ID}"
+          MF="${RD}/run_manifest.json"
+          SUMS="${RD}/SHA256SUMS.txt"
+
+          test -f "$MF"   || { echo "::error::Missing $MF"; exit 1; }
+          test -f "$SUMS" || { echo "::error::Missing $SUMS"; exit 1; }
+
+          MANIFEST_SHA="$(sha256sum "$MF"   | awk '{print $1}')"
+          SUMS_SHA="$(sha256sum "$SUMS" | awk '{print $1}')"
+          NOW="$(date -u +%FT%TZ)"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          cat > "${RD}/ATTESTATION.txt" <<EOF
+          AWO Run Attestation
+
+          Run-ID: ${RUN_ID}
+          Repository: ${{ github.repository }}
+          Commit: ${GIT_SHA}
+          Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Orchestrator: ${ORCHESTRATOR_ID}
+          Audit Reviewer: ${AUDIT_REVIEWER}
+          Timestamp (UTC): ${NOW}
+
+          Bindings:
+            run_manifest.json  sha256:${MANIFEST_SHA}
+            SHA256SUMS.txt     sha256:${SUMS_SHA}
+
+          Statement:
+            This attestation binds the AWO run manifest to the file inventory recorded in
+            SHA256SUMS.txt. Any alteration of either file will invalidate these hashes.
+          EOF
+
+      - name: Sign tarball and attestation (keyless, OIDC)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TARBALL="artifacts/awo-run-${RUN_ID}.tar.gz"
+          ATTN="runs/${RUN_ID}/ATTESTATION.txt"
+
+          cosign sign-blob --yes --output-signature "${TARBALL}.sig" \
+                           --output-certificate "${TARBALL}.cert" \
+                           "${TARBALL}"
+
+          cosign sign-blob --yes --output-signature "${ATTN}.sig" \
+                           --output-certificate "${ATTN}.cert" \
+                           "${ATTN}"
+
+      - name: Upload signatures
+        uses: actions/upload-artifact@v4
+        with:
+          name: awo-run-signatures-${{ env.RUN_ID }}
+          path: |
+            artifacts/awo-run-${{ env.RUN_ID }}.tar.gz.sig
+            artifacts/awo-run-${{ env.RUN_ID }}.tar.gz.cert
+            runs/${{ env.RUN_ID }}/ATTESTATION.txt
+            runs/${{ env.RUN_ID }}/ATTESTATION.txt.sig
+            runs/${{ env.RUN_ID }}/ATTESTATION.txt.cert
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Commit run to branch
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "runs/${RUN_ID}"
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
+          git push
+
+      - name: Post final summary
+        run: |
+          set -euo pipefail
+          COMMIT_SHA="$(git rev-parse --short HEAD)"
+          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${COMMIT_SHA}"
+
+          {
+            echo "## Audit: ✅ APPROVED & committed"
+            echo "- Run-ID: ${RUN_ID}"
+            echo "- Orchestrator: ${ORCHESTRATOR_ID}"
+            echo "- Audit Reviewer: ${AUDIT_REVIEWER}"
+            echo "- Commit: [${COMMIT_SHA}](${COMMIT_URL})"
+          } >> "$GITHUB_STEP_SUMMARY"
