@@ -49,36 +49,36 @@ jobs:
           fi
 
           python3 << 'PY'
-import json, os, sys
-from jsonschema import Draft202012Validator as V
+          import json, os, sys
+          from jsonschema import Draft202012Validator as V
 
-wf_path = os.environ["WF_PATH"]
-schema_path = "schemas/cri_workflow.schema.json"
+          wf_path = os.environ["WF_PATH"]
+          schema_path = "schemas/cri_workflow.schema.json"
 
-# Load workflow file
-try:
-    with open(wf_path, "r") as f:
-        doc = json.load(f)
-except Exception as e:
-    print("\nERROR: Failed to parse workflow JSON:")
-    print(str(e))
-    sys.exit(1)
+          # Load workflow file
+          try:
+              with open(wf_path, "r") as f:
+                  doc = json.load(f)
+          except Exception as e:
+              print("\nERROR: Failed to parse workflow JSON:")
+              print(str(e))
+              sys.exit(1)
 
-# Load schema
-with open(schema_path, "r") as f:
-    schema = json.load(f)
+          # Load schema
+          with open(schema_path, "r") as f:
+              schema = json.load(f)
 
-validator = V(schema)
-errors = sorted(validator.iter_errors(doc), key=lambda e: list(e.path))
+          validator = V(schema)
+          errors = sorted(validator.iter_errors(doc), key=lambda e: list(e.path))
 
-if errors:
-    print("\nCRI workflow validation failed:\n")
-    for e in errors:
-        print(f"- {e.message} (path: {'/'.join(map(str, e.path))})")
-    sys.exit(1)
+          if errors:
+              print("\nCRI workflow validation failed:\n")
+              for e in errors:
+                  print(f"- {e.message} (path: {'/'.join(map(str, e.path))})")
+              sys.exit(1)
 
-print("CRI workflow schema validation OK")
-PY
+          print("CRI workflow schema validation OK")
+          PY
 
 
       # ---------------------------------------------------------
@@ -110,20 +110,20 @@ PY
 
           if [ ! -f "$TARGET" ]; then
             python3 - <<PY
-import json
-print(json.dumps({
-  "run_id": "${RUN_ID}",
-  "run_hash": "${RUN_HASH}",
-  "criteria": [
-    "CRI workflow validated",
-    "run_manifest.json exists",
-    "operator graph executed"
-  ],
-  "status": "not_evaluated",
-  "evaluated_at": None,
-  "notes": "Awaiting reviewer or orchestrator evaluation."
-}, indent=2))
-PY
+            import json
+            print(json.dumps({
+            "run_id": "${RUN_ID}",
+            "run_hash": "${RUN_HASH}",
+            "criteria": [
+            "CRI workflow validated",
+            "run_manifest.json exists",
+            "operator graph executed"
+            ],
+            "status": "not_evaluated",
+            "evaluated_at": None,
+            "notes": "Awaiting reviewer or orchestrator evaluation."
+            }, indent=2))
+            PY
             > "$TARGET"
 
             echo "Created placeholder falsifiability.json"
@@ -138,13 +138,13 @@ PY
         shell: bash
         run: |
           python3 - <<PY > "runs/${RUN_ID}/randomness.json"
-import json
-print(json.dumps({
-  "run_id": "${RUN_ID}",
-  "seed": None,
-  "deterministic": False
-}, indent=2))
-PY
+          import json
+          print(json.dumps({
+          "run_id": "${RUN_ID}",
+          "seed": None,
+          "deterministic": False
+          }, indent=2))
+          PY
           echo "Persisted randomness metadata"
 
       # ---------------------------------------------------------
@@ -158,18 +158,18 @@ PY
 
           TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           python3 - <<PY > sbom-cyclonedx.json
-import json
-print(json.dumps({
-  "bomFormat": "CycloneDX",
-  "specVersion": "1.4",
-  "version": 1,
-  "metadata": {
-    "timestamp": "${TIMESTAMP}",
-    "tools": [{"name": "AWO Runner", "version": "2.0"}]
-  },
-  "components": []
-}, indent=2))
-PY
+          import json
+          print(json.dumps({
+          "bomFormat": "CycloneDX",
+          "specVersion": "1.4",
+          "version": 1,
+          "metadata": {
+          "timestamp": "${TIMESTAMP}",
+          "tools": [{"name": "AWO Runner", "version": "2.0"}]
+          },
+          "components": []
+          }, indent=2))
+          PY
           echo "Generated SBOM and SHA256SUMS"
 
       # ---------------------------------------------------------
@@ -207,14 +207,14 @@ PY
           mkdir -p ".tmp_attest/${RUN_ID}"
 
           python3 - <<PY > ".tmp_attest/${RUN_ID}/ATTESTATION.json"
-import json
-print(json.dumps({
-  "run_id": "${RUN_ID}",
-  "approved_by": "Wright-Shawn",
-  "timestamp": "${TIMESTAMP}",
-  "notes": "Human-approved run"
-}, indent=2))
-PY
+          import json
+          print(json.dumps({
+          "run_id": "${RUN_ID}",
+          "approved_by": "Wright-Shawn",
+          "timestamp": "${TIMESTAMP}",
+          "notes": "Human-approved run"
+          }, indent=2))
+          PY
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
