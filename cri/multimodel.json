@@ -16,12 +16,15 @@
               "function": {
                 "op": "text_contains",
                 "value": "battery lasts all day"
-              }
+              },
               "tolerance": { "metric": "boolean", "max": 1 }
             }
           ],
           "falsification_tests": [
-            { "name": "mentions-ui-confusing", "must_pass": true }
+            {
+              "name": "mentions-ui-confusing",
+              "must_pass": true
+            }
           ]
         }
       }
@@ -58,7 +61,7 @@
       "id": "assert_consensus_quality",
       "op": "assert_contains",
       "args": {
-        "from_step": "consensus_1",  
+        "from_step": "consensus_1",
         "must_include": [
           "battery lasts all day",
           "ui is confusing"
@@ -68,7 +71,9 @@
     {
       "id": "gate_review",
       "op": "audit_gate",
-      "args": { "checklist": "templates/audit-checklist.md" }
+      "args": {
+        "checklist": "templates/audit-checklist.md"
+      }
     },
     {
       "id": "emit_consensus_text",
