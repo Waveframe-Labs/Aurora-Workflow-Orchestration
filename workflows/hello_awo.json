@@ -1,0 +1,41 @@
+{
+  "name": "Hello AWO Demo",
+  "version": "1.0",
+  "description": "A minimal AWO-compliant workflow demonstrating prompt, script, and check steps.",
+  "schema_version": "1.1.1",
+
+  "steps": [
+    {
+      "name": "Generate summary",
+      "type": "prompt",
+      "prompt": "Summarize the following text: The UX is confusing but the battery lasts all day.",
+      "model": "gpt-4o-mini",
+      "params": {
+        "temperature": 0.3,
+        "max_tokens": 200
+      },
+      "save_as": "summary_output"
+    },
+
+    {
+      "name": "Extract battery claim",
+      "type": "script",
+      "inputs": { "text": "{{summary_output}}" },
+      "outputs": { "battery_flag": "boolean" }
+    },
+
+    {
+      "name": "Check for required content",
+      "type": "check",
+      "inputs": { "text": "{{summary_output}}" },
+      "outputs": {},
+      "params": {
+        "required": [
+          "battery",
+          "ui",
+          "confusing"
+        ]
+      }
+    }
+  ]
+}
