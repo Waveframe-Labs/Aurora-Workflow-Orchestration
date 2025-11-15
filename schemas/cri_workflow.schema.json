@@ -32,7 +32,8 @@
           },
 
           "args": {
-            "type": "object"
+            "type": "object",
+            "additionalProperties": true
           },
 
           "inputs_from": {
@@ -48,7 +49,8 @@
           },
 
           "params": {
-            "type": "object"
+            "type": "object",
+            "additionalProperties": true
           }
         }
       }
