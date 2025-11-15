@@ -474,7 +474,7 @@ jobs:
             "approved_at": "PLACEHOLDER_TIMESTAMP",
             "workflow_run_url": "https://github.com/PLACEHOLDER_GITHUB_REPOSITORY/actions/runs/PLACEHOLDER_GITHUB_RUN_ID"
           }
-APPROVAL_REC_EOF
+          EOF
           # Substitute variables
           sed -i "s/PLACEHOLDER_RUN_ID/${RUN_ID}/g" "runs/${RUN_ID}/approval.json"
           sed -i "s/PLACEHOLDER_GITHUB_ACTOR/${GITHUB_ACTOR}/g" "runs/${RUN_ID}/approval.json"
@@ -558,7 +558,7 @@ APPROVAL_REC_EOF
               This attestation binds the AWO run manifest to the file inventory
               recorded in SHA256SUMS.txt. Any alteration of either file will
               invalidate these hashes.
-EOF
+              EOF
 
       - name: Sign tarball and attestation (keyless, OIDC)
         shell: bash
