@@ -49,20 +49,20 @@ jobs:
           fi
 
           python3 << 'PY'
-          import json, os, sys
-          from jsonschema import Draft202012Validator as V
+import json, os, sys
+from jsonschema import Draft202012Validator as V
 
-          wf_path = os.environ["WF_PATH"]
-          schema_path = "schemas/cri_workflow.schema.json"
+wf_path = os.environ["WF_PATH"]
+schema_path = "schemas/cri_workflow.schema.json"
 
 # Load workflow file
-        try:
-         with open(wf_path, "r") as f:
-          doc = json.load(f)
-         except Exception as e:
-          print("\nERROR: Failed to parse workflow JSON:")
-          print(str(e))
-          sys.exit(1)
+try:
+    with open(wf_path, "r") as f:
+        doc = json.load(f)
+except Exception as e:
+    print("\nERROR: Failed to parse workflow JSON:")
+    print(str(e))
+    sys.exit(1)
 
 # Load schema
 with open(schema_path, "r") as f:
@@ -79,8 +79,6 @@ if errors:
 
 print("CRI workflow schema validation OK")
 PY
-
-
 
 
       # ---------------------------------------------------------
