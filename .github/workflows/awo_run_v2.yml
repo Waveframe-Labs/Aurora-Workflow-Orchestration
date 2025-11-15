@@ -6,7 +6,7 @@ on:
       workflow_file:
         description: "Path to CRI workflow JSON"
         required: true
-        default: "cri/multimodel.json"
+        default: "workflows/multimodel.json"
 
 permissions:
   contents: write
