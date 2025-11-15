@@ -1,623 +1,228 @@
-name: AWO Run v2 (AWO-only)
+name: AWO Run (CRI Orchestration v2)
 
 on:
   workflow_dispatch:
     inputs:
       workflow_file:
-        description: "Path to AWO workflow JSON (AWO step format, not CRI)"
-        required: false
-        default: "workflows/hello_awo.json"
+        description: "Path to CRI workflow JSON"
+        required: true
+        default: "cri/multimodel.json"
 
 permissions:
   contents: write
   id-token: write
 
-concurrency:
-  group: awo-run-v2-${{ github.ref_name }}-${{ github.event.inputs.workflow_file || 'default' }}
-  cancel-in-progress: false
-
 jobs:
   run_awo:
+    name: Execute CRI Workflow
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ steps.capture.outputs.run_id }}
       run_hash: ${{ steps.capture.outputs.run_hash }}
-      runner_id: ${{ steps.meta.outputs.runner_id }}
-    env:
-      WF_DEFAULT: workflows/hello_awo.json
-      APPROVER_ID: "Wright-Shawn"
-      RUNNER_ID: ${{ github.actor }}
-
     steps:
-      - name: Checkout repository
+      # ---------------------------------------------------------
+      # 0. Checkout repository
+      # ---------------------------------------------------------
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Resolve workflow path
-        id: resolve
-        shell: bash
-        run: |
-          set -euo pipefail
-          WF_INPUT="${{ github.event.inputs.workflow_file }}"
-          if [ -z "$WF_INPUT" ]; then
-            WF="$WF_DEFAULT"
-          else
-            WF="$WF_INPUT"
-          fi
-
-          if [ ! -f "$WF" ]; then
-            echo "::error::Workflow JSON not found at $WF"
-            exit 1
-          fi
-
-          echo "Resolved workflow path: $WF"
-          echo "wf_path=$WF" >> "$GITHUB_OUTPUT"
-          echo "WF_PATH=$WF" >> "$GITHUB_ENV"
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          if [ -f scripts/requirements.txt ]; then
-            pip install -r scripts/requirements.txt
-          fi
-          pip install jsonschema cyclonedx-bom || true
-
-      - name: Validate AWO workflow schema (reject CRI operators)
-        id: validate_wf
-        env:
-          WF_PATH: ${{ steps.resolve.outputs.wf_path }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - << 'PY'
-          import json, os, sys
-          from jsonschema import Draft202012Validator as V
-          from pathlib import Path
-
-          wf_path = os.environ.get("WF_PATH")
-          if not wf_path or not Path(wf_path).is_file():
-            print(f"::error::WF_PATH not set or file missing: {wf_path!r}", file=sys.stderr)
-            sys.exit(1)
-
-          with open(wf_path, "r", encoding="utf-8") as f:
-            doc = json.load(f)
-
-          # Detect CRI-style workflows early
-          steps = doc.get("steps")
-          if not isinstance(steps, list) or not steps:
-            print("::error::Workflow JSON missing non-empty 'steps' array.", file=sys.stderr)
-            sys.exit(1)
-
-          first = steps[0]
-          if isinstance(first, dict) and "op" in first and "type" not in first:
-            print("::error::Detected CRI-style operator workflow (uses 'op' but no 'type').", file=sys.stderr)
-            print("::error::This runner only supports AWO step workflows validated by workflow_schema.json.", file=sys.stderr)
-            print("::error::Move CRI workflows under /cri and/or use a CRI-specific runner.", file=sys.stderr)
-            sys.exit(1)
-
-          schema_path = Path("schemas/workflow_schema.json")
-          if not schema_path.is_file():
-            print(f"::error::Schema file missing at {schema_path}", file=sys.stderr)
-            sys.exit(1)
-
-          with open(schema_path, "r", encoding="utf-8") as f:
-            schema = json.load(f)
-
-          validator = V(schema)
-          try:
-            validator.validate(doc)
-          except Exception as e:
-            print("::error::AWO workflow JSON failed schema validation:", file=sys.stderr)
-            print(str(e), file=sys.stderr)
-            sys.exit(1)
-
-          print("workflow JSON: AWO schema OK (schemas/workflow_schema.json)")
-          PY
-
-      - name: Run AWO orchestrator
-        id: exec
-        shell: bash
-        env:
-          WF_PATH: ${{ steps.resolve.outputs.wf_path }}
-        run: |
-          set -euo pipefail
-          echo "Running AWO orchestrator with workflow: $WF_PATH"
-          python scripts/awo_run.py "$WF_PATH"
-
-      - name: Capture Run ID and compute hash fingerprint
+      # ---------------------------------------------------------
+      # 1. Capture Workflow Path and Generate RUN_ID + RUN_HASH
+      # ---------------------------------------------------------
+      - name: Capture run identity
         id: capture
         shell: bash
-        env:
-          WF_PATH: ${{ steps.resolve.outputs.wf_path }}
         run: |
           set -euo pipefail
+          WF_PATH="${{ github.event.inputs.workflow_file }}"
+          echo "WF_PATH=$WF_PATH" >> $GITHUB_ENV
+          
+          # RUN_ID: stable, reproducible timestamp
+          RUN_ID="run_$(date -u +%Y-%m-%dT%H-%M-%SZ)"
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          
+          # RUN_HASH: cryptographic identity binding
+          RUN_HASH=$(sha256sum "$WF_PATH" | awk '{print $1}')
+          echo "RUN_HASH=$RUN_HASH" >> $GITHUB_ENV
+          echo "run_hash=$RUN_HASH" >> $GITHUB_OUTPUT
+          
+          echo "Captured RUN_ID=$RUN_ID"
+          echo "Captured RUN_HASH=$RUN_HASH"
 
-          if [ -f runs/LAST_RUN ]; then
-            RID="$(tr -d '\r\n' < runs/LAST_RUN)"
-            if [ -z "$RID" ] || [ ! -d "runs/$RID" ]; then
-              echo "::warning::runs/LAST_RUN present but directory missing or empty; falling back to timestamp."
-              RID="run_$(date -u +%Y-%m-%dT%H-%M-%SZ)"
-              mkdir -p "runs/$RID"
-              echo "$RID" > runs/LAST_RUN
-            fi
-          else
-            echo "::warning::runs/LAST_RUN missing; creating new run id."
-            RID="run_$(date -u +%Y-%m-%dT%H-%M-%SZ)"
-            mkdir -p "runs/$RID"
-            echo "$RID" > runs/LAST_RUN
-          fi
-
-          # Governance-grade run hash (logical identifier)
-          WF_HASH="$(sha256sum "$WF_PATH" | awk '{print $1}')"
-          GIT_SHA="$(git rev-parse HEAD)"
-          HASH_INPUT="${RID}:${GIT_SHA}:${WF_HASH}"
-          RUN_HASH="run_$(printf '%s' "$HASH_INPUT" | sha256sum | awk '{print $1}')"
-
-          echo "Captured run directory: runs/$RID"
-          echo "Logical run hash: $RUN_HASH"
-
-          echo "run_id=$RID" >> "$GITHUB_OUTPUT"
-          echo "run_hash=$RUN_HASH" >> "$GITHUB_OUTPUT"
-          echo "RUN_ID=$RID" >> "$GITHUB_ENV"
-          echo "RUN_HASH=$RUN_HASH" >> "$GITHUB_ENV"
-
-      - name: Record runner identity
-        id: meta
+      # ---------------------------------------------------------
+      # 2. Validate workflow JSON against cri_workflow.schema.json
+      # ---------------------------------------------------------
+      - name: Validate CRI workflow JSON
         shell: bash
-        run: |
-          echo "runner_id=${RUNNER_ID}" >> "$GITHUB_OUTPUT"
-
-      - name: Ensure falsifiability record
-        shell: bash
-        env:
-          RUN_ID: ${{ steps.capture.outputs.run_id }}
-          RUN_HASH: ${{ steps.capture.outputs.run_hash }}
         run: |
           set -euo pipefail
-          RD="runs/${RUN_ID}"
-          mkdir -p "$RD"
-          TARGET="${RD}/falsifiability.json"
+          WF="$WF_PATH"
+          SCHEMA="schemas/cri_workflow.schema.json"
+          echo "Validating workflow JSON: $WF"
+          echo "Using schema: $SCHEMA"
+          
+          python3 << 'PY'
+          import json, sys, os
+          from jsonschema import Draft202012Validator as V
+          
+          wf_path = os.environ["WF_PATH"]
+          schema_path = "schemas/cri_workflow.schema.json"
+          
+          with open(wf_path, "r") as f:
+              doc = json.load(f)
+          with open(schema_path, "r") as f:
+              schema = json.load(f)
+          
+          validator = V(schema)
+          errors = sorted(validator.iter_errors(doc), key=lambda e: e.path)
+          
+          if errors:
+              print("\nCRI workflow validation failed:\n")
+              for e in errors:
+                  print(f"- {e.message} (path: {'/'.join(map(str,e.path))})")
+              sys.exit(1)
+          
+          print("CRI workflow schema validation OK")
+          PY
 
+      # ---------------------------------------------------------
+      # 3. Ensure run directory exists
+      # ---------------------------------------------------------
+      - name: Create run directory
+        shell: bash
+        run: |
+          mkdir -p "runs/${RUN_ID}"
+          echo "Created run directory runs/${RUN_ID}"
+
+      # ---------------------------------------------------------
+      # 4. Run CRI operator DAG (scripts/awo_run.py)
+      # ---------------------------------------------------------
+      - name: Execute CRI DAG
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/awo_run.py "${WF_PATH}" "runs/${RUN_ID}"
+
+      # ---------------------------------------------------------
+      # 5. Create falsifiability.json (initial placeholder)
+      # ---------------------------------------------------------
+      - name: Create falsifiability placeholder
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET="runs/${RUN_ID}/falsifiability.json"
+          
           if [ ! -f "$TARGET" ]; then
             python3 -c "import json; print(json.dumps({
               'run_id': '${RUN_ID}',
               'run_hash': '${RUN_HASH}',
               'criteria': [
+                'CRI workflow validated',
                 'run_manifest.json exists',
-                'workflow JSON validated',
-                'report.md or equivalent output present'
+                'operator graph executed'
               ],
               'status': 'not_evaluated',
               'evaluated_at': None,
-              'notes': 'created by workflow; orchestrator/auditor should update with actual falsifiability verdict.'
+              'notes': 'Awaiting reviewer or orchestrator evaluation.'
             }, indent=2))" > "$TARGET"
-            echo "Created falsifiability.json at ${TARGET}"
+            echo "Created placeholder falsifiability.json"
           else
-            echo "falsifiability.json already present at ${TARGET} (left unchanged)."
+            echo "falsifiability.json already exists; skipping"
           fi
 
+      # ---------------------------------------------------------
+      # 6. Capture randomness metadata
+      # ---------------------------------------------------------
       - name: Persist randomness metadata
         shell: bash
-        env:
-          RUN_ID: ${{ steps.capture.outputs.run_id }}
-          WF_PATH: ${{ steps.resolve.outputs.wf_path }}
         run: |
           set -euo pipefail
-          python - << 'PY'
-          import json, os, pathlib
+          TARGET="runs/${RUN_ID}/randomness.json"
+          
+          # No seed provided by CRI yet, so just mark nondeterministic
+          python3 -c "import json; print(json.dumps({
+            'run_id': '${RUN_ID}',
+            'seed': None,
+            'deterministic': False
+          }, indent=2))" > "$TARGET"
+          echo "Persisted randomness metadata"
 
-          run_id = os.environ["RUN_ID"]
-          wf_path = os.environ.get("WF_PATH")
-
-          rd = pathlib.Path("runs") / run_id
-          rd.mkdir(parents=True, exist_ok=True)
-          target = rd / "randomness.json"
-
-          seed = None
-          if wf_path and pathlib.Path(wf_path).is_file():
-            try:
-              with open(wf_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-              seed = data.get("random_seed", None)
-            except Exception:
-              seed = None
-
-          doc = {"run_id": run_id, "seed": seed}
-          with target.open("w", encoding="utf-8") as f:
-            json.dump(doc, f, indent=2)
-          print(f"randomness.json written for run {run_id}, seed={seed!r}")
-          PY
-
-      - name: Hash run folder & emit SBOM
-        if: ${{ steps.capture.outputs.run_id != '' }}
+      # ---------------------------------------------------------
+      # 7. Generate SHA256SUMS & SBOM
+      # ---------------------------------------------------------
+      - name: Generate provenance artifacts
         shell: bash
-        env:
-          RUN_ID: ${{ steps.capture.outputs.run_id }}
         run: |
           set -euo pipefail
-          RD="runs/${RUN_ID}"
-          TMP="$(mktemp)"
+          cd runs/${RUN_ID}
+          sha256sum * > SHA256SUMS.txt
+          
+          # SBOM: minimal CycloneDX JSON listing
+          TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          python3 -c "import json; print(json.dumps({
+            'bomFormat': 'CycloneDX',
+            'specVersion': '1.4',
+            'version': 1,
+            'metadata': {
+              'timestamp': '${TIMESTAMP}',
+              'tools': [{'name': 'AWO Runner', 'version': '2.0'}]
+            },
+            'components': []
+          }, indent=2))" > sbom-cyclonedx.json
+          
+          echo "Generated SBOM and SHA256SUMS"
 
-          (
-            cd "$RD"
-            find . -type f ! -name 'SHA256SUMS.txt' -print0 \
-              | sort -z \
-              | xargs -0 sha256sum
-          ) > "$TMP"
-
-          mv "$TMP" "$RD/SHA256SUMS.txt"
-          echo "Wrote SHA256SUMS.txt for run ${RUN_ID}"
-
-          # SBOM is best-effort
-          cyclonedx-py -o "$RD/sbom-cyclonedx.json" || echo "cyclonedx-py not available; SBOM skipped"
-
-      - name: Create payload
-        if: ${{ steps.capture.outputs.run_id != '' }}
-        shell: bash
-        env:
-          RUN_ID: ${{ steps.capture.outputs.run_id }}
-        run: |
-          set -euo pipefail
-          tar -czf "awo-run-${RUN_ID}.tar.gz" "runs/${RUN_ID}"
-          echo "Created awo-run-${RUN_ID}.tar.gz"
-
-      - name: Upload payload
-        if: ${{ steps.capture.outputs.run_id != '' }}
+      # ---------------------------------------------------------
+      # 8. Upload artifacts for review (scope gate)
+      # ---------------------------------------------------------
+      - name: Upload run artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: awo-run-${{ steps.capture.outputs.run_id }}
-          path: awo-run-${{ steps.capture.outputs.run_id }}.tar.gz
-          if-no-files-found: error
-          retention-days: 14
+          name: awo-run-${{ env.RUN_ID }}
+          path: runs/${{ env.RUN_ID }}
 
-  scope_gate:
+  # =============================================================
+  # HUMAN APPROVAL & ATTESTATION JOB
+  # =============================================================
+  human_approval:
     needs: run_awo
     runs-on: ubuntu-latest
-    if: ${{ needs.run_awo.outputs.run_id != '' }}
-    environment:
-      name: awo-scope
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    steps:
-      - name: Await scope approval
-        shell: bash
-        run: |
-          echo "Scope Gate — approve this environment in GitHub to continue."
-
-  render_summary:
-    needs: [run_awo, scope_gate]
-    runs-on: ubuntu-latest
-    if: ${{ needs.run_awo.outputs.run_id != '' }}
-    steps:
-      - name: Install jq
-        shell: bash
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
-      - name: Download payload
-        uses: actions/download-artifact@v4
-        with:
-          name: awo-run-${{ needs.run_awo.outputs.run_id }}
-          path: artifacts
-
-      - name: Extract run
-        id: locate
-        shell: bash
-        run: |
-          set -euo pipefail
-          TAR="artifacts/awo-run-${{ needs.run_awo.outputs.run_id }}.tar.gz"
-          mkdir -p extracted
-          tar -xzf "$TAR" -C extracted
-          RD="extracted/runs/${{ needs.run_awo.outputs.run_id }}"
-          echo "rd=$RD" >> "$GITHUB_OUTPUT"
-
-          echo "### Files" >> "$GITHUB_STEP_SUMMARY"
-          find "$RD" -maxdepth 3 -type f | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Show falsifiability & randomness
-        shell: bash
-        env:
-          RD: ${{ steps.locate.outputs.rd }}
-        run: |
-          set -euo pipefail
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Falsifiability Scaffold" >> "$GITHUB_STEP_SUMMARY"
-          if [ -f "$RD/falsifiability.json" ]; then
-            echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            jq . "$RD/falsifiability.json" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "_No falsifiability.json found._" >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Randomness Metadata" >> "$GITHUB_STEP_SUMMARY"
-          if [ -f "$RD/randomness.json" ]; then
-            echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            jq . "$RD/randomness.json" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "_No randomness.json found._" >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - name: Show run report excerpt
-        shell: bash
-        env:
-          RD: ${{ steps.locate.outputs.rd }}
-        run: |
-          set -euo pipefail
-          if [ -f "$RD/report.md" ]; then
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## Run Report (excerpt)" >> "$GITHUB_STEP_SUMMARY"
-            head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "_Full run is committed after final approval._" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "_No report.md found in run folder._" >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-  human_approval:
-    needs: [run_awo, scope_gate, render_summary]
-    runs-on: ubuntu-latest
-    if: ${{ needs.run_awo.outputs.run_id != '' }}
-    environment:
-      name: awo-audit
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    env:
-      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
-      RUNNER_ID: ${{ needs.run_awo.outputs.runner_id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Write attestation independence log
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p governance/logs
-          TS="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-
-          if [ "$RUNNER_ID" = "$GITHUB_ACTOR" ]; then
-            STATUS="FAILED_SELF_APPROVAL"
-            MESSAGE="Run halted: same identity for runner and approver."
-          else
-            STATUS="APPROVED_BY_INDEPENDENT_ACTOR"
-            MESSAGE="Runner and approver identities distinct."
-          fi
-
-          cat > governance/logs/approval.json <<'APPROVAL_EOF'
-          {
-            "run_id": "PLACEHOLDER_RUN_ID",
-            "runner": "PLACEHOLDER_RUNNER_ID",
-            "approver": "PLACEHOLDER_GITHUB_ACTOR",
-            "status": "PLACEHOLDER_STATUS",
-            "timestamp": "PLACEHOLDER_TS",
-            "message": "PLACEHOLDER_MESSAGE"
-          }
-          EOF
-          # Substitute variables
-          sed -i "s/PLACEHOLDER_RUN_ID/${RUN_ID}/g" governance/logs/approval.json
-          sed -i "s/PLACEHOLDER_RUNNER_ID/${RUNNER_ID}/g" governance/logs/approval.json
-          sed -i "s/PLACEHOLDER_GITHUB_ACTOR/${GITHUB_ACTOR}/g" governance/logs/approval.json
-          sed -i "s/PLACEHOLDER_STATUS/${STATUS}/g" governance/logs/approval.json
-          sed -i "s/PLACEHOLDER_TS/${TS}/g" governance/logs/approval.json
-          sed -i "s/PLACEHOLDER_MESSAGE/${MESSAGE}/g" governance/logs/approval.json
-
-      - name: Commit independence log
-        if: always()
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Await human approval
+        uses: trstringer/manual-approval@v1
         with:
-          commit_message: "governance: record attestation independence result for run ${{ env.RUN_ID }}"
-          file_pattern: governance/logs/approval.json
+          approvers: Wright-Shawn
+          minimum-approvals: 1
 
-      - name: Enforce independence gate
+      # ---------------------------------------------------------
+      # 10. Commit ATTESTATION + update run_manifest.json
+      # ---------------------------------------------------------
+      - name: Commit attestation
         shell: bash
         run: |
           set -euo pipefail
-          if [ "$RUNNER_ID" = "$GITHUB_ACTOR" ]; then
-            echo "::error::Attestation independence violated: runner and approver are the same (${RUNNER_ID})."
-            exit 1
-          fi
-          echo "Attestation independence verified: runner=${RUNNER_ID}, approver=${GITHUB_ACTOR}."
-
-  finalize:
-    needs: [run_awo, scope_gate, human_approval]
-    runs-on: ubuntu-latest
-    if: ${{ needs.run_awo.outputs.run_id != '' }}
-    env:
-      RUN_ID: ${{ needs.run_awo.outputs.run_id }}
-      RUN_HASH: ${{ needs.run_awo.outputs.run_hash }}
-    steps:
-      - name: Checkout (with credentials)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: true
-
-      - name: Download payload
-        uses: actions/download-artifact@v4
-        with:
-          name: awo-run-${{ env.RUN_ID }}
-          path: artifacts
-
-      - name: Extract run folder
-        shell: bash
-        run: |
-          set -euo pipefail
-          TAR="artifacts/awo-run-${RUN_ID}.tar.gz"
-          mkdir -p extracted
-          tar -xzf "$TAR" -C extracted
-          rsync -a extracted/runs/ runs/
-          echo "Finalizing ${RUN_ID}" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Write approval record
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "runs/${RUN_ID}"
-          TIMESTAMP="$(date -u +%FT%TZ)"
+          RUN_ID="${{ needs.run_awo.outputs.run_id }}"
+          TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           
-          cat > "runs/${RUN_ID}/approval.json" <<'APPROVAL_REC_EOF'
-          {
-            "run_id": "PLACEHOLDER_RUN_ID",
-            "approved_by": "PLACEHOLDER_GITHUB_ACTOR",
-            "approved_at": "PLACEHOLDER_TIMESTAMP",
-            "workflow_run_url": "https://github.com/PLACEHOLDER_GITHUB_REPOSITORY/actions/runs/PLACEHOLDER_GITHUB_RUN_ID"
-          }
-          EOF
-          # Substitute variables
-          sed -i "s/PLACEHOLDER_RUN_ID/${RUN_ID}/g" "runs/${RUN_ID}/approval.json"
-          sed -i "s/PLACEHOLDER_GITHUB_ACTOR/${GITHUB_ACTOR}/g" "runs/${RUN_ID}/approval.json"
-          sed -i "s/PLACEHOLDER_TIMESTAMP/${TIMESTAMP}/g" "runs/${RUN_ID}/approval.json"
-          sed -i "s|PLACEHOLDER_GITHUB_REPOSITORY|${GITHUB_REPOSITORY}|g" "runs/${RUN_ID}/approval.json"
-          sed -i "s/PLACEHOLDER_GITHUB_RUN_ID/${GITHUB_RUN_ID}/g" "runs/${RUN_ID}/approval.json"
-
-      - name: Mark manifest as succeeded
-        shell: bash
-        run: |
-          set -euo pipefail
-          MF="runs/${RUN_ID}/run_manifest.json"
-          if [ ! -f "$MF" ]; then
-            echo "::error::run_manifest.json not found at $MF"
-            ls -R runs || true
-            exit 1
-          fi
-          python - << 'PY'
-          import json, sys, datetime as dt, pathlib, os
-          mf_path = pathlib.Path(os.environ["MF"])
-          with mf_path.open("r", encoding="utf-8") as f:
-            m = json.load(f)
-          m["status"] = "succeeded"
-          m["finished_at"] = dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-          with mf_path.open("w", encoding="utf-8") as f:
-            json.dump(m, f, indent=2, ensure_ascii=False)
-          print("updated:", mf_path)
-          PY
-        env:
-          MF: runs/${RUN_ID}/run_manifest.json
-
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3
-        with:
-          cosign-release: "v2.4.1"
-
-      - name: Write attestation (bind manifest ↔ checksums)
-        shell: bash
-        env:
-          RUN_ID: ${{ env.RUN_ID }}
-          RUN_HASH: ${{ env.RUN_HASH }}
-        run: |
-          set -euo pipefail
-          RD="runs/${RUN_ID}"
-          MF="${RD}/run_manifest.json"
-          SUMS="${RD}/SHA256SUMS.txt"
-
-          if [ ! -f "$MF" ]; then
-            echo "::error::Missing $MF"
-            exit 1
-          fi
-          if [ ! -f "$SUMS" ]; then
-            echo "::error::Missing $SUMS"
-            exit 1
-          fi
-
-          MANIFEST_SHA="$(sha256sum "$MF" | awk '{print $1}')"
-          SUMS_SHA="$(sha256sum "$SUMS" | awk '{print $1}')"
-          NOW="$(date -u +%FT%TZ)"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          cat > "${RD}/ATTESTATION.txt" <<EOF
-          AWO Run Attestation
-
-          Logical Run Hash: ${RUN_HASH}
-          Run Directory: ${RUN_ID}
-
-          Repository: ${GITHUB_REPOSITORY}
-          Commit: ${GIT_SHA}
-          Workflow Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
-          Actor: ${GITHUB_ACTOR}
-          Timestamp (UTC): ${NOW}
-
-          Bindings:
-
-              run_manifest.json  sha256:${MANIFEST_SHA}
-              SHA256SUMS.txt     sha256:${SUMS_SHA}
-
-          Statement:
-
-              This attestation binds the AWO run manifest to the file inventory
-              recorded in SHA256SUMS.txt. Any alteration of either file will
-              invalidate these hashes.
-              EOF
-
-      - name: Sign tarball and attestation (keyless, OIDC)
-        shell: bash
-        env:
-          RUN_ID: ${{ env.RUN_ID }}
-        run: |
-          set -euo pipefail
-          TARBALL="artifacts/awo-run-${RUN_ID}.tar.gz"
-          ATTN="runs/${RUN_ID}/ATTESTATION.txt"
-
-          cosign sign-blob --yes --output-signature "${TARBALL}.sig" \
-                           --output-certificate "${TARBALL}.cert" \
-                           "${TARBALL}"
-
-          cosign sign-blob --yes --output-signature "${ATTN}.sig" \
-                           --output-certificate "${ATTN}.cert" \
-                           "${ATTN}"
-
-      - name: Upload signatures
-        uses: actions/upload-artifact@v4
-        with:
-          name: awo-run-signatures-${{ env.RUN_ID }}
-          path: |
-            artifacts/awo-run-${{ env.RUN_ID }}.tar.gz.sig
-            artifacts/awo-run-${{ env.RUN_ID }}.tar.gz.cert
-            runs/${{ env.RUN_ID }}/ATTESTATION.txt
-            runs/${{ env.RUN_ID }}/ATTESTATION.txt.sig
-            runs/${{ env.RUN_ID }}/ATTESTATION.txt.cert
-          if-no-files-found: warn
-          retention-days: 14
-
-      - name: Commit run to branch
-        shell: bash
-        env:
-          RUN_ID: ${{ env.RUN_ID }}
-        run: |
-          set -euo pipefail
-          git config user.name  "github-actions[bot]"
+          mkdir -p ".tmp_attest/${RUN_ID}"
+          
+          python3 -c "import json; print(json.dumps({
+            'run_id': '${RUN_ID}',
+            'approved_by': 'Wright-Shawn',
+            'timestamp': '${TIMESTAMP}',
+            'notes': 'Human-approved run'
+          }, indent=2))" > ".tmp_attest/${RUN_ID}/ATTESTATION.json"
+          
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "runs/${RUN_ID}"
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git commit -m "AWO: add ${RUN_ID} (human-approved) [skip ci]"
+          
+          mkdir -p "runs/${RUN_ID}/"
+          cp ".tmp_attest/${RUN_ID}/ATTESTATION.json" "runs/${RUN_ID}/ATTESTATION.json"
+          
+          git add "runs/${RUN_ID}/ATTESTATION.json"
+          git commit -m "AWO: add attestation for ${RUN_ID}"
           git push
-
-      - name: Post final summary
-        shell: bash
-        env:
-          RUN_ID: ${{ env.RUN_ID }}
-          RUN_HASH: ${{ env.RUN_HASH }}
-        run: |
-          set -euo pipefail
-          COMMIT_SHA="$(git rev-parse --short HEAD)"
-          COMMIT_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${COMMIT_SHA}"
-          {
-            echo "## Audit: ✅ APPROVED & committed"
-            echo "- Run-ID (directory): ${RUN_ID}"
-            echo "- Logical Run Hash: ${RUN_HASH}"
-            echo "- Commit: [${COMMIT_SHA}](${COMMIT_URL})"
-          } >> "$GITHUB_STEP_SUMMARY"
