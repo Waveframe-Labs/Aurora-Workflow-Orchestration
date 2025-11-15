@@ -113,10 +113,10 @@ jobs:
           python - <<PY
           import json, os, pathlib
           rd = pathlib.Path(os.environ["RUN_ID"])
-            data = {
-                "run_id": "${RUN_ID}",
-                "seed": None,
-                "deterministic": False
+          data = {
+              "run_id": "${RUN_ID}",
+              "seed": None,
+              "deterministic": False
           }
           p = pathlib.Path("runs") / rd / "randomness.json"
           p.parent.mkdir(parents=True, exist_ok=True)
