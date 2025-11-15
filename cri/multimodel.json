@@ -13,7 +13,10 @@
           "predictions": [
             {
               "name": "mentions-battery",
-              "function": "text-contains('battery lasts all day')",
+              "function": {
+                "op": "text_contains",
+                "value": "battery lasts all day"
+              }
               "tolerance": { "metric": "boolean", "max": 1 }
             }
           ],
