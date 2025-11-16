@@ -321,6 +321,8 @@ jobs:
     needs: [run_awo, scope_gate, render_summary]
     runs-on: ubuntu-latest
     if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
+    outputs:
+      RUN_ID: ${{ env.RUN_ID }}
     env:
       RUN_ID: ${{ needs.run_awo.outputs.run_id }}
       ORCHESTRATOR: ${{ needs.run_awo.outputs.orchestrator }}
@@ -369,7 +371,7 @@ jobs:
             echo "  \"timestamp\": \"${TS}\","
             echo "  \"message\": \"${RESULT}\""
             echo '}'
-          } | jq . > "governance/logs/${RUN_ID}_independence.json"
+          } | jq . > "governance/logs/${RUN_ID}_independence_${TS}.json"
 
           if [ "$STATUS" = "FAILED_SELF_APPROVAL" ]; then
             exit 1
@@ -380,7 +382,14 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "governance: attestation independence result for run ${RUN_ID}"
-          file_pattern: governance/logs/${{ env.RUN_ID }}_independence.json
+          file_pattern: governance/logs/${{ env.RUN_ID }}_independence_*.json
+
+      - name: Halt for human audit
+        if: always()
+        shell: bash
+        run: |
+          echo "Run requires final human audit before commit."
+          exit 78
 
   # =============================================================
   # Finalize: mark manifest, sign, commit run
@@ -388,7 +397,7 @@ jobs:
   finalize:
     needs: [run_awo, scope_gate, verify_independence]
     runs-on: ubuntu-latest
-    if: ${{ needs.run_awo.outputs.run_id != '' && needs.run_awo.outputs.run_id != 'none' }}
+    if: ${{ needs.verify_independence.result == 'success' }}
     env:
       RUN_ID: ${{ needs.run_awo.outputs.run_id }}
 
