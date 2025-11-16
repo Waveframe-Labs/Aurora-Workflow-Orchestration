@@ -366,7 +366,7 @@ jobs:
   finalize:
     needs: [run_awo, scope_gate, verify_independence, final_audit_gate]
     runs-on: ubuntu-latest
-    if: ${{ needs.verify_independence.result == 'success' }}
+    if: ${{ false }}
     env:
       RUN_ID: ${{ needs.verify_independence.outputs.RUN_ID || needs.run_awo.outputs.run_id }}
 
@@ -498,7 +498,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
+          git pull --rebase origin main || true
           git add "runs/${RUN_ID}"
 
           if git diff --staged --quiet; then
