@@ -1,8 +1,0 @@
-{
-  "run_id": "run_2025-11-16T01-58-05Z",
-  "orchestrator": "Wright-Shawn",
-  "reviewer": "Wright-Shawn",
-  "status": "FAILED_SELF_APPROVAL",
-  "timestamp": "2025-11-16T01:59:40Z",
-  "message": "Run halted: same identity for orchestrator and reviewer."
-}
