@@ -294,17 +294,35 @@ jobs:
           EOF
 
       - name: Update manifest
+        shell: bash
+        env:
+          RUN_ID: ${{ env.RUN_ID }}
         run: |
-          MF="runs/${RUN_ID}/run_manifest.json"
+          set -euo pipefail
+          export MF="runs/${RUN_ID}/run_manifest.json"
+          if [ ! -f "$MF" ]; then
+            echo "::error::run_manifest.json not found at $MF"
+            exit 1
+          fi
+
           python - << 'PY'
-          import json,os
-          mf=os.environ["MF"]
-          data=json.load(open(mf))
-          from datetime import datetime,timezone
-          data["status"]="succeeded"
-          data["finished_at"]=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-          json.dump(data,open(mf,"w"),indent=2)
+          import json, os
+          from datetime import datetime, timezone
+          
+          mf_path = os.environ["MF"]
+          
+          with open(mf_path, "r", encoding="utf-8") as f:
+              m = json.load(f)
+
+          m["status"] = "succeeded"
+          m["finished_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+          
+          with open(mf_path, "w", encoding="utf-8") as f:
+              json.dump(m, f, indent=2, ensure_ascii=False)
+
+          print("Updated manifest:", mf_path)
           PY
+
 
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
