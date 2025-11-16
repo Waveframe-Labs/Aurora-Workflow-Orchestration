@@ -78,20 +78,20 @@ jobs:
 
           # Optional workflow schema validation
           if [ -f schemas/workflow.schema.json ]; then
-cat > _schema_check.py << 'EOF'
-import json, sys
-from jsonschema import Draft202012Validator as V
+          cat > _schema_check.py << 'EOF'
+          import json, sys
+          from jsonschema import Draft202012Validator as V
 
-path = sys.argv[1]
-with open("schemas/workflow.schema.json", "r", encoding="utf-8") as f:
-    schema = json.load(f)
+          path = sys.argv[1]
+          with open("schemas/workflow.schema.json", "r", encoding="utf-8") as f:
+          schema = json.load(f)
 
-with open(path, "r", encoding="utf-8") as f:
-    doc = json.load(f)
+          with open(path, "r", encoding="utf-8") as f:
+          doc = json.load(f)
 
-V(schema).validate(doc)
-print("CRI workflow JSON schema OK:", path)
-EOF
+          V(schema).validate(doc)
+          print("CRI workflow JSON schema OK:", path)
+          EOF
 
             python _schema_check.py "$WF"
           fi
