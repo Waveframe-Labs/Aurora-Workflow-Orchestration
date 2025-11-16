@@ -301,7 +301,7 @@ jobs:
           set -euo pipefail
           mkdir -p governance/logs
 
-          TS="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          TS="$(date -u +'%Y-%m-%d_%H-%M-%SZ')"
           REVIEWER="${GITHUB_ACTOR}"
           ORCH="${ORCHESTRATOR}"
 
