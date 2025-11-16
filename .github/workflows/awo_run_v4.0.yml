@@ -46,23 +46,31 @@ jobs:
 
       - name: Resolve & validate CRI workflow JSON
         id: wf
+        shell: bash
         run: |
           set -euo pipefail
+
           WF="${{ github.event.inputs.workflow_file }}"
           echo "wf=$WF" >> "$GITHUB_OUTPUT"
-          test -f "$WF" || { echo "::error::Workflow JSON not found at $WF"; exit 1; }
+
+          if [ ! -f "$WF" ]; then
+            echo "::error::Workflow JSON not found at $WF"
+            exit 1
+          fi
 
           if [ -f schemas/workflow.schema.json ]; then
-            python - << 'EOF'
-            import json,sys
-            from jsonschema import Draft202012Validator as V
-            sch=json.load(open("schemas/workflow.schema.json"))
-            doc=json.load(open(sys.argv[1]))
-            V(sch).validate(doc)
-            print("workflow.json: schema OK")
-            EOF
-            "${WF}"
-          fi
+          cat << 'EOF' > _schema_check.py
+          import json, sys
+          from jsonschema import Draft202012Validator as V
+          
+          schema = json.load(open("schemas/workflow.schema.json"))
+          doc    = json.load(open(sys.argv[1]))
+          
+          V(schema).validate(doc)
+          print("CRI workflow JSON schema OK:", sys.argv[1])
+          EOF
+                    python _schema_check.py "$WF"
+                  fi
 
       - name: Execute CRI workflow
         id: exec
