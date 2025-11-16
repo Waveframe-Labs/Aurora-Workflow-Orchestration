@@ -1,4 +1,4 @@
-name: AWO Run v4.0 (Manual Approve to Commit — CRI)
+name: AWO Run v4.1 (Manual Approve to Commit — CRI)
 
 on:
   workflow_dispatch:
