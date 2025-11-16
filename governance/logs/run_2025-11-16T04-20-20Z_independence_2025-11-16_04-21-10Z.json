@@ -1,0 +1,8 @@
+{
+  "run_id": "run_2025-11-16T04-20-20Z",
+  "orchestrator": "Wright-Shawn",
+  "reviewer": "Wright-Shawn",
+  "status": "FAILED_SELF_APPROVAL",
+  "timestamp": "2025-11-16_04-21-10Z",
+  "message": "Reviewer = orchestrator"
+}
