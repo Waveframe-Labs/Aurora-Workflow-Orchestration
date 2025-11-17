@@ -1,0 +1,13 @@
+{
+  "run_id": "run_2025-11-17T00-58-56Z",
+  "orchestrator": "Wright-Shawn",
+  "reviewer": "Wright-Shawn",
+  "allow_self_approval": false,
+  "status": "FAILED_INVARIANTS",
+  "message": "AWO invariant validation failed.",
+  "invariants_ok": false,
+  "invariants_reasons": [
+    "invariants_missing"
+  ],
+  "timestamp": "2025-11-17_01-00-09Z"
+}
