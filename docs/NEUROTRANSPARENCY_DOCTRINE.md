@@ -1,7 +1,7 @@
 ---
 filetype: doctrine
 version: 1.1.0
-release_date: 2025-11-07
+release_date: 2025-11-19
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 license: CC BY 4.0
