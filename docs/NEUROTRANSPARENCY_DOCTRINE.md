@@ -1,6 +1,6 @@
 ---
 filetype: doctrine
-version: 1.0.0
+version: 1.1.0
 release_date: 2025-11-07
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
@@ -27,7 +27,7 @@ It underlies both the **Aurora Workflow Orchestration (AWO)** methodology and it
 
 ---
 
-## 1. Definition
+## Definition
 
 > **Neurotransparency (n.)** — the principle that every inference influencing a claim must be attributable to a declared role and recorded in a durable artifact such that the reasoning sequence can be deterministically reconstructed.
 
@@ -39,101 +39,469 @@ where each reasoning contribution is recorded as a tuple *(evidence pointer, rol
 
 ---
 
-## 2. Motivation
+## 1. Introduction — The Collapse of Cognitive Transparency
 
-Modern AI-assisted research collapses traditional authorship boundaries: reasoning steps occur across humans, language models, and automated validators.  
-Without a deterministic attribution framework, knowledge becomes non-verifiable once the underlying model or context changes.
+Scientific reasoning no longer originates from a single, inspectable mind.
+Modern research is produced through a distributed cognitive system spanning humans, large language models, automated validators, and workflow engines. The output of this system is increasingly opaque: synthetic reasoning shifts between model versions, human decisions vanish into undocumented intuition, and automated processes generate conclusions without a reconstructible chain of inference.
 
-Existing reproducibility standards focus on data and code.  
-**Neurotransparency extends reproducibility to cognition itself**—capturing not just *what* was done but *why* a conclusion was reached, and by whom (or what).
+Traditional reproducibility frameworks—built for static code, controlled experiments, and single-author logic—cannot represent this reality. They track actions but not thought. They assume cognition is stable, attributable, and inspectable after the fact. This assumption is now false. When models change, contexts expire, or workflows mutate, the reasoning behind a claim becomes impossible to reconstruct.
 
-This shift transforms epistemic credibility from a social construct to an evidentiary one.
+This constitutes a structural epistemic failure: we can no longer determine who reasoned about what, why, or whether the inference still holds under the current state of the system. In a multi-agent research environment, cognitive transparency is not optional. It must be enforced as a precondition for any claim to be considered valid.
 
----
-
-## 3. Implementation in AWO
-
-AWO enforces neurotransparency through three structural guarantees:
-
-| Mechanism | Artifact | Enforcement |
-|------------|-----------|--------------|
-| **Role Attribution** | `/logs/workflow/`, `/decisions/ADR-NNNN` | Every inference recorded with declared role (Orchestrator, Auditor, Synthesizer, etc.) |
-| **Hash Continuity** | `SHA256SUMS.txt` | Every reasoning artifact cryptographically linked to its origin context |
-| **Attestation Linkage** | `approval.json` | All validated claims must reference their evidence pointers and hash records |
-
-Failure to provide evidence linkage or role attribution constitutes a **non-conformance** event under §1.6 of the AWO Method Specification.
+Neurotransparency is introduced to resolve this collapse.
+It establishes the boundary condition for epistemic legitimacy in AI-assisted research: no inference may influence a claim unless its origin, role, and evidence path are deterministically recoverable. Without this invariant, synthetic and human cognition both become un-auditable black boxes, invalidating reproducibility at its foundation.
 
 ---
 
-## 4. Enforcement Pathway (CRI-CORE Context)
+## 2. Historical and Philosophical Motivation
 
-The upcoming **CRI-CORE** enforcement layer operationalizes neurotransparency through executable schemas:
+The need for neurotransparency emerges from a structural failure in modern epistemic practice. Scientific knowledge was historically produced by identifiable human authors whose reasoning processes, while imperfectly recorded, were at least conceptually local. The rise of AI-assisted research breaks this assumption. Reasoning now occurs across distributed agents—humans, language models, workflow engines—and no longer leaves a stable cognitive trace.
 
-| Module | Function | Schema Reference |
-|---------|-----------|------------------|
-| `neurotransparency.schema.json` | Defines minimal fields: role, evidence path, hash, timestamp | AWO `/schemas/` |
-| `reasoning_ledger.py` | Serializes reasoning steps and assigns deterministic IDs | CRI runtime |
-| `attestation_validator.py` | Verifies that every claim references a valid reasoning record | CRI enforcement gate |
+Classical reproducibility frameworks were designed for static artifacts: code, data, experimental procedures. They cannot account for synthetic cognition that changes across model versions, nor for human intuition that never enters the record. Post-hoc explainability techniques attempt to retroactively infer how a system reached a conclusion, but these reconstructions are speculative and non-deterministic. They offer interpretation, not evidence.
 
-CRI-CORE treats neurotransparency as a *first-class constraint*: builds fail if any claim-affecting artifact lacks verifiable provenance.
+Neurotransparency responds to this epistemic shift by establishing a non-negotiable requirement: **reasoning must be captured at the moment it occurs, before it influences a claim, and with sufficient structure to be reconstructed indefinitely.** This aligns scientific legitimacy not with institutional authority or narrative justification, but with evidentiary continuity. It transitions epistemology from a trust-based system to a trace-based one.
+
+In this sense, neurotransparency is not an enhancement to existing practice; it is a correction to a foundational break in how knowledge is produced, validated, and preserved under conditions of distributed cognition.
 
 ---
 
-## 5. Ethical and Epistemic Implications
+## 3. Operationalization in Aurora Workflow Orchestration (AWO)
 
-| Principle | Classical Science | Neurotransparent Research |
-|------------|------------------|-----------------------------|
-| **Authorship** | Singular, human | Distributed, role-based |
-| **Reproducibility** | Experimental and data-centric | Cognitive and reasoning-centric |
-| **Verification** | Peer review | Deterministic audit |
-| **Failure Mode** | Misinterpretation | Missing evidence pointer |
+Neurotransparency is not an abstract guideline within AWO; it is encoded as a mandatory constraint on all claim-affecting reasoning. AWO treats cognition as a first-class artifact and therefore requires that every inference pass through an attribution and evidence-binding pipeline before it can influence any downstream result.
 
-By embedding reasoning transparency into the research substrate, AWO and CRI-CORE redefine *trust* as *trace*.  
-This enables a post-institutional form of epistemic governance where credibility is computed, not declared.
+Three structural mechanisms enforce this requirement:
 
----
+### **3.1 Role-Attribution Inference**
+Every reasoning action must declare the role under which it is performed—Orchestrator, Auditor, Synthesizer, Validator, or other defined roles.  
+This establishes epistemic accountability by making the source of each inference unambiguous.  
+Undeclared reasoning is treated as non-existent in the workflow and cannot be used to justify any claim.
 
-## 6. Use Cases
+### **3.2 Hash-Bound Continuity**
+All reasoning outputs are hashed and integrated into the project’s `SHA256SUMS.txt`, forming a cryptographic chain-of-custody.  
+This ensures that any modification—intentional or accidental—invalidates hash continuity and is immediately detectable.  
+Reasoning that cannot be verified against its recorded hash is rejected as tampered or unverifiable.
 
-1. **Automated Literature Synthesis**  
-   Every summarized claim must cite its reasoning path and originating model role.
+### **3.3 Evidence-Linkage Requirements**
+Any claim introduced into the workflow must carry an explicit pointer to the reasoning artifacts that justify it.  
+AWO enforces this linkage through `approval.json`, which binds claims to their underlying evidence tuples.  
+A claim lacking verifiable evidence-linkage fails AWO’s compliance rules and cannot advance through the pipeline.
 
-2. **Scientific Simulation Governance**  
-   Parameter selection and model calibration decisions logged as reasoning events, enabling full reconstruction.
-
-3. **Policy or Ethics Review**  
-   Deliberative reasoning among AI agents traceable to hash-bound evidence pointers.
-
-4. **Cross-Model Audit**  
-   Multiple models perform the same reasoning task; differences become explicit through neurotransparency logs.
+Together, these mechanisms ensure that reasoning is never detached from its origin or transformed into an unverifiable abstraction.  
+AWO makes it impossible for a claim to exist without an attributable, hash-bound, and evidence-linked reasoning trail.  
+This operational
 
 ---
 
-## 7. Relationship to Adjacent Concepts
+## 4. Enforcement in CRI-CORE
 
-| Concept | Relation | Distinction |
-|----------|-----------|--------------|
-| **Explainability (XAI)** | Post-hoc interpretation | Neurotransparency is pre-registered reasoning capture |
-| **Accountability** | Governance outcome | Neurotransparency is evidentiary infrastructure |
-| **Provenance** | Historical chain | Neurotransparency is cognitive provenance—who reasoned, not just who edited |
-| **Neurosymbolic AI** | Hybrid reasoning architecture | Neurotransparency governs epistemic trace, not computation mode |
+Where AWO establishes the governance rules for neurotransparency, **CRI-CORE** provides the executable enforcement layer. It transforms the doctrine from a methodological requirement into a set of deterministic runtime checks that cannot be bypassed or satisfied through interpretation.
+
+CRI-CORE treats every reasoning contribution as an auditable object. A claim is admissible only if the cognitive trail leading to it can be verified through schema validation, hash integrity, and attestation independence. Enforcement proceeds through four mechanisms:
+
+### **4.1 Schema-Governed Reasoning Records**
+All reasoning steps must conform to `neurotransparency.schema.json`.  
+This schema specifies the minimal admissible structure of a reasoning record:
+- role identifier  
+- evidence pointer  
+- content hash  
+- timestamp  
+- optional contextual metadata  
+
+If any field is missing or malformed, the reasoning step is rejected before it can influence the workflow.
+
+### **4.2 Deterministic Ledger Construction**
+CRI-CORE instantiates a `reasoning_ledger` for each run.  
+Every inference is assigned a deterministic identifier derived from its hashed content and workflow state.  
+This prevents model or human agents from introducing ambiguous or duplicate reasoning events.  
+The ledger becomes the authoritative source of truth for the run's cognitive history.
+
+### **4.3 Attestation Independence**
+A claim cannot be approved by the same role that generated its supporting evidence.  
+CRI-CORE enforces this separation as a strict invariant.  
+If a reasoning record is validated by its own origin role, the run enters a non-conformance state an
 
 ---
 
-## 8. Governance and Citation
+## 5. Granularity of Trace: What Counts as a Reasoning Step?
 
-- This doctrine is governed under **ADR-0017**.  
-- Future enforcement handled by **CRI-CORE v0.1+** via `neurotransparency.schema.json`.  
-- The doctrine itself is a **citable artifact** and may be referenced as:
+Neurotransparency requires that reasoning be captured at the moment it occurs, but this obligation raises a critical structural question: **what qualifies as a reasoning step?**  
+If the granularity is too coarse, the cognitive trail becomes incomplete. If it is too fine, the workflow becomes intractable.  
+The doctrine therefore defines a precise boundary for admissible reasoning capture.
+
+### **5.1 Definition of a Reasoning Step**
+A reasoning step is any transformation that introduces, modifies, interprets, or evaluates information in a way that influences a claim.  
+A step must be captured if:
+- it changes the justification structure of a claim,  
+- it selects between alternative interpretations,  
+- it evaluates evidence or produces new evidence,  
+- or it introduces a new inference into the workflow.
+
+Procedural operations that do not affect epistemic content—such as formatting, ordering, or trivial I/O—do not qualify as reasoning steps.
+
+### **5.2 Human vs. Synthetic Cognition**
+The doctrine draws no distinction between human and AI reasoning.  
+Both are subject to identical trace requirements.  
+If a human provides intuition without recording the thought process, it is not admissible.  
+If a model produces an inference without generating a corresponding ledger entry, the inference is non-conformant and cannot enter the workflow.
+
+This removes historical asymmetry in scientific practice, where human reasoning was often treated as self-evident and machine reasoning as opaque.
+
+### **5.3 Compression and Noise Reduction**
+Not all cognitive artifacts are meaningful.  
+When models produce verbose or rambling outputs, CRI-CORE permits **structural compression**—removing linguistic noise—provided that:
+- the semantic content remains intact,  
+- the original hashed artifact is preserved in the ledger, and  
+- the compressed form references the original via hash linkage.
+
+This enables efficient storage and readability without sacrificing epistemic fidelity.
+
+### **5.4 Irreducible Minimal Unit of Trace**
+The doctrine defines the **minimal epistemic unit** as:
+- a role-attributed transformation,  
+- acting on identifiable evidence,  
+- producing a stable, hash-bound output.
+
+Anything smaller is metadata.  
+Anything larger risks obscuring internal cognitive transitions.  
+This definition ensures that the trace remains both faithful and operationally manageable.
+
+In effect, granularity is not a matter of verbosity but of epistemic significance.  
+If a transformation affects the truth-conditions of a claim, it must be captured.
+
+---
+
+## 6. Violations and Failure Modes
+
+Neurotransparency functions as a structural invariant; when it is violated, the epistemic integrity of the workflow collapses.  
+CRI-CORE classifies violations as **non-conformance events**, each of which invalidates the affected run.  
+The doctrine identifies the following primary failure modes.
+
+### **6.1 Missing Evidence Pointers**
+A reasoning step introduces an inference but fails to reference the evidence that justifies it.  
+This creates an epistemic gap: the claim cannot be reconstructed and therefore cannot be trusted.  
+In CRI-CORE, missing evidence pointers trigger immediate rejection during attestation validation.
+
+### **6.2 Role-Ambiguous Reasoning**
+A cognitive action is performed without declaring the responsible role (e.g., Orchestrator, Auditor, Synthesizer).  
+Since accountability cannot be established, the reasoning step is treated as anonymous and therefore inadmissible.  
+Both AWO and CRI-CORE treat role ambiguity as a hard failure.
+
+### **6.3 Hash Discontinuity or Mutation**
+When the content of a reasoning artifact does not match the recorded hash, or when a required hash is missing from `SHA256SUMS.txt`, the artifact is treated as compromised.  
+Hash discontinuity breaks the evidentiary chain and signals tampering or accidental corruption.  
+The workflow enters a non-conformance state and must terminate.
+
+### **6.4 Self-Attestation Violations**
+A role attempts to validate its own reasoning output, violating attestation independence.  
+This creates circular justification and collapses the separation-of-duties model that underpins AWO governance.  
+CRI-CORE blocks these attempts automatically and marks the run as invalid.
+
+### **6.5 Silent Cognitive Drift**
+A model or human introduces a modification that affects the epistemic structure of a claim without generating a new reasoning record.  
+Since the workflow has no trace of this transformation, the resulting claim becomes unverifiable.  
+Silent drift is treated as epistemic corruption and invalidates all downstream claims.
+
+### **6.6 Context Expiry and Model-Shift Failures**
+Synthetic cognition can change due to model version updates or expired context windows.  
+If a claim relies on inferences whose cognitive context cannot be reconstructed, the claim loses epistemic validity.  
+CRI-CORE tests for these conditions by verifying the determinism of reasoning IDs and ledger continuity.
+
+These failure modes are not edge cases.  
+They represent the primary mechanisms through which reasoning becomes opaque in distributed AI–human systems.  
+The neurotransparency doctrine requires that any such violation invalidate the affected claim and any claims dependent upon it.
+
+---
+
+## 7. Ethical and Epistemic Implications
+
+Neurotransparency reshapes the foundations of scientific legitimacy.  
+Traditional epistemic models assume that human reasoning is implicitly trustworthy and that peer review can retroactively validate conclusions.  
+In distributed AI–human systems, these assumptions no longer hold.  
+The doctrine therefore redefines the ethical and epistemic criteria under which claims may be accepted.
+
+### **7.1 Redefining Authorship**
+Classical authorship assigns credit to individuals based on contribution and narrative explanation.  
+Neurotransparency replaces this with **role-attributed cognition**, where each reasoning step is credited to the role that produced it.  
+This eliminates ambiguous intellectual ownership and ensures that cognitive labor—human or synthetic—is explicitly attributed.
+
+### **7.2 Redefining Verification**
+Peer review traditionally evaluates claims through interpretive assessment.  
+Under neurotransparency, verification becomes **deterministic audit**:  
+a claim is valid only if its reasoning trail can be reconstructed exactly as it occurred.  
+Interpretation is replaced by evidence-bound reconstruction.
+
+### **7.3 Epistemic Equity Between Human and Synthetic Agents**
+The doctrine eliminates historical asymmetry between human intuition and machine output.  
+Both must satisfy identical evidentiary conditions.  
+A human intuition that leaves no trace is epistemically indistinguishable from a model hallucination.  
+Both are rejected unless supported by verifiable reasoning artifacts.
+
+### **7.4 Accountability Without Surveillance**
+Neurotransparency does not require observation of private thoughts or intrusive monitoring.  
+It requires only that **claim-affecting reasoning** be made externally visible and hash-bound.  
+This preserves cognitive autonomy while ensuring epistemic accountability.
+
+### **7.5 Trust as Traceability**
+The doctrine replaces institutional trust and expert authority with **systemic traceability**.  
+A claim is credible not because a person or model asserts it, but because the evidence and reasoning that produced it are preserved, immutable, and auditable.  
+Epistemic legitimacy becomes a property of the workflow, not the researcher.
+
+### **7.6 Post-Institutional Scientific Governance**
+By embedding cognitive provenance directly into research artifacts, neurotransparency enables scientific validation without institutional gatekeepers.  
+Credibility emerges from the reproducibility and transparency of the reasoning process, not from affiliation or status.  
+This creates a scalable, decentralized model for verifying scientific claims in AI-hybrid environments.
+
+Together, these implications demonstrate that neurotransparency is not merely a technical solution; it is a redefinition of how knowledge is produced, justified, and governed in the presence of distributed cognition.
+
+---
+
+## 8. Use Cases
+
+Neurotransparency is not a theoretical construct; it is a practical requirement for maintaining epistemic integrity in AI–human research workflows.  
+The following use cases illustrate scenarios in which neurotransparency is essential and demonstrate how the doctrine prevents unverifiable cognition from entering the scientific record.
+
+### **8.1 Automated Literature Synthesis**
+Language models often summarize or analyze scientific papers without recording how specific claims were selected or interpreted.  
+Under neurotransparency:
+- each extracted claim must carry a reasoning record,  
+- the model’s role must be declared (e.g., Synthesizer), and  
+- citations, summaries, or interpretations must reference hash-bound evidence.
+
+This ensures that literature synthesis can be reconstructed, audited, and validated independently of model drift.
+
+### **8.2 Scientific Simulation Governance**
+Simulation parameters, calibration procedures, and model adjustments cannot be chosen implicitly.  
+Neurotransparency requires that:
+- each parameter choice be justified by a recorded reasoning step,  
+- calibration decisions be linked to evidence inputs, and  
+- any human interventions be role-attributed and hash-verifiable.
+
+This makes simulations reproducible not only in execution, but in epistemic justification.
+
+### **8.3 Ethical and Policy Reasoning**
+Multi-agent deliberation—across humans, LLMs, or workflow agents—requires an auditable justification chain.  
+Neurotransparency ensures that:
+- the origin of each argument is identifiable,  
+- value judgments are traceable to their reasoning paths, and  
+- revisions or disagreements can be analyzed without ambiguity.
+
+This prevents policy decisions from emerging out of undocumented or unverifiable cognitive processes.
+
+### **8.4 Cross-Model Audit and Consensus Formation**
+Different models may reach different conclusions when evaluating the same problem.  
+Neurotransparency provides a framework for:
+- comparing reasoning trails across models,  
+- detecting hallucinations or omissions,  
+- identifying points of divergence, and  
+- establishing consensus based on reconstructible cognitive evidence.
+
+This transforms AI ensemble behavior from a black box into an auditable epistemic structure.
+
+### **8.5 Provenance-Aware Workflow Automation**
+When automated systems perform transformations—classification, extraction, analysis, filtering—their contributions must be epistemically visible.  
+Neurotransparency ensures that every automated decision has:
+- a reasoning record,  
+- a declared role (e.g., Validator or Filter), and  
+- hash-bound integrity.
+
+This prevents hidden automation from silently altering scientific outcomes.
+
+These use cases demonstrate that neurotransparency is not optional; it is the minimal condition for maintaining epistemic clarity in environments where cognition is distributed, synthetic, and dynamic.
+
+---
+
+## 9. Relation to Adjacent Concepts
+
+Neurotransparency shares surface similarities with several established concepts in AI ethics, explainability, and scientific governance.  
+However, each of these concepts addresses a different epistemic problem and relies on assumptions that no longer hold in distributed AI–human workflows.  
+The doctrine clarifies these boundaries to prevent conceptual conflation.
+
+### **9.1 Explainability (XAI)**
+Explainability attempts to interpret or approximate the reasoning process of a system after the fact.  
+These explanations are inherently speculative and non-deterministic.  
+By contrast, neurotransparency requires *pre-registered reasoning capture*—the actual cognitive process, recorded at the moment it occurs.  
+XAI provides interpretation; neurotransparency provides evidence.
+
+### **9.2 Accountability**
+Accountability frameworks assign responsibility for decisions or actions.  
+Neurotransparency is not about responsibility; it is about **epistemic validity**.  
+A claim is admissible only if its reasoning trail is reconstructible, regardless of who or what produced it.  
+Accountability governs outcomes; neurotransparency governs cognition.
+
+### **9.3 Provenance**
+Provenance captures historical modifications to data or artifacts.  
+Neurotransparency extends this concept into the cognitive domain:  
+it records *reasoning events*, not just file or data changes.  
+Provenance answers “what happened?”  
+Neurotransparency answers “why was this inference made, by whom, and backed by what evidence?”
+
+### **9.4 Neurosymbolic AI**
+Neurosymbolic systems integrate neural models with symbolic reasoning.  
+Neurotransparency does not prescribe any computational architecture.  
+It governs **epistemic trace**, not representational form.  
+A workflow may be neural, symbolic, hybrid, or otherwise; neurotransparency simply demands that the reasoning influencing claims be recoverable and verifiable.
+
+### **9.5 Reproducibility Frameworks**
+Existing frameworks validate data, code, environment, or computational workflow.  
+Neurotransparency fills the remaining gap by validating **cognitive workflow**—the chain of reasoning that connects evidence to claims.  
+It sits above technical reproducibility as the epistemic requirement that ensures those technical artifacts actually support the stated conclusions.
+
+Together, these distinctions make clear that neurotransparency is not a subset of existing approaches.  
+It is a higher-order constraint that governs the epistemic integrity of AI-assisted reasoning itself.
+
+---
+
+## 10. Future Directions
+
+Neurotransparency establishes the minimal epistemic requirements for AI–human collaboration, but its implications extend beyond current implementations.  
+Several developments will expand the doctrine’s reach and strengthen its enforcement across scientific, computational, and governance contexts.
+
+### **10.1 Kolmogorov-Layer Cognitive Compression**
+As reasoning logs grow, structural noise becomes a scalability concern.  
+A future compression layer will:
+- remove redundant or verbose reasoning fragments,  
+- preserve the semantic structure and hash-bound originals, and  
+- provide a minimal sufficient explanation without sacrificing verifiability.
+
+This enables long-term storage and rapid audit while maintaining epistemic fidelity.
+
+### **10.2 Multi-Model Cognitive Orchestration**
+Scientific claims increasingly derive from ensembles of models rather than single systems.  
+Future versions of AWO and CRI-CORE will:
+- track reasoning trails across heterogeneous models,  
+- detect cross-model divergence, and  
+- form consensus based on reconstructible evidence paths rather than opaque averaging.
+
+Neurotransparency ensures that ensemble reasoning remains auditable rather than emergent and untraceable.
+
+### **10.3 Real-Time Cognitive Capture**
+Beyond static workflows, real-time environments—browser agents, simulation monitors, collaborative research tools—require instantaneous reasoning capture.  
+Future implementations will embed neurotransparency directly into:
+- interactive research environments,  
+- browser-based cognitive agents,  
+- continuous integration pipelines for scientific reasoning.
+
+This transforms reasoning into a stream of verifiable events rather than episodic artifacts.
+
+### **10.4 Decentralized Scientific Governance**
+As scientific output becomes more distributed, institutional review becomes insufficient.  
+Neurotransparency enables decentralized validation, where:
+- claims can be verified by independent agents,  
+- evidence trails do not rely on institutional authority, and  
+- legitimacy emerges from traceability, not affiliation.
+
+This forms the foundation for post-institutional scientific ecosystems.
+
+### **10.5 Cognitive Provenance Standards**
+Future versions of the doctrine will inform broader standards for:
+- cognitive provenance formats,  
+- multi-agent reasoning logs,  
+- epistemic metadata schemas,  
+- and cross-domain reasoning interoperability.
+
+These standards will make neurotransparency portable across platforms, institutions, and computational frameworks.
+
+Together, these directions show that neurotransparency is not a static principle.  
+It is the foundation for a scalable, verifiable, and decentralized epistemic architecture capable of supporting the next generation of AI-assisted scientific discovery.
+
+---
+
+## 11. Axioms of Neurotransparency
+
+The doctrine of neurotransparency can be reduced to a set of foundational axioms.  
+These axioms define the minimal epistemic conditions under which cognition may influence a scientific claim.  
+All subsequent rules, schemas, and enforcement mechanisms derive from these principles.
+
+### **Axiom 1 — No Inference Without Attribution**
+Every reasoning step must be explicitly attributed to a declared role.  
+Anonymous cognition does not exist in the epistemic space of the workflow.
+
+### **Axiom 2 — No Claim Without Evidence-Linkage**
+A claim is admissible only if it carries a verifiable pointer to the evidence and reasoning that support it.  
+Unreferenced inferences cannot influence outcomes.
+
+### **Axiom 3 — No Reasoning Without Hash Integrity**
+All reasoning artifacts must be hash-bound and included in the complete and exact `SHA256SUMS.txt` record.  
+Any missing, extra, or mutated artifact breaks evidentiary continuity.
+
+### **Axiom 4 — No Self-Attestation**
+The role that produces a reasoning step cannot validate the claim it supports.  
+Separation of duties is required to prevent circular justification.
+
+### **Axiom 5 — No Cognitive Drift**
+The reasoning trail must remain reconstructible across time, model updates, and context changes.  
+If cognition cannot be reproduced, the claim it supports is invalid.
+
+### **Axiom 6 — Minimal Epistemic Unit**
+A reasoning step is defined as a role-attributed transformation acting on identifiable evidence to produce a hash-bound output.  
+Anything less is metadata; anything more risks obscuring epistemic structure.
+
+### **Axiom 7 — Epistemic Invalidity Propagates Downstream**
+If a reasoning record is compromised, unverifiable, or non-conformant, all dependent claims inherit its invalidity.  
+The epistemic chain is only as strong as its weakest link.
+
+### **Axiom 8 — Trace Replaces Trust**
+The legitimacy of a claim derives from its reconstructible cognitive trail, not from institutional authority, human intuition, or model prestige.  
+Verification is procedural, not interpretive.
+
+These axioms define the non-negotiable boundaries of admissible cognition in AI-assisted research.  
+Any workflow that violates them loses epistemic validity, regardless of outcome quality or authorial intent.
+
+---
+
+## 12. Governance and Citation
+
+The Neurotransparency Doctrine is a governed artifact within the Aurora Research Initiative (ARI) and forms a core component of the epistemic infrastructure underpinning AWO and CRI-CORE.  
+Its maintenance, versioning, and citation requirements ensure that the doctrine remains stable, traceable, and portable across research contexts.
+
+### **12.1 Governance Authority**
+This doctrine is governed under **ADR-0017 — Documentation Governance** and inherits all requirements for:
+- version-controlled updates,  
+- immutable archival of prior versions,  
+- transparent change logs, and  
+- mandatory DOI assignment for each release.
+
+Any modifications must be approved through the AWO governance workflow and validated via independent attestation.
+
+### **12.2 Enforcement Integration**
+Beginning with **CRI-CORE v0.1**, neurotransparency becomes a first-class enforcement constraint.  
+All workflows must satisfy:
+- `neurotransparency.schema.json` compliance,  
+- attestation independence,  
+- complete and exact hashing, and  
+- deterministic ledger reconstruction.
+
+Failure to meet these conditions results in a non-conformant run.
+
+### **12.3 Citation Requirements**
+This doctrine is a citable scholarly artifact and must be referenced when:
+- implementing AWO-compliant workflows,  
+- designing cognitive provenance systems,  
+- developing CRI-CORE enforcement layers,  
+- or conducting research involving distributed AI–human reasoning.
+
+Use the following citation entry:
 
 ```bibtex
 @misc{wright_neurotransparency_doctrine_2025,
   author       = {Wright, Shawn C.},
   title        = {Neurotransparency Doctrine: An Epistemic Primitive for AI–Human Collaboration},
   year         = {2025},
-  version      = {1.0.0},
+  version      = {1.1.0},
   institution  = {Waveframe Labs / Aurora Research Initiative},
   license      = {CC BY 4.0},
   orcid        = {0009-0006-6043-9295},
   doi          = {10.5281/zenodo.17013612}
 }
+```
+
+### 12.4 Archival and Versioning Policy
+All versions of the doctrine must be:
+- archived in docs/archive/ after supersession,
+- assigned a unique DOI via Zenodo,
+- and referenced in the project’s provenance ledger.
+
+No version may be deleted.
+All superseded versions remain part of the auditable cognitive history of the project.  
+
+The governance framework ensures that the Neurotransparency Doctrine remains a stable, verifiable, and authoritative foundation for epistemically rigorous AI–human collaboration.
