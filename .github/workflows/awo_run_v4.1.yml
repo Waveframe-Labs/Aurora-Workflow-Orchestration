@@ -256,6 +256,7 @@ jobs:
             head -n 120 "$RD/report.md" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "_Full run is committed after final approval._" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   # =============================================================
   # GATE 2 — Final audit + attestation independence (machine gate)
