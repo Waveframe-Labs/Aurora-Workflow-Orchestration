@@ -64,4 +64,7 @@ jobs:
         run: |
           git add docs/pdf/*.pdf
           git commit -m "Auto-generate PDFs from Markdown" || echo "No changes to commit"
-          git push origin main
+          
+          git pull --rebase origin main   
+
+          git push origin main   
