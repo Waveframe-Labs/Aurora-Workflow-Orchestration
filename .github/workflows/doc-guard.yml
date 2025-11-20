@@ -7,14 +7,25 @@ on:
 jobs:
   doc-guard:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Run doc guard
-        env:
-          DOC_GUARD_STRICT: ${{ vars.DOC_GUARD_STRICT || '0' }} # override to '1' to fail on issues
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python + YAML deps
         run: |
+          python3 -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Run Doc Guard
+        env:
+          DOC_GUARD_STRICT: ${{ vars.DOC_GUARD_STRICT || '0' }}
+        run: |
+          echo "Running documentation validator..."
           python3 scripts/validate_docs.py || true
-      # keep this job non-blocking
-      - name: Always succeed
+
+      - name: Always succeed (non-blocking)
         if: always()
         run: echo "Doc Guard completed (non-blocking)."
