@@ -2,7 +2,8 @@ name: Doc Guard (non-blocking)
 
 on:
   push:
-  pull_request:
+  pull_request:  
+  workflow_dispatch:  
 
 jobs:
   doc-guard:
@@ -18,12 +19,16 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install pyyaml
-
       - name: Run Doc Guard
         env:
           DOC_GUARD_STRICT: ${{ vars.DOC_GUARD_STRICT || '0' }}
         run: |
           echo "Running documentation validator..."
+          echo "Current directory:"
+          pwd
+          echo "Listing files:"
+          ls -R
+          echo "Attempting to run scripts/validate_docs.py..."
           python3 scripts/validate_docs.py || true
 
       - name: Always succeed (non-blocking)
