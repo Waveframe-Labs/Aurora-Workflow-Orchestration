@@ -15,6 +15,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # IMPORTANT: full history so we can push cleanly
+          ref: main         # ensure we are operating on main
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git.config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Pull latest changes (ensure fast-forward)
+        run: |
+          git pull origin main
 
       - name: Install Pandoc and full LaTeX dependencies
         run: |
@@ -48,8 +60,8 @@ jobs:
               -o "docs/pdf/${base}.pdf"
           done
 
-      - name: Commit generated PDFs
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Auto-generate PDFs from Markdown"
-          file_pattern: docs/pdf/*.pdf
+      - name: Commit and push generated PDFs
+        run: |
+          git add docs/pdf/*.pdf
+          git commit -m "Auto-generate PDFs from Markdown" || echo "No changes to commit"
+          git push origin main
