@@ -191,3 +191,16 @@ It ensures science remains reconstructible, auditable, and legitimate.
 The doctrine provides the foundation.  
 The specification provides the machinery.  
 Together, they define the next stage of scientific reproducibility.
+
+```bibtex
+@misc{wright_neurotransparency_doctrine_2025,
+  author       = {Wright, Shawn C.},
+  title        = {Neurotransparency Doctrine: An Epistemic Primitive for AI–Human Collaboration},
+  year         = {2025},
+  version      = {1.0.0},
+  institution  = {Waveframe Labs / Aurora Research Initiative},
+  license      = {CC BY 4.0},
+  orcid        = {0009-0006-6043-9295},
+  doi          = {10.5281/zenodo.17013612}
+}
+```
