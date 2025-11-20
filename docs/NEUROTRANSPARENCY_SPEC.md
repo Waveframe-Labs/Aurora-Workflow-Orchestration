@@ -1,12 +1,14 @@
 ---
-filetype: doctrine
+filetype: specification
+title: Neurotransparency Specification (NTS)
 version: 1.1.0
 release_date: 2025-11-19
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 license: CC BY 4.0
+related: Neurotransparency Doctrine v1.0.0; AWO v1.2.x; CRI-CORE v0.1+
 orcid: 0009-0006-6043-9295
-related: CRI-CORE-v0.1 (forthcoming)
+doi: (assigned upon publication)
 ---
 
 # Neurotransparency: An Epistemic Primitive for AI–Human Collaboration
