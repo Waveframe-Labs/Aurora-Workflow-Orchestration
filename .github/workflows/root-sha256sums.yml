@@ -2,18 +2,9 @@ name: Build root SHA256SUMS
 
 on:
   push:
-    paths:
-      - 'docs/**.md'
-      - 'docs/**.pdf'
-      - 'decisions/**'
-      - 'runs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - 'CITATION.cff'
-      - 'COMPLIANCE.md'
-      - 'LICENSE*'
-      - 'SECURITY.md'
-      - '.github/workflows/root-sha256sums.yml'
+    paths-ignore:
+      - "SHA256SUMS.txt"
+      - ".github/workflows/root-sha256sums.yml"
   workflow_dispatch:
 
 permissions:
@@ -36,38 +27,18 @@ jobs:
       - name: Generate SHA256SUMS.txt
         shell: bash
         run: |
-          set -euxo pipefail
-          OUT="SHA256SUMS.txt"
-          TMP="$(mktemp)"
-          shopt -s globstar nullglob dotglob
+          set -euo pipefail
 
-          > "$TMP.files"
-          for pat in \
-            docs/**/*.md docs/**/*.pdf \
-            decisions/**/*.md \
-            runs/**/*.md runs/**/*.json runs/**/*.yml \
-            README.md CHANGELOG.md COMPLIANCE.md CITATION.cff \
-            LICENSE LICENSE-CC-BY-4.0.md SECURITY.md
-          do
-            for f in $pat; do
-              [[ -d "$f" ]] && continue
-              [[ "$f" == runs_legacy/* ]] && continue
-              echo "$f" >> "$TMP.files"
-            done
-          done
+          rm -f SHA256SUMS.txt
 
-          sort -u "$TMP.files" -o "$TMP.files"
+          # Exact coverage hashing (CRI-compliant)
+          find . -type f \
+            ! -path "./.git/*" \
+            ! -path "./SHA256SUMS.txt" \
+            ! -path "./.github/workflows/root-sha256sums.yml" \
+            -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
 
-          > "$OUT"
-          if [[ -s "$TMP.files" ]]; then
-            while IFS= read -r f; do
-              sha256sum "$f" >> "$OUT"
-            done < "$TMP.files"
-          else
-            echo "# No eligible files found to hash" >> "$OUT"
-          fi
-
-          echo "Lines in SHA256SUMS.txt: $(wc -l < "$OUT")" >> $GITHUB_STEP_SUMMARY
+          echo "Total files hashed: $(wc -l < SHA256SUMS.txt)" >> $GITHUB_STEP_SUMMARY
 
       - name: Skip commit if unchanged
         id: diff
@@ -85,3 +56,4 @@ jobs:
         with:
           commit_message: "chore: update root SHA256SUMS.txt"
           file_pattern: SHA256SUMS.txt
+          push_options: "--force-with-lease"
