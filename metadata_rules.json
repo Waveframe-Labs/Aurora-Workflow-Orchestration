@@ -1,0 +1,19 @@
+{
+  "default_metadata": {
+    "awokernel": false,
+    "filetype": "documentation",
+    "bibtex": "",
+    "version": "1.0",
+    "created": null,
+    "updated": null
+  },
+  "directory_rules": {
+    "ADR": "decision",
+    "governance": "governance",
+    "kernel": "core",
+    "theory": "specification",
+    "docs": "documentation",
+    "schema": "schema",
+    "scripts": "tooling"
+  }
+}
