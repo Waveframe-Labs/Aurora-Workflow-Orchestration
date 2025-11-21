@@ -30,63 +30,68 @@ jobs:
           pip install jsonschema
 
       - name: Create output directory
+        env:
+          PACKDIR: kernel/outputs/${{ github.event.inputs.packet_version }}
         run: |
-          mkdir -p kernel/outputs/${{ github.event.inputs.packet_version }}
+          mkdir -p "$PACKDIR"
 
       - name: Detect eligible kernel files
         id: detect
         run: |
-          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          grep -rl "^awokernel: true" . | grep -E "\.(md|txt|json)$"
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "files<<EOF"
+            grep -rl "^awokernel: true" . | grep -E "\.(md|txt|json)$"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Copy files into packet
+        env:
+          PACKDIR: kernel/outputs/${{ github.event.inputs.packet_version }}
         run: |
-          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
           while IFS= read -r file; do
-            mkdir -p "$PACKDIR/$(dirname $file)"
+            mkdir -p "$PACKDIR/$(dirname "$file")"
             cp "$file" "$PACKDIR/$file"
           done <<< "${{ steps.detect.outputs.files }}"
 
       - name: Generate SHA256SUMS
+        env:
+          PACKDIR: kernel/outputs/${{ github.event.inputs.packet_version }}
         run: |
-          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
           cd "$PACKDIR"
           find . -type f ! -name "SHA256SUMS.txt" -print0 \
             | xargs -0 sha256sum > SHA256SUMS.txt
 
       - name: Build manifest
+        env:
+          PACKDIR: kernel/outputs/${{ github.event.inputs.packet_version }}
+          PACKET_VERSION: ${{ github.event.inputs.packet_version }}
         run: |
-          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
           TEMPLATE="kernel/templates/manifest.template.json"
-
-          # Copy template
           cp "$TEMPLATE" "$PACKDIR/MANIFEST.json"
 
-          # Insert packet_version and generated_at
-          python - <<EOF
-          import json, datetime, os, hashlib, subprocess
+          python << 'EOF'import json, datetime, os
 
-          manifest_path = f"{os.environ['PACKDIR']}/MANIFEST.json"
+
+          PACKDIR = os.environ["PACKDIR"]
+          manifest_path = f"{PACKDIR}/MANIFEST.json"
+
           with open(manifest_path) as f:
           m = json.load(f)
 
-          m['packet_version'] = os.environ['packet_version']
-          m['generated_at'] = datetime.datetime.utcnow().isoformat() + "Z"
-
-          sumfile = f"{os.environ['PACKDIR']}/SHA256SUMS.txt"
+          m["packet_version"] = os.environ["PACKET_VERSION"]
+          m["generated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+          
+          sumfile = f"{PACKDIR}/SHA256SUMS.txt"
           files = []
           with open(sumfile) as f:
-          for line in f:
+             for line in f:
           h, path = line.strip().split(maxsplit=1)
           files.append({"path": path, "hash": h})
 
-          m['files'] = files
+          m["files"] = files
 
           with open(manifest_path, "w") as f:
-          json.dump(m, f, indent=2)
-
+              json.dump(m, f, indent=2)
           EOF
 
       - name: Validate manifest
