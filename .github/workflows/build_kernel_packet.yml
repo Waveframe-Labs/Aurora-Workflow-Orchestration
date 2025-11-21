@@ -53,12 +53,11 @@ jobs:
 
           # If drafts are disabled, restrict to filetype: core
           if [ "${INCLUDE_DRAFTS}" != "1" ]; then
-            FILES="$(printf '%s
-' $FILES | xargs -r grep -l '^filetype: core' | LC_ALL=C sort || true)"
-          else:
-            FILES="$(printf '%s
-' $FILES | LC_ALL=C sort)"
+            FILES=$(printf '%s\n' $FILES | xargs -r grep -l '^filetype: core' | LC_ALL=C sort || true)
+          else
+            FILES=$(printf '%s\n' $FILES | LC_ALL=C sort)
           fi
+
 
           if [ -z "$FILES" ]; then
             echo "::error::No eligible kernel files after filtering (check filetype: core metadata)."
