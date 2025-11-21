@@ -111,6 +111,7 @@ a278dab4a7de43a2e87223608099bf2e082e770b05f08b3fc333ab087935b599  ./figures/awo_
 6c3a45a8fef91012aa633c117edc761c29da29857b31baee7b61f3caabbd5dce  ./governance/logs/run_2025-11-19T22-03-06Z_independence_2025-11-19_22-03-51Z.json
 700215e649b8dda98716912b6b9c93c2fe4a1500d0f691db605eb75d15edeaa0  ./governance/logs/run_2025-11-21T05-43-33Z_independence_2025-11-21_05-44-20Z.json
 ce83452bd27ada5485b4a7ccf5f47cc44b368f2147e98408ef706132192ae47c  ./kernel/README.md
+a37ea997394c816985ebf47bca6c4192fc2dfcc6dc8423145cd7291fdf6c2f5a  ./kernel/kernel_include.list
 d7f7e1c93e1fed6d353a1fadd6436b3cbcec5ea75b360b3fb7423c613d9d8c5c  ./kernel/schema/manifest.schema.json
 9d13a760017cee2a2b995aca4d0eed911130e6104be87957ac6196d0d1814705  ./kernel/templates/manifest.template.json
 7cb94f11c385486bc7227c07edb75ce4311030ba374b128fdc74ae0573033937  ./logs/README.md
