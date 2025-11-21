@@ -6,7 +6,7 @@ a1009779dfa9e9a04e5f1d6776074af377d7f9f8b0eda6888c2ad2620b005e97  ./.github/ISSU
 4d2306de01bc9af193c0f6b5b4be257ccbf5adb6a5456928ddafd71ea0d5c82a  ./.github/_README.md
 31dff4e576907605a0817e56f97b6090fe4afec31c972032096867e8841931cc  ./.github/workflows/README.md
 ed5316347985faf4e4e6cd806d612df7b05ae8b4dd6bb12f96358ef30d56d010  ./.github/workflows/awo_run_v4.1.yml
-59161d89761c127b4ef765db50b274780be4507ec28d0dc25d47628cc33a660d  ./.github/workflows/build_kernel_packet.yml
+a6683c64440a5e6ee3064d9a94730493cd38a53cb1c9fa7c833d711cd7a09555  ./.github/workflows/build_kernel_packet.yml
 790bebae65e028fcc6fedb9695bd1a593416ec9a4aa9c86422c5a23aabf57bef  ./.github/workflows/doc-guard.yml
 717924c65364c95bc7253c667421f71e409dbc75688dcadf1168f714b0f54ba1  ./.github/workflows/md-to-pdf.yml
 48b33f9f89ef24f8a66f461ea9278e7ecf21b4660c26088989d231e53c578724  ./.gitignore
@@ -108,6 +108,7 @@ a278dab4a7de43a2e87223608099bf2e082e770b05f08b3fc333ab087935b599  ./figures/awo_
 8fb16ccb6354dace446d44bdb48472406ff880e779f2333f0f91e2f4c614ab1d  ./governance/logs/run_2025-11-16T04-27-17Z_independence_2025-11-16_04-28-18Z.json
 50dbcfcbf7d41d801f0f2e1bef9e6a46af225a7d0c565fbe3f9ca3be79772ed9  ./governance/logs/run_2025-11-17T00-58-56Z_independence_2025-11-17_01-00-09Z.json
 6c3a45a8fef91012aa633c117edc761c29da29857b31baee7b61f3caabbd5dce  ./governance/logs/run_2025-11-19T22-03-06Z_independence_2025-11-19_22-03-51Z.json
+700215e649b8dda98716912b6b9c93c2fe4a1500d0f691db605eb75d15edeaa0  ./governance/logs/run_2025-11-21T05-43-33Z_independence_2025-11-21_05-44-20Z.json
 ce83452bd27ada5485b4a7ccf5f47cc44b368f2147e98408ef706132192ae47c  ./kernel/README.md
 d7f7e1c93e1fed6d353a1fadd6436b3cbcec5ea75b360b3fb7423c613d9d8c5c  ./kernel/schema/manifest.schema.json
 9d13a760017cee2a2b995aca4d0eed911130e6104be87957ac6196d0d1814705  ./kernel/templates/manifest.template.json
