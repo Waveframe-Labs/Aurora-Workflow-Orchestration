@@ -107,6 +107,7 @@ a278dab4a7de43a2e87223608099bf2e082e770b05f08b3fc333ab087935b599  ./figures/awo_
 8fb16ccb6354dace446d44bdb48472406ff880e779f2333f0f91e2f4c614ab1d  ./governance/logs/run_2025-11-16T04-27-17Z_independence_2025-11-16_04-28-18Z.json
 50dbcfcbf7d41d801f0f2e1bef9e6a46af225a7d0c565fbe3f9ca3be79772ed9  ./governance/logs/run_2025-11-17T00-58-56Z_independence_2025-11-17_01-00-09Z.json
 6c3a45a8fef91012aa633c117edc761c29da29857b31baee7b61f3caabbd5dce  ./governance/logs/run_2025-11-19T22-03-06Z_independence_2025-11-19_22-03-51Z.json
+d7f7e1c93e1fed6d353a1fadd6436b3cbcec5ea75b360b3fb7423c613d9d8c5c  ./kernel/schema/manifest.schema.json
 7cb94f11c385486bc7227c07edb75ce4311030ba374b128fdc74ae0573033937  ./logs/README.md
 e76563972ed32681bc8020f37ba2a2248b89089f003389a1025f10128e2c70d0  ./logs/WORKFLOW_LOG_2025.md
 644c0961c353b41b71f6846f668af75b3e9edc969da15fab822a14066702368e  ./logs/attestation_failures/README.md
