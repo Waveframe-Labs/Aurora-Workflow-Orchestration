@@ -1,0 +1,38 @@
+name: Normalize Metadata (AWO)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  normalize:
+    name: Normalize metadata blocks across repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install ruamel.yaml
+
+      - name: Run metadata normalizer
+        run: |
+          python scripts/normalize_metadata.py
+
+      - name: Commit normalized metadata
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "normalize: metadata blocks updated"
+          file_pattern: "**/*.*"
