@@ -58,7 +58,6 @@ jobs:
             FILES=$(printf '%s\n' $FILES | LC_ALL=C sort)
           fi
 
-
           if [ -z "$FILES" ]; then
             echo "::error::No eligible kernel files after filtering (check filetype: core metadata)."
             exit 1
@@ -66,8 +65,7 @@ jobs:
 
           {
             echo "files<<EOF"
-            printf '%s
-' $FILES
+            printf '%s\n' $FILES
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -109,38 +107,38 @@ jobs:
 
           cp "$TEMPLATE" "$PACKDIR/MANIFEST.json"
 
-          python << 'EOF'
-import json
-import datetime
-import os
-from pathlib import Path
+          python << 'PYEOF'
+          import json
+          import datetime
+          import os
+          from pathlib import Path
 
-PACKDIR = os.environ["PACKDIR"]
-packet_version = os.environ["PACKET_VERSION"]
+          PACKDIR = os.environ["PACKDIR"]
+          packet_version = os.environ["PACKET_VERSION"]
 
-manifest_path = Path(PACKDIR) / "MANIFEST.json"
+          manifest_path = Path(PACKDIR) / "MANIFEST.json"
 
-with manifest_path.open() as f:
-    m = json.load(f)
+          with manifest_path.open() as f:
+              m = json.load(f)
 
-m["packet_version"] = packet_version
-m["generated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
+          m["packet_version"] = packet_version
+          m["generated_at"] = datetime.datetime.utcnow().isoformat() + "Z"
 
-sumfile = Path(PACKDIR) / "SHA256SUMS.txt"
-files = []
-with sumfile.open() as f:
-    for line in f:
-        line = line.strip()
-        if not line:
-            continue
-        h, path = line.split(maxsplit=1)
-        files.append({"path": path, "hash": h})
+          sumfile = Path(PACKDIR) / "SHA256SUMS.txt"
+          files = []
+          with sumfile.open() as f:
+              for line in f:
+                  line = line.strip()
+                  if not line:
+                      continue
+                  h, path = line.split(maxsplit=1)
+                  files.append({"path": path, "hash": h})
 
-m["files"] = files
+          m["files"] = files
 
-with manifest_path.open("w") as f:
-    json.dump(m, f, indent=2, sort_keys=True)
-EOF
+          with manifest_path.open("w") as f:
+              json.dump(m, f, indent=2, sort_keys=True)
+          PYEOF
 
       - name: Validate manifest
         run: |
