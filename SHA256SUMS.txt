@@ -127,6 +127,7 @@ e6f0ab5220acd91e853c1c17c2e9b6bf0b2d47d3dcbc2c8fc8ce3f6248ad0ae3  ./logs/audits/
 a7c59b8fc9f0ecba41d5292480e7d82184e9a35d80f6464603dcaf7fcc2e2677  ./logs/governance/role_attestations/README.md
 54a6381960fcc4c9064598e626f86fd1bae84498d6c0f0a75642d8843e2c0a31  ./logs/overrides/README.md
 b92c0ddb94cec36568761de3d7e9f78f03f1d628ae49e5fbd1e78f46bb96eb2e  ./logs/workflow/README.md
+edce58937b8c9f509a733b7c15dd47d150f60c5c54bbfaa1aac9f1119f2b0226  ./metadata_rules.json
 cc35261d25ddb8b0a48999691c4ec66f6e36aa212093212cca5f37c17da9dc29  ./models/README.md
 8c1ed7469e3fdb8dbec47b911a9450f4679b07a77a7619bf8675800139030401  ./models/alt_backend.py
 d5f9fac8805ecc2924cf15f2581456bf04fa80defe0bf2ad55bced26ba2890f8  ./models/base.py
