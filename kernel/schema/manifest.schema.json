@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AWO Kernel Packet Manifest",
+  "type": "object",
+  "required": ["packet_version", "generated_at", "files", "hash_algorithm"],
+  "properties": {
+    "packet_version": {
+      "type": "string",
+      "description": "Semantic version of the kernel packet"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hash_algorithm": {
+      "type": "string",
+      "enum": ["sha256"]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "hash"],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
