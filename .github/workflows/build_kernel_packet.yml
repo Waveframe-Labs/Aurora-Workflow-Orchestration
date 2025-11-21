@@ -1,0 +1,105 @@
+name: Build Kernel Packet (AWO)
+
+on:
+  workflow_dispatch:
+    inputs:
+      packet_version:
+        description: "Semantic version for this packet (e.g. 1.0.0)"
+        required: true
+      include_drafts:
+        description: "Include awokernel:true files even if filetype != core"
+        required: false
+        default: "0"
+
+jobs:
+  build:
+    name: Generate AWO Kernel Packet
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tools
+        run: |
+          pip install jsonschema
+
+      - name: Create output directory
+        run: |
+          mkdir -p kernel/outputs/${{ github.event.inputs.packet_version }}
+
+      - name: Detect eligible kernel files
+        id: detect
+        run: |
+          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          grep -rl "^awokernel: true" . | grep -E "\.(md|txt|json)$"
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Copy files into packet
+        run: |
+          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
+          while IFS= read -r file; do
+            mkdir -p "$PACKDIR/$(dirname $file)"
+            cp "$file" "$PACKDIR/$file"
+          done <<< "${{ steps.detect.outputs.files }}"
+
+      - name: Generate SHA256SUMS
+        run: |
+          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
+          cd "$PACKDIR"
+          find . -type f ! -name "SHA256SUMS.txt" -print0 \
+            | xargs -0 sha256sum > SHA256SUMS.txt
+
+      - name: Build manifest
+        run: |
+          PACKDIR="kernel/outputs/${{ github.event.inputs.packet_version }}"
+          TEMPLATE="kernel/templates/manifest.template.json"
+
+          # Copy template
+          cp "$TEMPLATE" "$PACKDIR/MANIFEST.json"
+
+          # Insert packet_version and generated_at
+          python - <<EOF
+          import json, datetime, os, hashlib, subprocess
+
+          manifest_path = f"{os.environ['PACKDIR']}/MANIFEST.json"
+          with open(manifest_path) as f:
+          m = json.load(f)
+
+          m['packet_version'] = os.environ['packet_version']
+          m['generated_at'] = datetime.datetime.utcnow().isoformat() + "Z"
+
+          sumfile = f"{os.environ['PACKDIR']}/SHA256SUMS.txt"
+          files = []
+          with open(sumfile) as f:
+          for line in f:
+          h, path = line.strip().split(maxsplit=1)
+          files.append({"path": path, "hash": h})
+
+          m['files'] = files
+
+          with open(manifest_path, "w") as f:
+          json.dump(m, f, indent=2)
+
+          EOF
+
+      - name: Validate manifest
+        run: |
+          jsonschema -i kernel/outputs/${{ github.event.inputs.packet_version }}/MANIFEST.json kernel/schema/manifest.schema.json
+
+      - name: Zip packet
+        run: |
+          cd kernel/outputs
+          zip -r "kernel-pack-${{ github.event.inputs.packet_version }}.zip" "${{ github.event.inputs.packet_version }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-pack-${{ github.event.inputs.packet_version }}
+          path: kernel/outputs/kernel-pack-${{ github.event.inputs.packet_version }}.zip
