@@ -1,0 +1,4 @@
+# Files to force-include in kernel packet
+# One relative path per line
+
+kernel/README.md
