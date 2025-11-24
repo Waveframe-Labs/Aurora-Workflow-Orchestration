@@ -26,6 +26,7 @@ d99062c5b59cdf9554ed2dc19e832a79a50f35ca1e3e26a473002209fc0ea182  ./architecture
 298e3610b882e710a0c29d98cb8e6a1e09d0b936ee28484a348c174a6e755b5c  ./architecture/CPP_v1.0.json
 ee0fe9745d1962fb98c3395f5461d2f19ba79a884fcd75fecdc8dbdca60305ec  ./architecture/CPP_v1.0.md
 095506c0a64d17922fa798926dd04af21b82afe2226c66041925de1ec80c4037  ./architecture/README.md
+702c45bd21fec62bd8ee3de04de764640a1049acde4325dc044ecda2649a4ca7  ./architecture/fcr/FCR-XXXX.md
 6219c9d1bfa61adb930f9102b80f952ae12bd345fe7da5b6c76609c531a29465  ./archive/docs/AWO_Adoption_Guide.pdf
 3fae6be6e16cb6d14349c31b1a76c18c8be37068260832b836718cb87dfa0b97  ./archive/docs/AWO_Method_Spec_v1.2.1.pdf
 806d276995d83dd9b3ef145fabf1c1926d818f20ade5defc488e511785dcf137  ./archive/docs/AWO_Whitepaper_v1.1.md
