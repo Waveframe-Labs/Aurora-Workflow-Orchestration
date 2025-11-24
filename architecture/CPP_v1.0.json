@@ -1,0 +1,42 @@
+{
+    "version": "CPP v1.0",
+    "timestamp": "2025-11-21",
+    "phases": {
+        "Phase 0": [
+            "Invariants Document (1)",
+            "Doc Guard Remediation (2)",
+            "CRI Workflow Stability (4)"
+        ],
+        "Phase 1": [
+            "Run History Integrity Rules (5)",
+            "Method Spec Synchronization (6)",
+            "Governance Document Sync (13)",
+            "AWO \u2192 CRI Versioning Protocol (16)",
+            "Falsifiability Manifest (11)",
+            "Metadata Policy Finalization (20)"
+        ],
+        "Phase 2": [
+            "Neurotransparency Spec Revision (26)"
+        ],
+        "Phase 3": [
+            "Metadata Pipeline (3)",
+            "Kernel Pack Generator (9)",
+            "Minimal Reproducer Template (21)",
+            "Glossary / Ontology (22)",
+            "Kernel Self-Check Utility (23)"
+        ],
+        "Phase 4": [
+            "Public Identity Anchor Sync (12)",
+            "Neurotransparency Micro-Paper (17)",
+            "Badge System (7)"
+        ],
+        "Phase 5": [
+            "Doc Guard \u2192 AWO Demo (8)",
+            "Magic Demo (25)",
+            "Demo Extension (Phase 2) (24)",
+            "AWO vs CRI Split Timing (18)",
+            "Security + Compliance Docs (14)",
+            "Reference Integrity Checker (15)"
+        ]
+    }
+}
