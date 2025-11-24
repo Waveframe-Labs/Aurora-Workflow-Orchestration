@@ -56,5 +56,57 @@ Intended for:
 
 ## Status
 
-All documents in this folder are currently classified as:
+All documents in this folder are currently classified as:  
+- status: baseline / frozen
+- governance: ARI Architecture Document
+- metadata: pending (to be auto-inserted by Metadata Pipeline v1)
 
+Once the metadata pipeline is implemented, each document will receive:
+
+- a fully structured metadata header  
+- its own DOI or DOI placeholder  
+- version lineage tracking  
+- governance annotations  
+- automatic validation  
+
+---
+
+## Modification Process (FCR Required)
+
+To modify any file in this directory:
+
+1. Create a new **Formal Change Request (FCR)** under:
+```
+/architecture/fcr/
+```
+2. Document:
+- rationale  
+- proposed changes  
+- affected architecture nodes  
+- compatibility impact  
+3. Assign a new version number (e.g., `v1.4 → v1.5`)
+4. Submit the FCR for review via ARI governance
+5. After approval:
+- modify the file(s)
+- update metadata
+- commit changes with the FCR ID
+
+No direct edits are permitted.
+
+---
+
+## Purpose of This Directory
+
+This directory exists so that:
+
+- AWO/CRI can be **reconstructed** without ambiguity  
+- governance rules remain **stable**  
+- the architecture is **transparent**  
+- future contributors cannot unintentionally change system structure  
+- metadata generation can operate reproducibly  
+- DOIs can reference specific architecture versions  
+- the project scales into a **standards-grade ecosystem**
+
+This folder is the “source of truth” for AWO/CRI architecture.
+
+---
