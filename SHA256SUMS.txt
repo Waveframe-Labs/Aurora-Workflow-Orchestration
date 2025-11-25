@@ -6,6 +6,7 @@ a1009779dfa9e9a04e5f1d6776074af377d7f9f8b0eda6888c2ad2620b005e97  ./.github/ISSU
 4d2306de01bc9af193c0f6b5b4be257ccbf5adb6a5456928ddafd71ea0d5c82a  ./.github/_README.md
 31dff4e576907605a0817e56f97b6090fe4afec31c972032096867e8841931cc  ./.github/workflows/README.md
 ed5316347985faf4e4e6cd806d612df7b05ae8b4dd6bb12f96358ef30d56d010  ./.github/workflows/awo_run_v4.1.yml
+2875767143a105c971f16aa104e5f03e5392f3afb011f9d78675e7de73547d4c  ./.github/workflows/awo_run_v4_2.yml
 e65178042fb11872e225c3727f143a8b075b8e3e9dc10643feeac5d14a15e2a8  ./.github/workflows/build_kernel_packet.yml
 790bebae65e028fcc6fedb9695bd1a593416ec9a4aa9c86422c5a23aabf57bef  ./.github/workflows/doc-guard.yml
 717924c65364c95bc7253c667421f71e409dbc75688dcadf1168f714b0f54ba1  ./.github/workflows/md-to-pdf.yml
