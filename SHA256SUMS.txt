@@ -71,6 +71,7 @@ f8443e06f7722cea10e6f75917255775bcdc4cdaacb09f7c98725b7f080ab548  ./decisions/AD
 c5cb688d98072afb6b71eae5803479018dcd430270eaf2f047bcc792074c1f66  ./decisions/README.md
 0c3bfcbc443cc3f234ce079d9ff4c4f9957c559758c7e63b8306121b7164395c  ./docs/AWO_Adoption_Guide.md
 6e11c16bcc58e6b78b6c93b21a3d48b6dc00f60200e07c43eaf52bd0d8ab8564  ./docs/AWO_Compliance_Report.md
+921de1f1aeff352ffdb48ac28bc4bbc5a5ce1d2edb074a3036e6c5b4d805b162  ./docs/AWO_DAG_v1.0.md
 1df20eded0ffd70e950cb163906f2fa51b9b3a203ed244a04134721d0a6bc353  ./docs/AWO_Method_Spec_v1.2.1.md
 3a8f1eddd21290032c7e4ab161ef4b1b04153518458b75a6976fdc3f71ef620c  ./docs/AWO_Whitepaper_v1.2.1.md
 59807dc6f4196633cbb786e3ee6eb665f41608ba5c166feb1183e49dad4fe295  ./docs/CRI_HANDOFF.md
