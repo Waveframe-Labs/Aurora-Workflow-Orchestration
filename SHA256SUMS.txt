@@ -102,6 +102,7 @@ ebee4b53bed64928dce77a665a83ba8c9abc83a21e77c0909b4af9cdb019bcac  ./docs/pdf/ONB
 bb9f06d65470c9d2e9273a1a422bea6e471662943c88b8d4434750e001778245  ./docs/pdf/README_TOC.pdf
 d44f36628cc89d2612bb39068c69f39d0d3eba9dd6368dbde032ff012ce07b12  ./docs/pdf/ROLE_ATTESTATION.pdf
 a0de77deff17f2ae604de607419137b8cbb6bc2c88ccd6574e86152ee1941de1  ./docs/pdf/VERIFY_ATTESTATION.pdf
+1b96d9bc104da49c44e327462c82aa1a7a97b4182fb4784e5288bf2e8ec5da29  ./docs/workflow-tests/AWO_Workflow_Test_Plan_v1.0.md
 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  ./docs/workflow-tests/Demo
 c428a6d4605f288f7a1c7f118e7a87dffc4dd6c08002cc59444fae9206b7080e  ./figures/AI_Governance_Gap_Diagram.png.png
 f97e271823116e4e1cc65c09cb3923c7219d16721905d4c00065b74532f1c9f2  ./figures/AI_Governance_Gap_Diagram.svg
