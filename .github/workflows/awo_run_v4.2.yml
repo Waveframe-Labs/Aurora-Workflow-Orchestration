@@ -89,9 +89,7 @@ jobs:
             echo "orchestrator=${{ github.actor }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          RID="$(tr -d '
-
-' < runs/LAST_RUN)"
+          RID="$(tr -d '\r\n' < runs/LAST_RUN)"
           case "$RID" in
             (*[!A-Za-z0-9._-]*|'')
               echo "::error::Invalid RUN_ID in runs/LAST_RUN: '$RID'"
@@ -270,7 +268,11 @@ jobs:
           echo "[GATE2] Orchestrator: ${ORCHESTRATOR}"
           echo "[GATE2] Reviewer: ${GITHUB_ACTOR}"
           echo "[GATE2] allow_self_approval: ${ALLOW_SELF_APPROVAL}"
-          python scripts/awo_validate.py gate2             --run-id "${RUN_ID}"             --orchestrator "${ORCHESTRATOR}"             --reviewer "${GITHUB_ACTOR}"             --allow-self-approval "${ALLOW_SELF_APPROVAL}"
+          python scripts/awo_validate.py gate2 \
+            --run-id "${RUN_ID}" \
+            --orchestrator "${ORCHESTRATOR}" \
+            --reviewer "${GITHUB_ACTOR}" \
+            --allow-self-approval "${ALLOW_SELF_APPROVAL}"
           CODE=$?
           # Enforce self-approval policy at the workflow layer
           if [ "${ORCHESTRATOR}" = "${GITHUB_ACTOR}" ] && [ "${ALLOW_SELF_APPROVAL}" != "1" ]; then
@@ -404,8 +406,14 @@ jobs:
           set -euo pipefail
           FINAL_TAR="awo-run-final-${RUN_ID}.tar.gz"
           ATTN="governance/attestations/${RUN_ID}/ATTESTATION.txt"
-          cosign sign-blob --yes             --output-signature "${FINAL_TAR}.sig"             --output-certificate "${FINAL_TAR}.cert"             "${FINAL_TAR}"
-          cosign sign-blob --yes             --output-signature "${ATTN}.sig"             --output-certificate "${ATTN}.cert"             "${ATTN}"
+          cosign sign-blob --yes \
+            --output-signature "${FINAL_TAR}.sig" \
+            --output-certificate "${FINAL_TAR}.cert" \
+            "${FINAL_TAR}"
+          cosign sign-blob --yes \
+            --output-signature "${ATTN}.sig" \
+            --output-certificate "${ATTN}.cert" \
+            "${ATTN}"
 
       - name: Self-verify cosign signatures (offline)
         shell: bash
@@ -415,8 +423,14 @@ jobs:
           set -euo pipefail
           FINAL_TAR="awo-run-final-${RUN_ID}.tar.gz"
           ATTN="governance/attestations/${RUN_ID}/ATTESTATION.txt"
-          cosign verify-blob             --certificate "${FINAL_TAR}.cert"             --signature   "${FINAL_TAR}.sig"             "${FINAL_TAR}"
-          cosign verify-blob             --certificate "${ATTN}.cert"             --signature   "${ATTN}.sig"             "${ATTN}"
+          cosign verify-blob \
+            --certificate "${FINAL_TAR}.cert" \
+            --signature   "${FINAL_TAR}.sig" \
+            "${FINAL_TAR}"
+          cosign verify-blob \
+            --certificate "${ATTN}.cert" \
+            --signature   "${ATTN}.sig" \
+            "${ATTN}"
 
       - name: Upload FINAL payload and signatures
         uses: actions/upload-artifact@v4
