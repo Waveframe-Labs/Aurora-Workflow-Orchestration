@@ -31,7 +31,6 @@ ca6ec513e1f9ccd576eff9320c510368a1fd0c1947062f4370469bfff5a8052b  ./architecture
 3353220c5ce7147039ebe8a2a7dcace19ce48ad2a0f6af0957711bd23d248a5e  ./architecture/test-suite/AWO_v4.2_Delta_Spec_v1.0.md
 350fba16549c767eaa155b40a40336a22ed3260d2a8fc1c109f1615fcd013642  ./architecture/test-suite/AWO_v4.2_Test_Suite_DAG_v1.0.md
 25613e5fe3f09a0c097f28b89dd4d4eaf003d4d9964c465d5d4e1f9efcbe2b52  ./architecture/test-suite/stabilization/AWO_v4.2_Workflow_Stabilization_Plan.md
-01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  ./architecture/test-suite/stabilization/awo
 6219c9d1bfa61adb930f9102b80f952ae12bd345fe7da5b6c76609c531a29465  ./archive/docs/AWO_Adoption_Guide.pdf
 3fae6be6e16cb6d14349c31b1a76c18c8be37068260832b836718cb87dfa0b97  ./archive/docs/AWO_Method_Spec_v1.2.1.pdf
 806d276995d83dd9b3ef145fabf1c1926d818f20ade5defc488e511785dcf137  ./archive/docs/AWO_Whitepaper_v1.1.md
