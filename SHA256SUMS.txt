@@ -115,6 +115,7 @@ ea9eeee7cbf9a4c1aa6a8d0dc7e844f4852a6c8f4f2e19066a0fd005211a5e0b  ./figures/AOM-
 8305fe647abf62842c5b11b4f034ea926c0926bdc8a5d80f53afdd579ff83676  ./figures/README.md
 f311904c20b82842836f0ee606cd88b2a895485b38584a59a97af8a68bffbe0b  ./figures/awo_architecture_diagram.png
 a278dab4a7de43a2e87223608099bf2e082e770b05f08b3fc333ab087935b599  ./figures/awo_banner_cri.PNG
+8d98659285f6bd0abed3928cc60a602314a054fa6330b338fd7c856041836bb8  ./governance/audits/AWO_Repo_Audit_2025-11-26.md
 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  ./governance/audits/demo
 65983ab2481834cc436f84a9661909d50bc278dc254e3362c2f7f2cc9e76d448  ./governance/corrective_actions/AWO-CAR-0001.md
 554b65b8ca7876c607dcaec333616d696738cde0974bd205441a1e4190131860  ./governance/logs/approval.json
