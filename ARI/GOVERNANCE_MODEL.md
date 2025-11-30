@@ -14,9 +14,7 @@ status: "Final — Role & Oversight Structure"
 created: "2025-11-26"
 type: "governance"  
 doi: "10.5281/zenodo.17743096"  
----
-
-# Aurora Research Initiative — Governance Model (v1.0.0)
+---  
 
 This document defines the **governance model**, **role structure**, **decision boundaries**, and
 **oversight rules** for the Aurora Research Initiative (ARI). It ensures institutional clarity,
@@ -230,3 +228,4 @@ This governance model defines ARI’s authority, ensures system integrity, and p
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
