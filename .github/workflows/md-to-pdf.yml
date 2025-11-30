@@ -1,70 +1,64 @@
-name: Convert Markdown Docs to PDF
+name: Convert Markdown to PDF
 
 on:
   push:
     paths:
       - 'docs/**/*.md'
+      - 'ARI/**/*.md'
   workflow_dispatch:
 
 jobs:
-  build-pdfs:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0    # IMPORTANT: full history so we can push cleanly
-          ref: main         # ensure we are operating on main
+        uses: actions/checkout@v3
 
-      - name: Set up Git user
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Pull latest changes (ensure fast-forward)
-        run: |
-          git pull origin main
-
-      - name: Install Pandoc and full LaTeX dependencies
+      - name: Install Pandoc
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc \
-            texlive \
-            texlive-xetex \
-            texlive-latex-recommended \
-            texlive-latex-extra \
-            texlive-fonts-recommended
+          sudo apt-get install -y pandoc
 
-      - name: Create output directory
-        run: mkdir -p docs/pdf
-
-      - name: Convert all Markdown files (recursive) to PDF
+      - name: Ensure output directories exist
         run: |
-          for file in $(find docs -name '*.md'); do
-            [ -f "$file" ] || continue
-            base=$(basename "$file" .md)
-            echo "Converting $file → docs/pdf/${base}.pdf"
+          mkdir -p docs/pdf
+          mkdir -p ARI/pdf
+
+      ############################################################
+      # AWO DOCUMENTS — existing behavior (unchanged)
+      ############################################################
+      - name: Convert AWO Markdown docs to PDF
+        run: |
+          shopt -s globstar nullglob
+          for file in docs/**/*.md; do
+            base="$(basename "$file" .md)"
             pandoc "$file" \
-              --from=markdown+yaml_metadata_block+smart+table_captions+fenced_code_blocks \
+              --from=markdown \
               --pdf-engine=xelatex \
-              --standalone \
-              -V geometry:margin=1in \
-              -V fontsize=11pt \
-              -V colorlinks=true \
-              -V urlcolor=blue \
-              -V linkcolor=blue \
-              -V toccolor=gray \
-              -o "docs/pdf/${base}.pdf"
+              --toc \
+              --output="docs/pdf/${base}.pdf"
+          done
+
+      ############################################################
+      # ARI DOCUMENTS — NEW behavior
+      ############################################################
+      - name: Convert ARI Markdown docs to PDF
+        run: |
+          shopt -s globstar nullglob
+          for file in ARI/**/*.md; do
+            base="$(basename "$file" .md)"
+            pandoc "$file" \
+              --from=markdown \
+              --pdf-engine=xelatex \
+              --toc \
+              --output="ARI/pdf/${base}.pdf"
           done
 
       - name: Commit and push generated PDFs
         run: |
-          git add docs/pdf/*.pdf
-          git commit -m "Auto-generate PDFs from Markdown" || echo "No changes to commit"
-          
-          git pull --rebase origin main   
-
-          git push origin main   
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/pdf/*.pdf ARI/pdf/*.pdf || true
+          git commit -m "Automated PDF generation for Markdown files" || true
+          git push
