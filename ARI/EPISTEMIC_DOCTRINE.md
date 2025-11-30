@@ -14,9 +14,7 @@ status: "Final — Epistemic Foundation v1.0.0"
 created: "2025-11-26"
 type: "epistemics"  
 doi: "10.5281/zenodo.17743096"  
----
-
-# Aurora Research Initiative — Epistemic Doctrine (v1.0.0)
+---  
 
 This document establishes the epistemic foundation of the Aurora Research Initiative (ARI).  
 It defines the theory of knowledge, scientific principles, and evidentiary standards that govern the
@@ -205,3 +203,4 @@ This doctrine establishes the epistemic foundation for all scientific work withi
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
