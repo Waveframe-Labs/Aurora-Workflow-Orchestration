@@ -7,18 +7,16 @@ on:
       - 'ARI/**/*.md'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write  # REQUIRED for committing generated PDFs
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Install Pandoc + wkhtmltopdf
         run: |
@@ -30,50 +28,50 @@ jobs:
           mkdir -p docs/pdf
           mkdir -p ARI/pdf
 
-      ############################################################
-      # AWO DOCUMENTS
-      ############################################################
+      ###################################################################
+      # Convert AWO docs → PDF (Pandoc with wkhtmltopdf)
+      ###################################################################
       - name: Convert AWO Markdown docs to PDF
         run: |
           shopt -s globstar nullglob
           for file in docs/**/*.md; do
             [ -e "$file" ] || continue
             base="$(basename "$file" .md)"
-
             pandoc "$file" \
               --from=markdown \
+              --metadata=title:" " \
               --pdf-engine=wkhtmltopdf \
               --output="docs/pdf/${base}.pdf"
           done
 
-      ############################################################
-      # ARI DOCUMENTS — SAFE YAML-IGNORING MODE
-      ############################################################
+      ###################################################################
+      # Convert ARI docs → PDF (Pandoc with wkhtmltopdf)
+      # Forces blank title to block Pandoc auto-title injection.
+      ###################################################################
       - name: Convert ARI Markdown docs to PDF
         run: |
           shopt -s globstar nullglob
           for file in ARI/**/*.md; do
             [ -e "$file" ] || continue
             base="$(basename "$file" .md)"
-
-            # Extract the real ARI document title from the first H1 AFTER metadata
-            title=$(grep -m 1 '^# ' "$file" | sed 's/^# //')
-
             pandoc "$file" \
               --from=markdown \
-              --metadata=title:"$title" \
+              --metadata=title:" " \
               --pdf-engine=wkhtmltopdf \
               --output="ARI/pdf/${base}.pdf"
           done
 
-      ############################################################
-      # COMMIT AND PUSH
-      ############################################################
+      ###################################################################
+      # Commit the generated PDFs
+      ###################################################################
       - name: Commit and push generated PDFs
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/pdf/*.pdf 2>/dev/null || true
-          git add ARI/pdf/*.pdf 2>/dev/null || true
-          git commit -m "Automated PDF generation for Markdown files" || true
+
+          git add docs/pdf/*.pdf ARI/pdf/*.pdf || true
+
+          # Exit silently if nothing to commit
+          git commit -m "Automated PDF generation for Markdown files" || exit 0
+
           git push
