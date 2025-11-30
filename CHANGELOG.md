@@ -1,5 +1,88 @@
 # Changelog
 
+## v1.2.0 — Post-Finalization Expansion & Architecture Stabilization (2025-11-29)
+
+### Summary
+Although **AWO remains finalized as a methodological framework**, the repository underwent a major infrastructure expansion to support its new role inside the **Aurora Research Initiative (ARI)** and its upcoming successor, **CRI-CORE**.
+
+This release formalizes the architectural, testing, schema, and governance layers required for AWO to function as the institutional backbone of ARI.  
+These changes do **not** reopen AWO’s methodology — they strengthen its infrastructure, provenance, and long-term maintainability.
+
+### Key Updates
+
+#### 1. **Introduction of ARI Namespace**
+- Added new `/ARI/` directory containing all **Aurora Research Initiative** governance documents.  
+- Integrated ARI into AWO’s repository structure as the institutional oversight layer.  
+- Added deterministic **Markdown → PDF** generation for all ARI artifacts.
+
+#### 2. **Architecture Stabilization Suite**
+Added under `/architecture/`:
+- `/fcr/` containing **FCR-0001** (Formal Change Request structure).  
+- `/test-suite/stabilization/` including:
+  - `AWO_v4.2_Workflow_Stabilization_Plan.md`
+  - `AWO_v4.2_Delta_Spec_v1.0.md`
+  - `AWO_v4.2_Test_Suite_DAG_v1.0.md`
+  - `TS-Index_v1.0.md`
+- Added **CPP v1.0 (Cognitive Provenance Protocol)** in JSON + Markdown.
+
+These files define the transformation pathway toward AWO v4.x / CRI-CORE operational integration.
+
+#### 3. **Schema Framework Expansion**
+Added new schemas under `/schemas/`:
+- `claim.schema.json`
+- `cri_workflow.schema.json`
+- `environment.schema.json`
+- `neurotransparency.schema.json`
+- `provenance.schema.json`
+- `redaction_pointer.schema.json`
+- `run_manifest.schema.json`
+- `workflow_schema.json`
+
+Schemas now provide full structural constraints over workflows, manifests, provenance, and attestation.
+
+#### 4. **Test-Suite Growth**
+Under `/workflow-tests/`:
+- Added **AWO Workflow Test Plan v1.0**  
+- Updated whitepaper + methodspec tests (v1.2.1)  
+- Added **Evidence Registry**, **Governance Summary**, onboarding documentation, attestation verification, neurotransparency doctrine & spec  
+- Established a broad automated test surface for CRI-CORE.
+
+#### 5. **Script Enhancements**
+Updated and extended core AWO tooling:
+- `awo_run.py`
+- `awo_attest.py`
+- `awo_validate.py`
+- `validate_docs.py`
+- `validate_run.py`
+- `normalize_metadata.py`
+
+These scripts now operate as a light runtime layer pending CRI-CORE’s full release.
+
+#### 6. **Markdown → PDF Build System (Repository-wide)**
+- Introduced a new deterministic conversion workflow using **Pandoc + wkhtmltopdf**.  
+- Generates scholar-grade PDFs for *both* `/docs/` and `/ARI/`.  
+- Fully automated, audit-trailed, bot-committed outputs.  
+- Replaces all local/manual exports.
+
+#### 7. **Archive Consolidation**
+- Expanded `/archive/docs` and `/archive/workflows` to store historical whitepapers, methodspecs, and doctrine documents.  
+- Ensures full reproducibility and long-term auditability.
+
+### Why It Matters
+AWO is now more than a methodology — it is a **governed, schema-backed, reproducible institutional framework**.  
+These additions prepare the ecosystem for **CRI-CORE**, which will operationalize AWO’s epistemic rules in live execution form.
+
+### Next Step
+- Prepare the next tag (`v1.3.0`) for archival once final validation is complete.  
+- Begin CRI-CORE implementation using the stabilization suite and schema framework.  
+- Expand the automated test suite for CRI interoperability.
+
+---
+
+**Status:** AWO remains finalized as a methodology · Repository expanded for ARI integration  
+**Successor:** [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE)  
+**Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+
 ## v1.2.0 — CRI Handoff & Repository Finalization (2025-10-22)
 
 ### Summary
