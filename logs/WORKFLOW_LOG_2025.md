@@ -1,10 +1,9 @@
 ---
 filetype: workflow_log
 version: 1.1.1
-updated: 2025-10-20
+updated: 2025-11-29
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
-
 ---
 
 # Workflow Log — Aurora Workflow Orchestration (AWO)
@@ -40,64 +39,80 @@ Format: **What I did, What I learned, Next step.**
 - **What I did:** Completed full repository hardening and governance migration to **Waveframe Labs**.  
   Standardized all folder-level `README.md` files with metadata headers (filetype, version, updated, maintainer, contact).  
   Unified maintainer and contact identity under `swright@waveframelabs.org`.  
-  Implemented **cryptographic attestation** using Sigstore `cosign` for OIDC-based signing of AWO runs.  
-  Each run now produces verifiable artifacts (`ATTESTATION.txt`, `.sig`, `.cert`) linking manifests to checksums.  
-  Updated GitHub workflow to include attestation generation, signature upload, and verification gates.  
+  Integrated Sigstore `cosign` attestation for cryptographic signing of AWO runs.  
   Deprecated manual `/audit/` procedures in favor of tamper-evident attestation.  
-  Verified integrity through successful attested run `run_2025-10-12T14-29-03Z`.
-
-- **What I learned:**  
-  AWO has reached maturity as a fully governed, cryptographically verifiable methodology.  
-  The addition of attestation bridges the last reproducibility gap—ensuring every run, manifest, and checksum is both auditable and tamper-evident.  
-  Institutional transfer under **Waveframe Labs** formally establishes AWO as part of a reproducible-research ecosystem with enterprise-grade trust guarantees.
-
+  Verified integrity through attested run `run_2025-10-12T14-29-03Z`.
+- **What I learned:** AWO reached maturity as a governed, cryptographically verifiable methodology.  
 - **Next step:**  
   1. Tag **v1.1.1** and archive the attested release on Zenodo.  
-  2. Begin **CRI-CORE** integration as the operational layer for continuous research verification.  
-  3. Document attestation verification instructions for external replicators.
-
-**Related ADRs:**  
-- ADR-0014 — *Repository Hardening and Organizational Transfer to Waveframe Labs*  
-- ADR-0015 — *Attestation Integration & Cryptographic Signing*
+  2. Begin **CRI-CORE** integration as the operational layer.  
+  3. Document attestation verification instructions.
+- **Related ADRs:** ADR-0014, ADR-0015
 
 ---
 
 ## Current Status (as of 2025-10-12)
-- **What I did:** Finalized **AWO v1.1.1** as a hardened, cryptographically verifiable reproducibility framework under **Waveframe Labs** governance.  
-  Completed full repository audit, attestation pipeline integration, and organizational migration.  
-  Verified reproducibility integrity via attested run `run_2025-10-12T14-29-03Z` and corresponding signature artifacts.
+- **What I did:** Finalized AWO v1.1.1 under Waveframe Labs governance with hardened attestation pipelines.
 
 ---
 
-## 2025-10-20 — v1.2.0 Automated Documentation Builds & Aurora Research Initiative Finalization
+## 2025-10-20 — v1.2.0 Automated Documentation Builds & ARI Integration
 
 - **What I did:**  
-  Integrated automated PDF build pipelines for all core documentation artifacts (Whitepaper and Method Specification).  
-  Implemented two GitHub Actions workflows (`build-whitepaper-pdf.yml` and `build-methodspec-pdf.yml`) to generate and commit reproducible `.pdf` outputs from Markdown sources using Pandoc + XeLaTeX.  
-  Verified successful bot-committed builds of `/docs/AWO_Whitepaper_v1.1.pdf` and `/docs/AWO_Method_Spec_v1.2.pdf`.    
-  Transitioned institutional governance of AWO into the **Aurora Research Initiative**, the flagship program published by **Waveframe Labs**, aligning it with the Initiative’s broader reproducibility mandate.   
-  Prepared the repository for final `v1.2.0` tag and Zenodo archival once integration resumes.
-
-- **What I learned:**  
-  Automation is the final bridge between transparency and reproducibility.  
-  By removing human intervention from documentation builds, AWO now guarantees verifiable parity between Markdown and distributed PDFs — every artifact can be reproduced exactly from versioned source.  
-  Institutional continuity under the **Aurora Research Initiative** ensures AWO’s methodology remains transparent, citable, and evolution-ready.
-
+  Implemented Pandoc-based automated PDF builds for Whitepaper and Method Spec.  
+  Added reproducible GitHub Actions workflows to commit generated PDFs.  
+  Aligned AWO under the newly established **Aurora Research Initiative (ARI)**, inheriting its metadata and governance boundaries.  
+  Prepared for v1.2.0 archival release.
+- **What I learned:** Automation closes the loop between transparency and reproducibility.  
 - **Next step:**  
-  1. Tag and publish `v1.2.0` on GitHub.  
-  2. Attach generated PDFs to the release for long-term archival and Zenodo DOI linking.  
-  3. Begin **CRI-CORE** phase: operationalize AWO’s orchestration logic into a continuous runtime for live epistemic verification.  
-
-**Related ADRs:**  
-- ADR-0016 — *Automated PDF Build Integration*  
-- ADR-0017 — *Documentation Governance under Aurora Research Initiative*
+  1. Tag and publish `v1.2.0`.  
+  2. Attach PDFs to the archival release.  
+  3. Begin CRI-CORE operationalization.
+- **Related ADRs:** ADR-0016, ADR-0017
 
 ---
 
 ## Current Status (as of 2025-10-20)
-- **What I did:** Finalized AWO v1.2.0 within the Aurora Research Initiative, under Waveframe Labs governance. 
-  Established automated documentation workflows, verified build reproducibility, and validated repository readiness for archival.  
-  The framework is now fully reproducible and institutionally aligned — marking AWO’s completion and handoff to the upcoming CRI-CORE operational phase.
+- **What I did:** AWO v1.2.0 is governance-aligned, automated, and ready for archival under ARI.
+
+---
+
+## 2025-11-29 — v1.3.0 ARI Document Integration, Unified PDF Pipeline & Institutional Stabilization
+
+- **What I did:**  
+  Integrated a unified Markdown→PDF pipeline capable of generating **scholar-grade, reproducible PDFs** for both AWO and **ARI** documents.  
+  Added `/ARI/` as an auxiliary folder within AWO strictly for **PDF generation and provenance tracking**, without modifying any AWO artifacts.  
+  Created parallel `ARI/pdf/` and `docs/pdf/` output directories to maintain clean subsystem separation.  
+  Implemented workflow routing so that AWO and ARI documents are converted independently with deterministic settings.  
+  Verified the pipeline against eight ARI governance documents, all of which rendered successfully with institutionally compliant front pages.  
+  Stabilized the repository with clearer governance boundaries:  
+  - ARI = institutional layer  
+  - AWO = methodological layer  
+  - CRI-CORE = execution/automation layer  
+  Enhanced README clarity regarding AWO’s archival role and relationship to ARI.
+
+- **What I learned:**  
+  Publication pipelines are part of reproducibility governance.  
+  AWO’s infrastructure now enables **auditable, version-pinned artifact generation**, which strengthens both ARI and AWO without merging their domains.  
+  AWO is not diminished — it now provides a regulated build environment used across the ecosystem.
+
+- **Next step:**  
+  1. Complete **AWO Cleanup Phase** (documentation polish, metadata normalization, integrity checks).  
+  2. Regenerate `SHA256SUMS.txt` and validate workflow determinism.  
+  3. Add ADR documenting the new unified publication pipeline.  
+  4. Tag and publish `v1.3.0` as the official “Governance-Aligned Infrastructure Release.”  
+  5. Resume CRI-CORE rebuild after AWO cleanup.
+
+- **Related ADRs:**  
+  - ADR-0018 — *Governed Publication Pipeline Integration* (to be added)  
+  - ADR-0019 — *ARI–AWO Boundary Clarification* (optional but recommended)
+
+---
+
+## Current Status (as of 2025-11-29)
+- **What I did:** AWO now functions as a governed reproducibility and publication environment under ARI oversight.  
+  All major infrastructure, governance alignment, and publication pipelines are complete.  
+  Ready for the AWO Cleanup Phase and subsequent v1.3.0 release.
 
 ---
 
