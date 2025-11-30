@@ -77,7 +77,7 @@ Format: **What I did, What I learned, Next step.**
 
 ---
 
-## 2025-11-29 — v1.3.0 ARI Document Integration, Unified PDF Pipeline & Institutional Stabilization
+## 2025-11-29 — v1.2.0 ARI Document Integration, Unified PDF Pipeline & Institutional Stabilization
 
 - **What I did:**  
   Integrated a unified Markdown→PDF pipeline capable of generating **scholar-grade, reproducible PDFs** for both AWO and **ARI** documents.  
@@ -102,10 +102,6 @@ Format: **What I did, What I learned, Next step.**
   3. Add ADR documenting the new unified publication pipeline.  
   4. Tag and publish `v1.3.0` as the official “Governance-Aligned Infrastructure Release.”  
   5. Resume CRI-CORE rebuild after AWO cleanup.
-
-- **Related ADRs:**  
-  - ADR-0018 — *Governed Publication Pipeline Integration* (to be added)  
-  - ADR-0019 — *ARI–AWO Boundary Clarification* (optional but recommended)
 
 ---
 
