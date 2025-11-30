@@ -21,8 +21,6 @@ anchors:
   - "ARI-GOV-LOG-v1.0.0"
 ---
 
-# ARI Governance Log
-
 This log records all governance-level changes, decisions, approvals, and version increments within the Aurora Research Initiative (ARI).  
 Entries must follow ARI’s Change Control and Versioning Policy and include rationale, author, timestamp, and affected documents.
 
@@ -53,3 +51,4 @@ Foundational governance structure completed. ARI enters active status.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
