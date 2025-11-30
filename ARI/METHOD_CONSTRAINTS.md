@@ -21,9 +21,7 @@ dependencies:
   - "METADATA_POLICY.md"
 anchors:
   - "ARI-METHOD-CONSTRAINTS-v1.0.0"
----
-
-# Method Constraints (v1.0.0)
+---  
 
 This document establishes the binding constraints and required capabilities governing the Aurora Workflow Orchestration (AWO) framework. It defines the responsibilities, prohibitions, and operational boundaries that AWO must adhere to under the authority of the Aurora Research Initiative (ARI). These constraints ensure long-term reproducibility, governance stability, and epistemic integrity.
 
@@ -168,3 +166,4 @@ No silent changes permitted.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
