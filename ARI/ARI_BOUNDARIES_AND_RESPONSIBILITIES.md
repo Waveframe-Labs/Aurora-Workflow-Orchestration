@@ -20,9 +20,7 @@ dependencies:
   - "EPISTEMIC_DOCTRINE.md"
 anchors:
   - "ARI-BOUNDARIES-v1.0.0"
----
-
-# ARI Boundaries and Responsibilities (v1.0.0)
+---  
 
 This document formally defines the jurisdiction, responsibilities, and prohibitions governing  
 the interaction between ARI, AWO, CRI-CORE, Waveframe Labs, and all Case Studies.  
@@ -220,3 +218,4 @@ No silent changes permitted.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
