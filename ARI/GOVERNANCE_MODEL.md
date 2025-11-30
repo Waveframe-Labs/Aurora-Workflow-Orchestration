@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Governance Model (v1.0.0)
+# Governance Model (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -228,4 +227,5 @@ This governance model defines ARI’s authority, ensures system integrity, and p
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
