@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Roadmap (v1.0.0)
+# Roadmap (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -166,4 +165,5 @@ This roadmap defines the path toward institutional maturity for the Aurora Resea
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
