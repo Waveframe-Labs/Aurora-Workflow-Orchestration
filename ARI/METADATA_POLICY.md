@@ -14,9 +14,7 @@ status: "Final — Metadata Requirements v1.0.0"
 created: "2025-11-26"
 type: "epistemics"  
 doi: "10.5281/zenodo.17743096"  
----
-
-# Aurora Research Initiative — Metadata Policy (v1.0.0)
+---  
 
 This policy defines the **required metadata structure** for all documents, artifacts, workflows,
 and research products within the Aurora ecosystem. Metadata provides the backbone of provenance,
@@ -141,3 +139,4 @@ Requires:
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
