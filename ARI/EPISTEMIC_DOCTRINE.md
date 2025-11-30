@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Epistemic Doctrine (v1.0)
+# Epistemic Doctrine (v1.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -203,4 +202,5 @@ This doctrine establishes the epistemic foundation for all scientific work withi
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
