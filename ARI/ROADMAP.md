@@ -14,9 +14,7 @@ status: "Final — Evolution Plan"
 created: "2025-11-26"
 type: "roadmap"  
 doi: "10.5281/zenodo.17743096"  
----
-
-# Aurora Research Initiative — Roadmap (v1.0.0)
+---  
 
 This roadmap defines the strategic evolution of the **Aurora Research Initiative (ARI)** across
 multiple phases. It establishes how ARI grows from its foundational architecture into a fully mature
@@ -168,3 +166,4 @@ This roadmap defines the path toward institutional maturity for the Aurora Resea
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
