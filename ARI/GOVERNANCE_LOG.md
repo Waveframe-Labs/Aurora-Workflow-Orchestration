@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Governance Log (v1.0.0)
+# Governance Log (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -51,4 +50,5 @@ Foundational governance structure completed. ARI enters active status.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
