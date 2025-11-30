@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Initialization Log (v1.0.0)
+# Initialization Log (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -98,3 +97,4 @@ metadata, and governance expansion.
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 
 </div>
+
