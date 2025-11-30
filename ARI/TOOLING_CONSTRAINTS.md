@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Tooling Constraints (v1.0.0)
+# Tooling Constraints (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -185,3 +184,4 @@ No silent modifications permitted.
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 
 </div>  
+
