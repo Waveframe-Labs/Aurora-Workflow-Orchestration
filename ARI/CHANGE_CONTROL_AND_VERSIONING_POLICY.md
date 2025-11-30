@@ -23,9 +23,7 @@ dependencies:
   - "EPISTEMIC_DOCTRINE.md"
 anchors:
   - "ARI-CHANGE-CONTROL-v1.0.0"
----
-
-# Change Control and Versioning Policy (v1.0.0)
+---  
 
 This document defines the **binding governance rules** for versioning, release control, and institutional change management across the Aurora Research Initiative (ARI), Aurora Workflow Orchestration (AWO), CRI-CORE, Waveframe Labs, and all Case Studies.  
 It establishes a **dual-versioning model** and mandates **global release tagging** for every version change, ensuring reproducibility, auditability, and long-term institutional stability.
@@ -240,3 +238,4 @@ No silent revisions permitted.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
