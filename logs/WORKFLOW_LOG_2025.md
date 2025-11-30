@@ -1,6 +1,6 @@
 ---
 filetype: workflow_log
-version: 1.1.1
+version: 1.2.0
 updated: 2025-11-29
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
@@ -36,79 +36,118 @@ Format: **What I did, What I learned, Next step.**
 ---
 
 ## 2025-10-12 — v1.1.1 Repository Hardening, Organizational Transfer & Attestation Integration
-- **What I did:** Completed full repository hardening and governance migration to **Waveframe Labs**.  
-  Standardized all folder-level `README.md` files with metadata headers (filetype, version, updated, maintainer, contact).  
-  Unified maintainer and contact identity under `swright@waveframelabs.org`.  
-  Integrated Sigstore `cosign` attestation for cryptographic signing of AWO runs.  
-  Deprecated manual `/audit/` procedures in favor of tamper-evident attestation.  
-  Verified integrity through attested run `run_2025-10-12T14-29-03Z`.
-- **What I learned:** AWO reached maturity as a governed, cryptographically verifiable methodology.  
-- **Next step:**  
-  1. Tag **v1.1.1** and archive the attested release on Zenodo.  
-  2. Begin **CRI-CORE** integration as the operational layer.  
-  3. Document attestation verification instructions.
-- **Related ADRs:** ADR-0014, ADR-0015
+- **What I did:** Completed full repository hardening and governance migration to **Waveframe Labs**. Standardized metadata headers across all directories.  
+  Added **Sigstore cosign** OIDC-based attestation into the AWO run lifecycle.  
+  Each run now produces verifiable artifacts (`ATTESTATION.txt`, `.sig`, `.cert`) linking manifests to checksums.  
+  Upgraded workflows to include signature generation, validation gates, and portable verification instructions.  
+- **What I learned:** AWO reached maturity as a cryptographically verifiable methodology. Attestation closes the last reproducibility gap. Institutional transfer positions AWO as part of a governed ecosystem rather than a standalone tool.  
+- **Next step:** Publish v1.1.1 on Zenodo and initiate CRI-CORE design.  
+**Related ADRs:** ADR-0014, ADR-0015
 
 ---
 
-## Current Status (as of 2025-10-12)
-- **What I did:** Finalized AWO v1.1.1 under Waveframe Labs governance with hardened attestation pipelines.
+## 2025-10-20 — v1.2.0 Automated Documentation Builds & ARI Institutionalization
+- **What I did:** Added automated PDF build workflows (Whitepaper & Method Spec) using Pandoc + XeLaTeX.  
+  Verified reproducible, bot-generated PDFs across the documentation suite.  
+  Integrated AWO formally into the **Aurora Research Initiative (ARI)** governance layer.  
+- **What I learned:** Fully automated documentation builds eliminate human variance. ARI provides long-term stability and institutional framing for AWO.  
+- **Next step:** Prepare v1.2.0 archival release and begin CRI-CORE operational planning.  
+**Related ADRs:** ADR-0016, ADR-0017
 
 ---
 
-## 2025-10-20 — v1.2.0 Automated Documentation Builds & ARI Integration
+## 2025-11-29 — Post-v1.2.0 Expansion & Architecture Stabilization (pre-tag)
+**Status:** *Unreleased changes — will be finalized upon next tag.*
 
-- **What I did:**  
-  Implemented Pandoc-based automated PDF builds for Whitepaper and Method Spec.  
-  Added reproducible GitHub Actions workflows to commit generated PDFs.  
-  Aligned AWO under the newly established **Aurora Research Initiative (ARI)**, inheriting its metadata and governance boundaries.  
-  Prepared for v1.2.0 archival release.
-- **What I learned:** Automation closes the loop between transparency and reproducibility.  
-- **Next step:**  
-  1. Tag and publish `v1.2.0`.  
-  2. Attach PDFs to the archival release.  
-  3. Begin CRI-CORE operationalization.
-- **Related ADRs:** ADR-0016, ADR-0017
+### What I did:
+Since 2025-10-20, AWO experienced its largest structural expansion to date. Major developments include:
+
+### **1. Architecture Stabilization Layer**
+- Added `/architecture/fcr/` with **FCR-0001**.  
+- Added `/architecture/test-suite/stabilization/` containing:  
+  - `AWO_v4.2_Workflow_Stabilization_Plan.md`  
+  - `AWO_v4.2_Delta_Spec_v1.0.md`  
+  - `AWO_v4.2_Test_Suite_DAG_v1.0.md`  
+  - `TS-Index_v1.0.md`  
+- Added **CPP v1.0 (Cognitive Provenance Protocol)** in both JSON and Markdown form.
+
+This formalized AWO’s transformation pipeline ahead of the upcoming v4.x model.
+
+### **2. Governance Expansion**
+Validated and added ADRs through **ADR-0017**, covering:  
+Evidence registry, audit gates, licensing, CRI-CORE handoff, documentation governance, file-template governance, and automated PDF build integration.
+
+### **3. Schema Growth**
+Added foundational schemas enabling CRI-CORE and extended validation:
+- `claim.schema.json`  
+- `cri_workflow.schema.json`  
+- `environment.schema.json`  
+- `neurotransparency.schema.json`  
+- `provenance.schema.json`  
+- `redaction_pointer.schema.json`  
+- `run_manifest.schema.json`  
+- `workflow_schema.json`
+
+Schemas now govern nearly every operation in AWO.
+
+### **4. Test Suite Infrastructure**
+Expanded `/workflow-tests/` with:
+- AWO Workflow Test Plan v1.0  
+- Updated Specs & Whitepapers (v1.2.1)  
+- Evidence Registry  
+- Governance Summary  
+- Neuotransparency Doctrine & Spec  
+- Verification and onboarding guides
+
+This establishes the test foundation required for AWO v4.x validation.
+
+### **5. Execution & Validation Scripts**
+Extended or added:
+- `awo_run.py`  
+- `awo_attest.py`  
+- `awo_validate.py`  
+- `validate_docs.py`  
+- `validate_run.py`  
+- `normalize_metadata.py`
+
+AWO is now functionally a runtime system, not just a methodology.
+
+### **6. ARI Integration as a First-Class Component**
+A new `/ARI/` namespace houses all ARI documents.  
+The repository now *automatically publishes scholar-grade ARI PDFs* using deterministic conversion workflows, embedding AWO within ARI’s governance scope.
+
+### **7. Scholar-Grade Markdown → PDF Pipeline**
+Added a repository-wide Markdown→PDF generator using Pandoc + wkhtmltopdf.  
+Features:
+- Deterministic reproducibility  
+- Bot-committed PDFs  
+- Audit trail  
+- Parallel support for `/docs/` and `/ARI/`
+
+### **8. Archive Consolidation**
+Reorganized `/archive/` to store older whitepapers, specs, workflows, and doctrine documents for historical reproducibility.
 
 ---
 
-## Current Status (as of 2025-10-20)
-- **What I did:** AWO v1.2.0 is governance-aligned, automated, and ready for archival under ARI.
+### What I learned:
+1. **AWO is evolving into a full research-governance substrate**, not merely a workflow engine.  
+2. **Institutionalization is now operational**, with ARI serving as AWO’s formal oversight and epistemic anchor.  
+3. **Reproducible scholarly artifact generation is essential infrastructure**, ensuring external credibility.  
+4. **CRI-CORE is now the natural and necessary next phase**, enabled by schemas, stabilization plans, and runtime scripts.
 
 ---
 
-## 2025-11-29 — v1.2.0 ARI Document Integration, Unified PDF Pipeline & Institutional Stabilization
-
-- **What I did:**  
-  Integrated a unified Markdown→PDF pipeline capable of generating **scholar-grade, reproducible PDFs** for both AWO and **ARI** documents.  
-  Added `/ARI/` as an auxiliary folder within AWO strictly for **PDF generation and provenance tracking**, without modifying any AWO artifacts.  
-  Created parallel `ARI/pdf/` and `docs/pdf/` output directories to maintain clean subsystem separation.  
-  Implemented workflow routing so that AWO and ARI documents are converted independently with deterministic settings.  
-  Verified the pipeline against eight ARI governance documents, all of which rendered successfully with institutionally compliant front pages.  
-  Stabilized the repository with clearer governance boundaries:  
-  - ARI = institutional layer  
-  - AWO = methodological layer  
-  - CRI-CORE = execution/automation layer  
-  Enhanced README clarity regarding AWO’s archival role and relationship to ARI.
-
-- **What I learned:**  
-  Publication pipelines are part of reproducibility governance.  
-  AWO’s infrastructure now enables **auditable, version-pinned artifact generation**, which strengthens both ARI and AWO without merging their domains.  
-  AWO is not diminished — it now provides a regulated build environment used across the ecosystem.
-
-- **Next step:**  
-  1. Complete **AWO Cleanup Phase** (documentation polish, metadata normalization, integrity checks).  
-  2. Regenerate `SHA256SUMS.txt` and validate workflow determinism.  
-  3. Add ADR documenting the new unified publication pipeline.  
-  4. Tag and publish `v1.3.0` as the official “Governance-Aligned Infrastructure Release.”  
-  5. Resume CRI-CORE rebuild after AWO cleanup.
+### Next step:
+1. Prepare the next release tag (**v1.2.1** or **v1.3.0**, depending on scope classification).  
+2. Produce a complete Zenodo archive with all new artifacts.  
+3. Begin CRI-CORE implementation using the new schemas and stabilization documents.  
+4. Execute and expand the test suite for v4.x readiness.
 
 ---
 
 ## Current Status (as of 2025-11-29)
-- **What I did:** AWO now functions as a governed reproducibility and publication environment under ARI oversight.  
-  All major infrastructure, governance alignment, and publication pipelines are complete.  
-  Ready for the AWO Cleanup Phase and subsequent v1.3.0 release.
+AWO is now a **schema-governed, institutionally embedded, reproducible orchestration system** supported by deterministic build pipelines, formal architecture suites, and ARI governance.  
+It is fully prepared for the next release and the CRI-CORE operational phase.
 
 ---
 
