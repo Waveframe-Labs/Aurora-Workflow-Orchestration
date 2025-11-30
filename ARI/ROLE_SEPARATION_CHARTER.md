@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Role Separation Charter (v1.0.0)
+# Role Separation Charter (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -213,4 +212,5 @@ No silent changes permitted.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
