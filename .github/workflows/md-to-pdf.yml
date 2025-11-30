@@ -40,7 +40,7 @@ jobs:
           done
 
       ############################################################
-      # ARI DOCUMENTS (parallel to AWO)
+      # ARI DOCUMENTS — metadata block enabled
       ############################################################
       - name: Convert ARI Markdown docs to PDF
         run: |
@@ -48,7 +48,8 @@ jobs:
           for file in ARI/**/*.md; do
             base="$(basename "$file" .md)"
             pandoc "$file" \
-              --from=markdown \
+              --from=markdown+yaml_metadata_block \
+              --metadata-file="$file" \
               --pdf-engine=wkhtmltopdf \
               --output="ARI/pdf/${base}.pdf"
           done
