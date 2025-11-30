@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## Change Control and Versioning Policy (v1.0.0)
+# Change Control and Versioning Policy (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -238,4 +237,5 @@ No silent revisions permitted.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
