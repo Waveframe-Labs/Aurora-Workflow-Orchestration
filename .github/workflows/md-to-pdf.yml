@@ -7,9 +7,6 @@ on:
       - 'ARI/**/*.md'
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,42 +25,38 @@ jobs:
           mkdir -p docs/pdf
           mkdir -p ARI/pdf
 
-      ###################################################################
-      # Convert AWO docs → PDF (Pandoc with wkhtmltopdf)
-      ###################################################################
+      ############################################################
+      # AWO DOCUMENTS (docs/**/*.md)
+      ############################################################
       - name: Convert AWO Markdown docs to PDF
         run: |
           shopt -s globstar nullglob
           for file in docs/**/*.md; do
-            [ -e "$file" ] || continue
             base="$(basename "$file" .md)"
             pandoc "$file" \
               --from=markdown \
               --metadata=title:" " \
+              --shift-heading-level-by=-1 \
               --pdf-engine=wkhtmltopdf \
               --output="docs/pdf/${base}.pdf"
           done
 
-      ###################################################################
-      # Convert ARI docs → PDF (Pandoc with wkhtmltopdf)
-      # Forces blank title to block Pandoc auto-title injection.
-      ###################################################################
+      ############################################################
+      # ARI DOCUMENTS (ARI/**/*.md)
+      ############################################################
       - name: Convert ARI Markdown docs to PDF
         run: |
           shopt -s globstar nullglob
           for file in ARI/**/*.md; do
-            [ -e "$file" ] || continue
             base="$(basename "$file" .md)"
             pandoc "$file" \
               --from=markdown \
               --metadata=title:" " \
+              --shift-heading-level-by=-1 \
               --pdf-engine=wkhtmltopdf \
               --output="ARI/pdf/${base}.pdf"
           done
 
-      ###################################################################
-      # Commit the generated PDFs
-      ###################################################################
       - name: Commit and push generated PDFs
         run: |
           git config user.name "github-actions"
@@ -71,7 +64,10 @@ jobs:
 
           git add docs/pdf/*.pdf ARI/pdf/*.pdf || true
 
-          # Exit silently if nothing to commit
-          git commit -m "Automated PDF generation for Markdown files" || exit 0
-
-          git push
+          # Commit only if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "Automated PDF generation for Markdown files"
+            git push
+          else
+            echo "No PDF changes to commit."
+          fi
