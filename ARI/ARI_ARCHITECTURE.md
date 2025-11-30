@@ -14,8 +14,7 @@ status: "Final — Institutional Architecture v1.0.0"
 created: "2025-11-26"
 type: "architecture"  
 doi: "10.5281/zenodo.17743096"  
----
-# Aurora Research Initiative (ARI) — ARI Architecture (v1.0.0)
+---  
 
 The **Aurora Research Initiative (ARI)** serves as the institutional, governance, and epistemic
 foundation for the Aurora Workflow Orchestration ecosystem. This document defines ARI’s structure,
@@ -236,3 +235,4 @@ Future versions will add diagrams, decision logic, metadata schemas, and governa
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
