@@ -131,7 +131,7 @@ If you can commit to a Git repo, you can commit to reproducibility.
 | Project | Domain | Mode of Use |
 |----------|---------|-------------|
 | [Waveframe v4.0](https://github.com/Waveframe-Labs/Waveframe-v4.0) | Cosmology | Manual orchestration with falsifiability logs and ADRs |
-| [Societal Simulator](https://github.com/Waveframe-Labs/Societal-Progress-Simulator) | Systems modeling | Demonstrates reproducibility without automation |
+| [Societal Simulator](https://github.com/Waveframe-Labs/Societal-Health-Simulator) | Systems modeling | Demonstrates reproducibility without automation |
 | [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE) | Research runtime | Automated orchestration and provenance enforcement |
 
 ---
