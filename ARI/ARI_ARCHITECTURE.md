@@ -1,5 +1,4 @@
-# Aurora Research Initiative (ARI)
-## ARI Architecture (v1.0.0)
+# ARI Architecture (v1.0.0)
 
 **Author:** Shawn C. Wright  
 **Affiliation:** Waveframe Labs — Independent Open-Science Research Entity  
@@ -235,4 +234,5 @@ Future versions will add diagrams, decision logic, metadata schemas, and governa
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
 
