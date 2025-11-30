@@ -14,9 +14,7 @@ status: "Active — Append-Only"
 created: "2025-11-26"
 type: "log"  
 doi: "10.5281/zenodo.17743096"  
----
-
-# Aurora Research Initiative — Initialization Log (INIT_LOG.md)
+---  
 
 This document records the initialization and foundational events of the
 **Aurora Research Initiative (ARI)**. All entries in this file are **append-only** and represent
@@ -98,4 +96,5 @@ metadata, and governance expansion.
 ---  
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+
 </div>
