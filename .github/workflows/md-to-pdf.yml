@@ -11,9 +11,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  # REQUIRED for committing generated PDFs
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Install Pandoc + wkhtmltopdf
         run: |
@@ -26,13 +31,15 @@ jobs:
           mkdir -p ARI/pdf
 
       ############################################################
-      # AWO DOCUMENTS (uses wkhtmltopdf)
+      # AWO DOCUMENTS
       ############################################################
       - name: Convert AWO Markdown docs to PDF
         run: |
           shopt -s globstar nullglob
           for file in docs/**/*.md; do
+            [ -e "$file" ] || continue
             base="$(basename "$file" .md)"
+
             pandoc "$file" \
               --from=markdown \
               --pdf-engine=wkhtmltopdf \
@@ -40,24 +47,33 @@ jobs:
           done
 
       ############################################################
-      # ARI DOCUMENTS — metadata block enabled
+      # ARI DOCUMENTS — SAFE YAML-IGNORING MODE
       ############################################################
       - name: Convert ARI Markdown docs to PDF
         run: |
           shopt -s globstar nullglob
           for file in ARI/**/*.md; do
+            [ -e "$file" ] || continue
             base="$(basename "$file" .md)"
+
+            # Extract the real ARI document title from the first H1 AFTER metadata
+            title=$(grep -m 1 '^# ' "$file" | sed 's/^# //')
+
             pandoc "$file" \
-              --from=markdown+yaml_metadata_block \
-              --metadata-file="$file" \
+              --from=markdown \
+              --metadata=title:"$title" \
               --pdf-engine=wkhtmltopdf \
               --output="ARI/pdf/${base}.pdf"
           done
 
+      ############################################################
+      # COMMIT AND PUSH
+      ############################################################
       - name: Commit and push generated PDFs
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/pdf/*.pdf ARI/pdf/*.pdf || true
+          git add docs/pdf/*.pdf 2>/dev/null || true
+          git add ARI/pdf/*.pdf 2>/dev/null || true
           git commit -m "Automated PDF generation for Markdown files" || true
           git push
