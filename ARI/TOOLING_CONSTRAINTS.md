@@ -21,9 +21,7 @@ dependencies:
   - "METADATA_POLICY.md"
 anchors:
   - "ARI-TOOLING-CONSTRAINTS-v1.0.0"
----
-
-# Tooling Constraints (v1.0.0)
+---  
 
 This document establishes the binding constitutional constraints governing the CRI-CORE tooling layer. It defines the legal, epistemic, and operational boundaries under which CRI-CORE must function. These constraints ensure that CRI-CORE remains a purely mechanistic execution engine with no authority to interpret, infer, validate, or influence epistemic or methodological logic.
 
@@ -185,4 +183,5 @@ No silent modifications permitted.
 ---  
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+
 </div>  
