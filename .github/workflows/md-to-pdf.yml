@@ -15,10 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Pandoc
+      - name: Install Pandoc + wkhtmltopdf
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc
+          sudo apt-get install -y pandoc wkhtmltopdf
 
       - name: Ensure output directories exist
         run: |
@@ -26,7 +26,7 @@ jobs:
           mkdir -p ARI/pdf
 
       ############################################################
-      # AWO DOCUMENTS — existing behavior (unchanged)
+      # AWO DOCUMENTS (uses wkhtmltopdf)
       ############################################################
       - name: Convert AWO Markdown docs to PDF
         run: |
@@ -35,13 +35,12 @@ jobs:
             base="$(basename "$file" .md)"
             pandoc "$file" \
               --from=markdown \
-              --pdf-engine=xelatex \
-              --toc \
+              --pdf-engine=wkhtmltopdf \
               --output="docs/pdf/${base}.pdf"
           done
 
       ############################################################
-      # ARI DOCUMENTS — NEW behavior
+      # ARI DOCUMENTS (parallel to AWO)
       ############################################################
       - name: Convert ARI Markdown docs to PDF
         run: |
@@ -50,8 +49,7 @@ jobs:
             base="$(basename "$file" .md)"
             pandoc "$file" \
               --from=markdown \
-              --pdf-engine=xelatex \
-              --toc \
+              --pdf-engine=wkhtmltopdf \
               --output="ARI/pdf/${base}.pdf"
           done
 
