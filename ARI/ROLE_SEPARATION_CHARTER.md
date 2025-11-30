@@ -22,9 +22,7 @@ dependencies:
   - "EPISTEMIC_DOCTRINE.md"
 anchors:
   - "ARI-ROLE-SEPARATION-CHARTER-v1.0.0"
----
-
-# Role Separation Charter (v1.0.0)
+---  
 
 This charter establishes the formal separation of roles, authorities, and responsibilities across the Aurora ecosystem. It defines the governance hierarchy and institutional boundaries that prevent role bleeding, ensure stability, and provide a long-term organizational structure.  
 This document uses the **Hybrid Model (Option C)**: a minimal set of current active roles with defined *future governance bodies* reserved, enabling institutional growth without rewriting the charter.
@@ -215,3 +213,4 @@ No silent changes permitted.
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>  
+
