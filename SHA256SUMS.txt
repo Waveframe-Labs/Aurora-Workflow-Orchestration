@@ -102,7 +102,7 @@ dd68a034ad25786568c59ac3fca2b2dc82299f349fbf5db9d61aeb26cd607a9b  ./docs/AWO_Ado
 921de1f1aeff352ffdb48ac28bc4bbc5a5ce1d2edb074a3036e6c5b4d805b162  ./docs/AWO_DAG_v1.0.md
 1df20eded0ffd70e950cb163906f2fa51b9b3a203ed244a04134721d0a6bc353  ./docs/AWO_Method_Spec_v1.2.1.md
 3a8f1eddd21290032c7e4ab161ef4b1b04153518458b75a6976fdc3f71ef620c  ./docs/AWO_Whitepaper_v1.2.1.md
-59807dc6f4196633cbb786e3ee6eb665f41608ba5c166feb1183e49dad4fe295  ./docs/CRI_HANDOFF.md
+77d016c4e8a4e5563a33ef53665a21bbce7fab7469989532bca374e5030b0753  ./docs/CRI_HANDOFF.md
 f6c3ec85bdbb8c31bdd40c434b615b83462277f362c29a79f8c1fca0710efdae  ./docs/CRI_spec.md
 2ab03baefaba066b662c597fb5f04e3e53d39601d10d7490c355d9f832530734  ./docs/Evidence_Registry.md
 bf40e08f866837a8da1a4bfb991973967b330ad29e652f737ca8eecd1dda69c6  ./docs/FAQ.md
