@@ -155,7 +155,7 @@ a37ea997394c816985ebf47bca6c4192fc2dfcc6dc8423145cd7291fdf6c2f5a  ./kernel/inclu
 d7f7e1c93e1fed6d353a1fadd6436b3cbcec5ea75b360b3fb7423c613d9d8c5c  ./kernel/schema/manifest.schema.json
 9d13a760017cee2a2b995aca4d0eed911130e6104be87957ac6196d0d1814705  ./kernel/templates/manifest.template.json
 7cb94f11c385486bc7227c07edb75ce4311030ba374b128fdc74ae0573033937  ./logs/README.md
-54aba27025853a71b7eabdb7c5862d8925386d78ad5155234d4de4468daf735b  ./logs/WORKFLOW_LOG_2025.md
+4b5ff2a77a3da462bb6748af364d32018462308e53094b89e88a94a6f7f5effa  ./logs/WORKFLOW_LOG_2025.md
 644c0961c353b41b71f6846f668af75b3e9edc969da15fab822a14066702368e  ./logs/attestation_failures/README.md
 e6f0ab5220acd91e853c1c17c2e9b6bf0b2d47d3dcbc2c8fc8ce3f6248ad0ae3  ./logs/audits/README.md
 02e36e682aae262792f345a6c7431b0f88dfef6adf6bb924b8188658d5921e7f  ./logs/audits/rejections/README.md
