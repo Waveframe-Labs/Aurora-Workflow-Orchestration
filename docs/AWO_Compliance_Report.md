@@ -1,8 +1,8 @@
 # AWO_Compliance_Report.md
 
 ## Aurora Workflow Orchestration (AWO) — Compliance Report
-**Version:** 1.2.1  
-**Date:** 2025-10-29  
+**Version:** 1.0.0    
+**Date:** 2025-12-01  
 **Maintainer:** Waveframe Labs  
 **Author:** Shawn C. Wright  
 **Contact:** s.wright@waveframelabs.org  
