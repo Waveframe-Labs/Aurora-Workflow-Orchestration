@@ -12,8 +12,7 @@ This log chronicles the verified development of **Aurora Workflow Orchestration 
 Each entry corresponds to a public GitHub release tag and documented repository state.  
 Format: **What I did, What I learned, Next step.**
 
----
-
+---  
 ## 2025-08-31 — v1.0.0 Initial Public Release
 - **What I did:** Published the first public release of the AWO framework. Defined core orchestration roles (Primary Engine, Supporting Models, Human-in-the-Loop). Implemented baseline reproducibility mechanisms — environment pins, logs, and deterministic runners.  
 - **What I learned:** Reproducibility is not just about code; it’s a behavioral protocol. Role separation and structured critique loops are essential for credible AI-assisted research.  
@@ -141,14 +140,20 @@ Reorganized `/archive/` to store older whitepapers, specs, workflows, and doctri
 1. Prepare the next release tag (**v1.2.1** or **v1.3.0**, depending on scope classification).  
 2. Produce a complete Zenodo archive with all new artifacts.  
 3. Begin CRI-CORE implementation using the new schemas and stabilization documents.  
-4. Execute and expand the test suite for v4.x readiness.
+4. Execute and expand the test suite for v4.x readiness.  
 
 ---
 
-## Current Status (as of 2025-11-29)
-AWO is now a **schema-governed, institutionally embedded, reproducible orchestration system** supported by deterministic build pipelines, formal architecture suites, and ARI governance.  
-It is fully prepared for the next release and the CRI-CORE operational phase.
+## 2025-12-01 — Structural Cleanup and Institutional Boundary Enforcement
 
----
+### What I did:  
+Removed the /ARI/ directory from the AWO repository after formally publishing ARI as its own DOI-backed institutional repository. This aligns AWO with its proper methodological scope and ensures clean separation between institutional governance (ARI) and methodological execution (AWO).
+
+### What I learned:  
+Repository boundaries must reflect conceptual boundaries.
+As AWO matures, structural correctness becomes essential for maintaining clarity, reproducibility, and institutional integrity. Keeping ARI inside AWO created scope ambiguity that needed to be resolved.  
+
+### Next step:
+Proceed with AWO v4.2 cleanup and prepare the migration of tooling into CRI-CORE to further reinforce separation of concerns. Split neurotransparency and pdf generator into seperate repositories.  
 
 *This workflow log serves as AWO’s provenance ledger; each entry corresponds to a verifiable tagged release and its Zenodo-archived state.*
