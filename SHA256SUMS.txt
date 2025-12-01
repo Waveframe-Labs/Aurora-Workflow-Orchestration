@@ -98,7 +98,7 @@ f8443e06f7722cea10e6f75917255775bcdc4cdaacb09f7c98725b7f080ab548  ./decisions/AD
 1a10ff1c3229e11f44e9e5282f4e8c6f8a2c3b1929a08bd54591dd95e4c1c0c8  ./decisions/ADR-0017-documentation-governance-under-ARI.md
 c5cb688d98072afb6b71eae5803479018dcd430270eaf2f047bcc792074c1f66  ./decisions/README.md
 dd68a034ad25786568c59ac3fca2b2dc82299f349fbf5db9d61aeb26cd607a9b  ./docs/AWO_Adoption_Guide.md
-6e11c16bcc58e6b78b6c93b21a3d48b6dc00f60200e07c43eaf52bd0d8ab8564  ./docs/AWO_Compliance_Report.md
+2fca5e4ee36fa8d72399ee6d3792c866fdad9c366e0469c7ce955bc54a5311b1  ./docs/AWO_Compliance_Report.md
 921de1f1aeff352ffdb48ac28bc4bbc5a5ce1d2edb074a3036e6c5b4d805b162  ./docs/AWO_DAG_v1.0.md
 1df20eded0ffd70e950cb163906f2fa51b9b3a203ed244a04134721d0a6bc353  ./docs/AWO_Method_Spec_v1.2.1.md
 3a8f1eddd21290032c7e4ab161ef4b1b04153518458b75a6976fdc3f71ef620c  ./docs/AWO_Whitepaper_v1.2.1.md
