@@ -141,6 +141,7 @@ f311904c20b82842836f0ee606cd88b2a895485b38584a59a97af8a68bffbe0b  ./figures/awo_
 a278dab4a7de43a2e87223608099bf2e082e770b05f08b3fc333ab087935b599  ./figures/awo_banner_cri.PNG
 8d98659285f6bd0abed3928cc60a602314a054fa6330b338fd7c856041836bb8  ./governance/audits/AWO_Repo_Audit_2025-11-26.md
 ae6255276e071996f3bdb044e004fb67fa61dfe78e262da245896724a925d03f  ./governance/corrective_actions/AWO-CAP-0001.md
+6690496411a19673a57a1ce4792263869b14f7bc5fd01336f9114bdde8346f78  ./governance/corrective_actions/AWO-CAP-0002.md
 554b65b8ca7876c607dcaec333616d696738cde0974bd205441a1e4190131860  ./governance/logs/approval.json
 91d7a3fcc8271ff22495958641aa08c2187b63a9d8eface135c1b7a060312e6e  ./governance/logs/run_2025-11-16T02-06-03Z_independence.json
 29ad7f4a8b22ba0c46ac0c0bbcc6f2319c071215d7af344f0d76abefe8bb0987  ./governance/logs/run_2025-11-16T03-02-30Z_independence_2025-11-16_03-03-23Z.json
