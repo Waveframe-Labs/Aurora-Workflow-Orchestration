@@ -1,7 +1,7 @@
 ---
 filetype: handoff_record
-version: 1.2.0
-updated: 2025-10-22
+version: 1.0.0
+updated: 2025-12-01
 maintainer: Waveframe Labs
 program: Aurora Research Initiative
 contact: swright@waveframelabs.org
