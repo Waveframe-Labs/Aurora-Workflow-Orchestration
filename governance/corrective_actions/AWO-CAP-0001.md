@@ -1,7 +1,7 @@
 ---
 filetype: corrective_action_record
 version: 1.0
-updated: 2025-11-08
+updated: 2025-12-01
 maintainer: Waveframe Labs
 contact: swright@waveframelabs.org
 authority: Aurora Research Initiative (ARI)  
@@ -46,7 +46,7 @@ This allows automated self-approval when executed by a single user context.
    - Configure GitHub “Environment Protection Rules” requiring manual approval from a registered approver before attestation can proceed.
 
 3. **Version Control**
-   - Amend AWO Governance Summary to reflect new enforcement as of **v1.2.2**.
+   - Amend AWO Governance Summary to reflect new enforcement as of **v1.2.0**.
 
 ---
 
