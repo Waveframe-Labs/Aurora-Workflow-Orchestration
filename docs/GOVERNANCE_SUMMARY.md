@@ -39,7 +39,8 @@ Each entry below corresponds to immutable artifacts validated through checksum a
 | 2025-10-31 | Repository | Neurotransparency Checkpoint | Maintainer | ✅ Passed | 0002, 0012, 0015 | All claim-affecting inferences contain traceable evidence pointers (§1.6 Method Spec) |
 | 2025-10-31 | Repository | Evidence Registry Established | Orchestrator | ✅ Activated | 0002, 0015 | `/docs/Evidence_Registry.md` now authoritative for claim–artifact mapping |
 | 2025-11-01 | Repository | Whitepaper v1.2.1 Publication | Orchestrator | ✅ Released | 0010, 0017 | Updated rationale for AWO design and governance scope |
-| 2025-11-07 | Repository | Governance Summary Updated | Auditor | ✅ Approved | 0017 | Governance record harmonized with new artifacts and compliance structure | 2025-12-01 | Repository | Structural Correction — Removal of `/ARI/` Directory | Maintainer | ✅ Completed | 0017 | ARI migrated to standalone DOI-backed repository; AWO scope corrected |  
+| 2025-11-07 | Repository | Governance Summary Updated | Auditor | ✅ Approved | 0017 | Governance record harmonized with new artifacts and compliance structure | 2025-12-01 | Repository | Structural Correction — Removal of `/ARI/` Directory | Maintainer | ✅ Completed | 0017 | ARI migrated to standalone DOI-backed repository; AWO scope corrected | 2025-12-04 | Repository | Structural Correction — Neurotransparency Docs Archived to `/archive/docs/` | Maintainer | ✅ Completed | 0017 | Removed epistemic-layer materials from active AWO; restored ARI–AWO boundary compliance |  
+  
 
 ---
 
