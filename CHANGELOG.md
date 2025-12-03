@@ -1,5 +1,46 @@
 # Changelog
 
+## v1.2.0 — Governance Boundary Correction & Neurotransparency Archival (2025-12-04)
+
+### Summary
+This update performs an architectural correction to maintain strict **ARI governance boundaries** within the AWO repository.  
+Neurotransparency documents—while historically drafted inside AWO—belong to the **epistemic layer (Layer 0)**, not the methodological layer defined by AWO (Layer 2).  
+To eliminate boundary drift and restore repository purity, all neurotransparency materials were relocated to the archive.
+
+No methodological content was altered.  
+No workflow logic was changed.
+
+### Key Updates
+
+#### 1. **Archived Neurotransparency Doctrine & Specification Drafts**
+- Moved the following documents from `/docs/` to `/archive/docs/`:
+  - **Neurotransparency Doctrine (draft)**
+  - **Neurotransparency Specification (draft)**
+- Confirmed removal of all non-methodological epistemic materials from the active AWO structure.
+
+#### 2. **Repository Boundary Restoration**
+- Ensured AWO now contains *only* methodological logic, schemas, workflows, and provenance tooling.
+- Verified that epistemic doctrine is governed under ARI Layer 0 and not within AWO’s operational layer.
+- Eliminated cross-layer ambiguity that previously risked violating ARI governance.
+
+#### 3. **No Functional Changes**
+- Workflow behavior, schemas, test suites, and methodology remain unchanged.
+- This update preserves the integrity of AWO’s finalization status.
+
+### Why It Matters
+This release restores AWO’s role as a **pure methodological framework** within the Aurora Research Initiative.  
+By relocating doctrine and specification drafts, the repository now reflects the correct **Layer 0 → Layer 2 separation** defined in ARI’s architecture.
+
+This improves long-term governance stability and prevents epistemic–methodological drift.
+
+---
+
+**Status:** AWO remains finalized as a methodology · Repository corrected for ARI boundary compliance  
+**Successor:** [CRI-CORE](https://github.com/Waveframe-Labs/CRI-CORE)  
+**Canonical DOI:** [10.5281/zenodo.17013612](https://doi.org/10.5281/zenodo.17013612)
+
+---  
+
 ## v1.2.0 — Post-Finalization Expansion & Architecture Stabilization (2025-11-29)
 
 ### Summary
