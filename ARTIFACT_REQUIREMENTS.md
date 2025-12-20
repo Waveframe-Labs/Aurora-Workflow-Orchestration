@@ -212,3 +212,10 @@ This document is valid only if its metadata complies with
 **ARI Metadata Policy v2.0.0**.
 
 Any violation of metadata requirements invalidates this document.
+
+---  
+
+<div align="center">
+  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+</div>
+
