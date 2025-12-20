@@ -139,3 +139,9 @@ with **ARI Metadata Policy v2.0.0**.
 
 Any modification that renders the metadata non-compliant invalidates this
 document as an authoritative AWO artifact.
+
+---  
+
+<div align="center">
+  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+</div>
