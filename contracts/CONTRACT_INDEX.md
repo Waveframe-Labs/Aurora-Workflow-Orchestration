@@ -54,17 +54,17 @@ It does not define contract semantics or schema contents.
 
 | Contract ID | Schema File | Authorized By | Status |
 |-------------|------------|---------------|--------|
-| AWO-CONTRACT-A1 | `schemas/awo.initiation.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A2 | `schemas/awo.scope.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A3 | `schemas/awo.evaluation.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A4 | `schemas/awo.contribution.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A5 | `schemas/awo.reasoning.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A6 | `schemas/awo.review.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A7 | `schemas/awo.issue_register.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A8 | `schemas/awo.approval.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A9 | `schemas/awo.audit.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Planned |
-| AWO-CONTRACT-A10 | `schemas/awo.change_log.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Optional |
-| AWO-CONTRACT-A11 | `schemas/awo.dependency.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Optional |
+| AWO-CONTRACT-A1 | `schemas/awo.initiation.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A2 | `schemas/awo.scope.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A3 | `schemas/awo.evaluation.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A4 | `schemas/awo.contribution.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A5 | `schemas/awo.reasoning.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A6 | `schemas/awo.review.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A7 | `schemas/awo.issue_register.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A8 | `schemas/awo.approval.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A9 | `schemas/awo.audit.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active |
+| AWO-CONTRACT-A10 | `schemas/awo.change_log.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active (Optional) |
+| AWO-CONTRACT-A11 | `schemas/awo.dependency.schema.json` | ARTIFACT_CLASSES.md, ARTIFACT_REQUIREMENTS.md | Active (Optional) |
 
 ---
 
