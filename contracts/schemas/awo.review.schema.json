@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/schemas/awo.review.schema.json",
+  "title": "AWO Review Report Schema",
+  "type": "object",
+  "description": "Schema for the AWO Review Report artifact (A-6). Defines machine-readable requirements for evaluation of contributions against criteria and invariants.",
+  "required": [
+    "metadata",
+    "artifacts_reviewed",
+    "criteria_applied",
+    "findings",
+    "producing_role"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string"
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifacts_reviewed": {
+      "type": "array",
+      "description": "Identifiers of artifacts evaluated during review.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "criteria_applied": {
+      "type": "array",
+      "description": "Evaluation criteria applied during review.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "findings": {
+      "type": "string",
+      "description": "Summary of review findings and conclusions."
+    },
+    "issues_identified": {
+      "type": "array",
+      "description": "Optional list of issues identified during review.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "producing_role": {
+      "type": "string",
+      "description": "Declared role responsible for producing the review report."
+    }
+  },
+  "additionalProperties": false
+}
