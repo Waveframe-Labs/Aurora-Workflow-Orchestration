@@ -1,0 +1,64 @@
+{
+  "manifest_version": "1.0.0",
+  "awo_version": "2.0.0",
+  "status": "active",
+  "updated": "2025-12-22",
+  "author": "Waveframe Labs",
+  "maintainer": "Waveframe Labs",
+  "license": "Apache-2.0",
+  "governance": {
+    "governing_body": "Aurora Research Initiative (ARI)",
+    "metadata_policy": "ARI Metadata Policy v2.0.0",
+    "role_charter": "Role Separation Charter v1.1.1"
+  },
+  "scope": {
+    "definition": "SCOPE.md",
+    "invariants": "INVARIANTS.md",
+    "roles": "ROLES.md",
+    "workflow": "WORKFLOW_SPEC.md"
+  },
+  "artifacts": {
+    "classes": "ARTIFACT_CLASSES.md",
+    "requirements": "ARTIFACT_REQUIREMENTS.md"
+  },
+  "contracts": {
+    "index": "contracts/CONTRACT_INDEX.md",
+    "schema_map": "contracts/ARTIFACT_SCHEMA_MAP.md",
+    "schemas_path": "contracts/schemas/",
+    "required_contracts": [
+      "AWO-CONTRACT-A1",
+      "AWO-CONTRACT-A2",
+      "AWO-CONTRACT-A3",
+      "AWO-CONTRACT-A4",
+      "AWO-CONTRACT-A5",
+      "AWO-CONTRACT-A6",
+      "AWO-CONTRACT-A7",
+      "AWO-CONTRACT-A8",
+      "AWO-CONTRACT-A9"
+    ],
+    "optional_contracts": [
+      "AWO-CONTRACT-A10",
+      "AWO-CONTRACT-A11"
+    ]
+  },
+  "enforcement_boundary": {
+    "defines": [
+      "methodology",
+      "artifact semantics",
+      "contract identities"
+    ],
+    "does_not_define": [
+      "execution",
+      "automation",
+      "enforcement logic"
+    ],
+    "enforced_by": [
+      "CRI-CORE"
+    ]
+  },
+  "ai_indexing": {
+    "machine_readable": true,
+    "contract_driven": true,
+    "schema_first": true
+  }
+}
