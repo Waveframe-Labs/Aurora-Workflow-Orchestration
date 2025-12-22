@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/schemas/awo.scope.schema.json",
+  "title": "AWO Scope Definition Schema",
+  "type": "object",
+  "description": "Schema for the AWO Scope Definition artifact (A-2). Defines the minimum machine-readable requirements for formal scope specification.",
+  "required": [
+    "metadata",
+    "in_scope",
+    "out_of_scope",
+    "boundary_rationale",
+    "producing_role"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string"
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "in_scope": {
+      "type": "array",
+      "description": "Explicitly enumerated items included within the scope boundary.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "out_of_scope": {
+      "type": "array",
+      "description": "Explicitly enumerated items excluded from the scope boundary.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "boundary_rationale": {
+      "type": "string",
+      "description": "Justification for the chosen scope boundaries."
+    },
+    "producing_role": {
+      "type": "string",
+      "description": "Declared role responsible for producing the scope definition artifact."
+    },
+    "revision_of": {
+      "type": "string",
+      "description": "Identifier of a prior scope artifact if this artifact is a revision."
+    }
+  },
+  "additionalProperties": false
+}
