@@ -1,7 +1,6 @@
 # Aurora Workflow Orchestration (AWO)
 
-[![Waveframe Labs](https://img.shields.io/badge/WAVEFRAME%20LABS-Institutional%20Repository-FF6A00?style=flat)](https://waveframelabs.org)
-[![Governed Repository](https://img.shields.io/badge/Governance-ARI%20Compliant-8A2BE2?style=flat)](https://github.com/Waveframe-Labs/Aurora-Research-Initiative)  
+[![Waveframe Labs](https://img.shields.io/badge/WAVEFRAME%20LABS-Institutional%20Repository-FF6A00?style=flat)](https://waveframelabs.org)   
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612)  
 [![ORCID](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-A6CE39?logo=orcid&logoColor=white)](https://orcid.org/0009-0006-6043-9295)   
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)  
@@ -10,6 +9,17 @@
 ![Last Commit](https://img.shields.io/github/last-commit/Waveframe-Labs/Aurora-Workflow-Orchestration/main)
 
 _Code under Apache 2.0 · Documentation under CC BY 4.0_
+
+---  
+
+### ARCHIVAL NOTICE
+*This directory contains Aurora Workflow Orchestration materials developed prior to AWO v2.0.0.
+These documents are preserved for historical provenance only.
+They are non-normative, **non-compliant, and must not be treated as authoritative** under current ARI governance.*
+
+*The active and authoritative AWO specification begins at the repository root.*    
+
+---  
 
 ![AURORA WORKFLOW ORCHESTRATION](figures/awo_banner_cri.PNG)
 
