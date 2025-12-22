@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/contracts/schemas/awo.approval.schema.json",
+  "title": "AWO Approval Record Schema",
+  "description": "Schema for formal approval decisions within Aurora Workflow Orchestration (AWO). Records approval outcomes, conditions, and authority declarations.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "approval"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Draft",
+            "Active",
+            "Archived",
+            "Superseded"
+          ]
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false",
+            "partial"
+          ]
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "required": [
+        "approval_id",
+        "decision",
+        "approving_role",
+        "approved_by",
+        "decision_date",
+        "scope_reference"
+      ],
+      "properties": {
+        "approval_id": {
+          "type": "string",
+          "description": "Unique identifier for the approval record."
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "Approved",
+            "Conditionally Approved",
+            "Rejected"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions attached to a conditional approval."
+        },
+        "approving_role": {
+          "type": "string",
+          "description": "Role exercising approval authority (e.g., ARI-IC, AWO-Lead)."
+        },
+        "approved_by": {
+          "type": "string",
+          "description": "Human or organizational entity granting approval."
+        },
+        "decision_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "scope_reference": {
+          "type": "string",
+          "description": "Reference to the scoped artifact set being approved."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional contextual notes associated with the approval decision."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
