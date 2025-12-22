@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/contracts/schemas/awo.change_log.schema.json",
+  "title": "AWO Change Log Schema",
+  "description": "Optional schema for recording structured change history of AWO-governed artifacts, contracts, and specifications.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "change_log"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Draft",
+            "Active",
+            "Archived",
+            "Superseded"
+          ]
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false",
+            "partial"
+          ]
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "change_log": {
+      "type": "object",
+      "required": [
+        "subject",
+        "entries"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "Artifact, contract, or specification the change log applies to."
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "change_id",
+              "date",
+              "change_type",
+              "description",
+              "authorized_by"
+            ],
+            "properties": {
+              "change_id": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "change_type": {
+                "type": "string",
+                "enum": [
+                  "Addition",
+                  "Modification",
+                  "Correction",
+                  "Deprecation"
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "authorized_by": {
+                "type": "string",
+                "description": "Role or authority authorizing the change."
+              },
+              "supersedes": {
+                "type": "string",
+                "description": "Optional reference to superseded version or change."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
