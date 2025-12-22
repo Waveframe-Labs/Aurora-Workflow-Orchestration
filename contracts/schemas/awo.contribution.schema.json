@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/schemas/awo.contribution.schema.json",
+  "title": "AWO Contribution Artifact Schema",
+  "type": "object",
+  "description": "Schema for the AWO Contribution Artifact (A-4). Defines machine-readable requirements for substantive research contributions and their traceability.",
+  "required": [
+    "metadata",
+    "content_summary",
+    "inputs",
+    "limitations",
+    "producing_role"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string"
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "content_summary": {
+      "type": "string",
+      "description": "High-level summary of the substantive contribution."
+    },
+    "inputs": {
+      "type": "array",
+      "description": "References to upstream inputs or artifacts used in the contribution.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "limitations": {
+      "type": "string",
+      "description": "Declared limitations, uncertainties, or known gaps in the contribution."
+    },
+    "producing_role": {
+      "type": "string",
+      "description": "Declared role responsible for producing the contribution artifact."
+    },
+    "reasoning_record_ref": {
+      "type": "string",
+      "description": "Optional reference to an associated reasoning record artifact."
+    }
+  },
+  "additionalProperties": false
+}
