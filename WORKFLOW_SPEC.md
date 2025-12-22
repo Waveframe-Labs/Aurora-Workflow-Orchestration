@@ -5,16 +5,20 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-20"
-updated: "2025-12-20"
+updated: "2025-12-22"
 author: "Waveframe Labs"
 maintainer: "Waveframe Labs"
 license: "Apache-2.0"
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human oversight, aligned to AWO Scope, Invariants, and Roles, and validated against ARI Metadata Policy v2.0.0."
+ai_assistance_details: "AI-assisted drafting with full human oversight; revised to normalize completed AWO v2.0.0 contract schemas and aligned with ARI Metadata Policy v2.0.0."
 dependencies:
-  - "AWO Scope Definition v2.0.0"
-  - "AWO Methodological Invariants v2.0.0"
-  - "AWO Workflow Roles v2.0.0"
+  - "SCOPE.md"
+  - "INVARIANTS.md"
+  - "ROLES.md"
+  - "ARTIFACT_CLASSES.md"
+  - "ARTIFACT_REQUIREMENTS.md"
+  - "contracts/ARTIFACT_SCHEMA_MAP.md"
+  - "contracts/CONTRACT_INDEX.md"
   - "Role Separation Charter v1.1.1"
 anchors:
   - "AWO-WORKFLOW-SPEC-v2.0.0"
@@ -61,7 +65,7 @@ Establish research intent and scope.
 - Declared scope constraints
 
 **Required Artifacts:**
-- Initiation record
+- Initiation record (A-1)
 
 **Permitted Roles:**
 - Workflow Initiator
@@ -77,8 +81,8 @@ Constrain the problem space and define evaluation criteria.
 - Initiation record
 
 **Required Artifacts:**
-- Scope definition artifact
-- Evaluation criteria
+- Scope definition artifact (A-2)
+- Evaluation criteria (A-3)
 
 **Permitted Roles:**
 - Workflow Initiator
@@ -95,8 +99,8 @@ Produce substantive research artifacts.
 - Scope definition
 
 **Required Artifacts:**
-- Intermediate research artifacts
-- Reasoning records
+- Contribution artifacts (A-4)
+- Reasoning records (A-5)
 
 **Permitted Roles:**
 - Contributor
@@ -112,8 +116,8 @@ Evaluate artifacts for methodological sufficiency.
 - Contribution artifacts
 
 **Required Artifacts:**
-- Review report
-- Identified issues or confirmations
+- Review report (A-6)
+- Issue register when applicable (A-7)
 
 **Permitted Roles:**
 - Reviewer
@@ -129,7 +133,7 @@ Determine whether workflow outputs satisfy defined criteria.
 - Review report
 
 **Required Artifacts:**
-- Approval decision record
+- Approval decision record (A-8)
 
 **Permitted Roles:**
 - Approver
@@ -139,13 +143,13 @@ Determine whether workflow outputs satisfy defined criteria.
 ### P-6 — Audit
 
 **Purpose:**
-Assess compliance with AWO invariants and traceability requirements.
+Assess compliance with AWO invariants, role constraints, and traceability requirements.
 
 **Required Inputs:**
-- All prior artifacts
+- All prior workflow artifacts
 
 **Required Artifacts:**
-- Audit report
+- Audit report (A-9)
 
 **Permitted Roles:**
 - Auditor
@@ -163,14 +167,15 @@ Implicit or skipped phases are prohibited.
 
 ---
 
-## 5. Artifact Class Requirements
+## 5. Artifact and Schema Normalization
 
-Artifacts defined in this specification:
-- MUST be explicit and persistent
-- MUST include compliant YAML metadata where applicable
-- MUST be sufficient to reconstruct workflow execution
+All artifact classes referenced in this specification have corresponding
+**machine-readable schemas** defined in `/contracts/schemas/` and indexed in
+`contracts/CONTRACT_INDEX.md`.
 
-Artifact formats and storage are out of scope.
+- Required artifacts (A-1 through A-9) MUST conform to their schemas.
+- Optional artifacts (A-10, A-11) MUST conform when present.
+- Schema validation does not alter methodological meaning.
 
 ---
 
@@ -216,8 +221,6 @@ with **ARI Metadata Policy v2.0.0**.
 
 Any modification that renders the metadata non-compliant invalidates this
 document as an authoritative AWO artifact.
-
----  
 
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
