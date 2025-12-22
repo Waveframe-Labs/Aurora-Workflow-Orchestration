@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/schemas/awo.issue_register.schema.json",
+  "title": "AWO Issue Register Schema",
+  "type": "object",
+  "description": "Schema for the AWO Issue Register artifact (A-7). Defines machine-readable requirements for enumerating issues identified during review or audit.",
+  "required": [
+    "metadata",
+    "issues",
+    "producing_role"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string"
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "issues": {
+      "type": "array",
+      "description": "Enumerated issues identified, each with severity and required action.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "severity"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the issue."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the issue."
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ],
+            "description": "Severity classification of the issue."
+          },
+          "required_action": {
+            "type": "string",
+            "description": "Required remediation action."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "producing_role": {
+      "type": "string",
+      "description": "Declared role responsible for producing the issue register."
+    }
+  },
+  "additionalProperties": false
+}
