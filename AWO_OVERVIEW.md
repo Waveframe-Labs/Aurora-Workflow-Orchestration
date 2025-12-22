@@ -34,8 +34,7 @@ It answers the question:
 
 > “What *is* AWO, what authority does it claim, and what does it explicitly not do?”
 
-This document is **normative** with respect to AWO’s scope, intent, and
-methodological boundaries.
+This document is **authoritative with respect to AWO’s scope, intent, and methodological boundaries,** but does not supersede detailed normative specifications.
 
 ---
 
