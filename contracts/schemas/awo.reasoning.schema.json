@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waveframelabs.org/schemas/awo.reasoning.schema.json",
+  "title": "AWO Reasoning Record Schema",
+  "type": "object",
+  "description": "Schema for the AWO Reasoning Record artifact (A-5). Defines machine-readable requirements for structured reasoning, transformations, and uncertainty disclosure.",
+  "required": [
+    "metadata",
+    "reasoning_steps",
+    "transformations",
+    "assumptions",
+    "uncertainties",
+    "producing_role"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
+      "required": [
+        "title",
+        "version",
+        "status",
+        "created",
+        "updated",
+        "author",
+        "maintainer",
+        "license",
+        "ai_assisted"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "author": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "ai_assisted": {
+          "type": "string"
+        },
+        "ai_assistance_details": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "reasoning_steps": {
+      "type": "array",
+      "description": "Ordered steps describing the reasoning process.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "transformations": {
+      "type": "array",
+      "description": "Descriptions of transformations applied to inputs during reasoning.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Explicit assumptions made during reasoning.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "description": "Known uncertainties, gaps, or unresolved questions.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "producing_role": {
+      "type": "string",
+      "description": "Declared role responsible for producing the reasoning record."
+    }
+  },
+  "additionalProperties": false
+}
