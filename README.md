@@ -4,6 +4,6 @@
   <a href="https://doi.org/10.5281/zenodo.17013612">DOI: 10.5281/zenodo.17013612</a></sub>
 </p>
 
-<div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
-</div>
+<p align="center">
+  <sub>Governed under the <a href="https://github.com/Waveframe-Labs/Aurora-Research-Initiative">Aurora Research Initiative (ARI)</a></sub>
+<
