@@ -1,12 +1,11 @@
-
 ---
 title: "AWO Provenance Model"
 filetype: "documentation"
 type: "specification"
 version: "2.0.0"
 status: "Active"
-created: "2025-12-24"
-updated: "2025-12-24"
+created: "2025-12-25"
+updated: "2025-12-25"
 author: "Waveframe Labs"
 maintainer: "Waveframe Labs"
 license: "Apache-2.0"
