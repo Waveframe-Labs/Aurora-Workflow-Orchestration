@@ -2,146 +2,137 @@
 title: "AWO Document Registry"
 filetype: "documentation"
 type: "specification"
-version: "2.0.0"
+version: "2.1.0"
 status: "Active"
 created: "2025-12-20"
-updated: "2025-12-20"
+updated: "2025-12-27"
 author: "Waveframe Labs"
 maintainer: "Waveframe Labs"
 license: "Apache-2.0"
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human oversight, aligned to AWO Scope, Invariants, Roles, and Workflow Specification, and validated against ARI Metadata Policy v2.0.0."
+ai_assistance_details: "AI-assisted restructuring and expansion under human methodological direction."
 dependencies:
-  - "AWO Scope Definition v2.0.0"
-  - "AWO Methodological Invariants v2.0.0"
-  - "AWO Workflow Roles v2.0.0"
-  - "AWO Workflow Specification v2.0.0"
+  - "SCOPE.md"
+  - "INVARIANTS.md"
+  - "ROLES.md"
+  - "WORKFLOW_SPEC.md"
+  - "ARTIFACT_CLASSES.md"
+  - "ARTIFACT_REQUIREMENTS.md"
+  - "PROVENANCE_MODEL.md"
+  - "DESIGN_LAWS.md"
+  - "CONTRACT_ENFORCEMENT_MODEL.md"
   - "ARI Metadata Policy v2.0.0"
-  - "Role Separation Charter v1.1.1"
 anchors:
-  - "AWO-DOCUMENT-REGISTRY-v2.0.0"
+  - "AWO-DOCUMENT-REGISTRY-v2.1.0"
 ---
 
 # AWO Document Registry
 
 ## 1. Purpose
 
-This document defines the **authoritative registry of normative documents** for
-**Aurora Workflow Orchestration (AWO) v2.0.0**.
+This registry defines the **canonical list of authoritative AWO documents**,
+their **governance scope**, and **dependencies**.  
+It serves as the root of identity and authority for the **Method Layer**.
 
-It enumerates which documents are authoritative, what each document governs,
-and the boundaries of their authority.
-
-This document is **normative**.
+No document outside this registry has normative power over AWO.
 
 ---
 
-## 2. Normative Document Set
+## 2. Normative Document Set (Authoritative)
 
-The following documents constitute the **complete normative specification**
-of AWO v2.0.0.
+These documents collectively define **AWO v2 methodology in full**:
 
-No document outside this set may define, extend, or modify AWO methodology.
+| Code | Document | Governs | Type |
+|---|---|---|---|
+| D-1 | **SCOPE.md** | Method boundaries & authority surface | Core |
+| D-2 | **INVARIANTS.md** | Non-negotiable methodological rules | Core |
+| D-3 | **ROLES.md** | Workflow roles & separation constraints | Core |
+| D-4 | **WORKFLOW_SPEC.md** | Workflow phase model & transitions | Core |
+| D-5 | **DOCUMENT_REGISTRY.md** | Registry & authority order | Core |
+| D-6 | **ARTIFACT_CLASSES.md** | Classes of artifacts workflows produce | Structural |
+| D-7 | **ARTIFACT_REQUIREMENTS.md** | Required fields & validation rules | Structural |
+| D-8 | **PROVENANCE_MODEL.md** | Traceability & reconstruction logic | Structural |
+| D-9 | **DESIGN_LAWS.md** | Design principles & constraints | Normative |
+| D-10 | **CONTRACT_ENFORCEMENT_MODEL.md** | Contract validation & state transitions | Enforcement-binding |
+| D-11 | **AWO_GLOSSARY.md** | Controlled terminology | Normative |
+| D-12 | **AWO_NEUROTRANSPARENCY.md** | Cognitive provenance obligations under AWO | Normative |
 
----
-
-### D-1 — `SCOPE.md`
-
-**Title:** AWO Scope Definition  
-**Governs:** Methodological scope and authority boundaries  
-**Status:** Normative  
-**Version:** 2.0.0  
-
----
-
-### D-2 — `INVARIANTS.md`
-
-**Title:** AWO Methodological Invariants  
-**Governs:** Non-negotiable methodological constraints  
-**Status:** Normative  
-**Version:** 2.0.0  
+📌 **These files *are* AWO v2. If it’s not listed above, it cannot define method.**
 
 ---
 
-### D-3 — `ROLES.md`
+## 3. Schema & Contract Attachments
 
-**Title:** AWO Workflow Roles  
-**Governs:** Workflow-level role semantics and responsibilities  
-**Status:** Normative  
-**Version:** 2.0.0  
+These are **not normative individually**, but are **normatively referenced**.  
+Breaking or removing them affects compliance.
 
----
+📁 `/contracts/schemas/`
 
-### D-4 — `WORKFLOW_SPEC.md`
+- `awo.approval.schema.json`
+- `awo.audit.schema.json`
+- `awo.change_log.schema.json`
+- `awo.contribution.schema.json`
+- `awo.dependency.schema.json`
+- `awo.evaluation.schema.json`
+- `awo.initiation.schema.json`
+- `awo.issue_register.schema.json`
+- `awo.reasoning.schema.json`
+- `awo.review.schema.json`
+- `awo.scope.schema.json`
 
-**Title:** AWO Workflow Specification  
-**Governs:** Abstract workflow phases, transitions, and artifact classes  
-**Status:** Normative  
-**Version:** 2.0.0  
+📁 `/contracts/`
 
----
+- `CONTRACT_ENFORCEMENT_MODEL.md`
+- `CONTRACT_INDEX.md`
+- `ARTIFACT_SCHEMA_MAP.md`
 
-### D-5 — `DOCUMENT_REGISTRY.md`
-
-**Title:** AWO Document Registry  
-**Governs:** Enumeration and authority mapping of AWO normative documents  
-**Status:** Normative  
-**Version:** 2.0.0  
-
----
-
-## 3. Non-Normative Materials
-
-The following categories are **explicitly non-normative**:
-
-- Historical documents and archived branches
-- Implementation examples or reference workflows
-- Tooling, automation, or enforcement code
-- Diagrams, figures, and explanatory notes
-- Website content and external summaries
-
-Non-normative materials MUST NOT be used to infer or override AWO methodology.
+These files form the **machine-readable enforcement surface for CRI-CORE**.
 
 ---
 
-## 4. Authority Resolution
+## 4. Authority Hierarchy (Resolution Order)
 
-In the event of conflict:
+If conflict occurs:
 
-1. **ARI governance documents** prevail over AWO documents.
-2. **AWO documents** prevail over downstream tooling or case studies.
-3. Within AWO, authority is resolved in the following order:
-   - `SCOPE.md`
-   - `INVARIANTS.md`
-   - `ROLES.md`
-   - `WORKFLOW_SPEC.md`
-   - `DOCUMENT_REGISTRY.md`
+1. **SCOPE.md**
+2. **INVARIANTS.md**
+3. **ROLES.md**
+4. **WORKFLOW_SPEC.md**
+5. **DOCUMENT_REGISTRY.md**
+6. All other normative AWO docs
+7. Artifact/Schema docs
+8. Contracts & enforcement docs
+9. Figures & explanatory materials
 
-Later documents MUST be interpreted consistently with earlier ones.
-
----
-
-## 5. Registry Stability
-
-Changes to the normative document set REQUIRE:
-- explicit modification of this registry,
-- major version increment if scope or authority changes,
-- preservation of backward traceability.
-
-Adding, removing, or redefining a normative document is a governance action.
+This ordering MUST be respected across all repos and tools.
 
 ---
 
-## 6. Compliance Requirement
+## 5. Document Lifecycle & Change Rules
 
-This document is institutionally valid only if its metadata block complies
-with **ARI Metadata Policy v2.0.0**.
+- Changes to Core docs require **major version bump**
+- Additions/removals require **registry update**
+- Deprecation must record rationale + successor document
+- Historical versions must remain publicly accessible (`/v1-archived/`)
 
-Any modification that renders the metadata non-compliant invalidates this
-document as an authoritative AWO artifact.
+Registry updates without version control violate ARI governance law.
 
----  
+---
+
+## 6. Non-Normative Materials
+
+The following DO NOT define method:
+
+- Diagrams, READMEs, website text
+- Examples, tutorials, walkthroughs
+- Archived v1 documentation
+- Tooling implementations
+- Generated PDFs
+
+They exist *to enable* AWO, never *override* it.
+
+---
 
 <div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+<sub>© 2025 Waveframe Labs — Method Layer Authority Registry</sub>
 </div>
