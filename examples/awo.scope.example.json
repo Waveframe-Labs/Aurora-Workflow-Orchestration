@@ -1,0 +1,54 @@
+{
+  "$schema": "../schemas/awo.scope.schema.json",
+  "artifact_id": "A2-SCOPE-2025-001",
+  "type": "scope_definition",
+  "version": "1.0.0",
+  "created": "2025-12-28",
+  "actor": {
+    "name": "Shawn C. Wright",
+    "role": "initiator",
+    "affiliation": "Waveframe Labs"
+  },
+  "scope": {
+    "goal": "Formally bound the research domain for the entropy-perturbation stability study.",
+    "research_question": "Does stochastic perturbation destabilize or self-correct entropy-driven expansion models?",
+    "success_criteria": [
+      "ODE simulation runs deterministically for ≥ N=20 parameter sweeps",
+      "Reasoning record explains each transformation step",
+      "Audit trail provides reproducibility without oral context"
+    ],
+    "deliverables": [
+      "Contribution artifact with simulation outputs",
+      "Reasoning record detailing transformation steps",
+      "Review report + issues register",
+      "Approval artifact confirming criteria satisfaction"
+    ]
+  },
+  "boundaries": {
+    "excluded_methods": [
+      "Neural surrogate modeling",
+      "Quantum cosmology extensions",
+      "Observational inference beyond base dataset"
+    ],
+    "temporal_limit": "Workflow must complete within 30 days of initiation."
+  },
+  "traceability_requirements": {
+    "metadata_compliance": true,
+    "provenance_required": true,
+    "artifact_links_required": true,
+    "explicit_role_declaration": true
+  },
+  "links": {
+    "upstream": [
+      "A1-INIT-2025-001"
+    ],
+    "governing_docs": [
+      "SCOPE.md",
+      "INVARIANTS.md",
+      "ROLES.md",
+      "WORKFLOW_SPEC.md",
+      "ARTIFACT_CLASSES.md",
+      "ARTIFACT_REQUIREMENTS.md"
+    ]
+  }
+}
