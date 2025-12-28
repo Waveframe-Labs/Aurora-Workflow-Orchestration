@@ -1,132 +1,68 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/contracts/schemas/awo.change_log.schema.json",
-  "title": "AWO Change Log Schema",
-  "description": "Optional schema for recording structured change history of AWO-governed artifacts, contracts, and specifications.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Change Log",
   "type": "object",
-  "required": [
-    "metadata",
-    "change_log"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Draft",
-            "Active",
-            "Archived",
-            "Superseded"
-          ]
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string",
-          "enum": [
-            "true",
-            "false",
-            "partial"
-          ]
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
     },
-    "change_log": {
-      "type": "object",
-      "required": [
-        "subject",
-        "entries"
-      ],
-      "properties": {
-        "subject": {
-          "type": "string",
-          "description": "Artifact, contract, or specification the change log applies to."
-        },
-        "entries": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "change_id",
-              "date",
-              "change_type",
-              "description",
-              "authorized_by"
-            ],
-            "properties": {
-              "change_id": {
-                "type": "string"
-              },
-              "date": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "change_type": {
-                "type": "string",
-                "enum": [
-                  "Addition",
-                  "Modification",
-                  "Correction",
-                  "Deprecation"
-                ]
-              },
-              "description": {
-                "type": "string"
-              },
-              "authorized_by": {
-                "type": "string",
-                "description": "Role or authority authorizing the change."
-              },
-              "supersedes": {
-                "type": "string",
-                "description": "Optional reference to superseded version or change."
-              }
-            },
-            "additionalProperties": false
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "entries": {
+      "type": "array",
+      "description": "Chronological list of changes applied during the workflow run.",
+      "items": {
+        "type": "object",
+        "required": [
+          "timestamp",
+          "changed_by",
+          "description"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changed_by": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "related_artifacts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
-      },
-      "additionalProperties": false
+      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "entries"
+  ]
 }
