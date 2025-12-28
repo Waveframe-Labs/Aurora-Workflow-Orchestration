@@ -4,16 +4,20 @@ filetype: "documentation"
 type: "specification"
 version: "2.0.0"
 status: "Active"
-created: "2025-12-20"
-updated: "2025-12-20"
+created: "2025-12-25"
+updated: "2025-12-25"
 author: "Waveframe Labs"
 maintainer: "Waveframe Labs"
 license: "Apache-2.0"
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human oversight, validation against ARI Metadata Policy v2.0.0, and final approval by the maintainer."
+ai_assistance_details: "AI-assisted drafting with full human oversight and alignment with AWO v2 architectural specification."
 dependencies:
+  - "AWO_OVERVIEW.md"
+  - "INVARIANTS.md"
+  - "WORKFLOW_SPEC.md"
+  - "ARTIFACT_CLASSES.md"
+  - "ARTIFACT_REQUIREMENTS.md"
   - "ARI Metadata Policy v2.0.0"
-  - "Role Separation Charter v1.1.1"
 anchors:
   - "AWO-SCOPE-v2.0.0"
 ---
@@ -22,96 +26,62 @@ anchors:
 
 ## 1. Purpose
 
-This document defines the **authoritative scope** of **Aurora Workflow Orchestration (AWO) v2.0.0**.
-
-It specifies:
-- what AWO governs,
-- what AWO explicitly does not govern, and
-- the boundaries that prevent scope, governance, or enforcement creep.
-
+This document defines the **formal scope and boundaries** of  
+**Aurora Workflow Orchestration (AWO) v2.0.0**, establishing what the methodology governs,
+what belongs upstream, and what must remain downstream.  
 This document is **normative**.
 
 ---
 
-## 2. In-Scope (Governed by AWO)
+## 2. In-Scope (Method Layer)
 
-AWO governs **methodology only**.
+AWO governs:
 
-Specifically, AWO defines:
+1. Workflow structure and required phases  
+2. Minimum artifact classes required for scientific reconstruction  
+3. Methodological traceability and falsifiability conditions  
+4. Role participation in each workflow phase  
+5. Semantic requirements for artifacts  
+6. Procedural validity conditions for scientific work
 
-- The abstract structure of AI-assisted research workflows  
-- The required logical phases of compliant research workflows  
-- The separation of roles within research workflows, as constrained by the Role Separation Charter  
-- The required classes of research artifacts and their conceptual relationships  
-- Methodological constraints necessary for auditability and reproducibility  
-- Conditions under which research outputs may be considered **methodologically valid**
-
-AWO is concerned with **how research must be structured**, not how it is executed.
+AWO defines **how work becomes reproducible**, not what work is correct.
 
 ---
 
-## 3. Out-of-Scope (Not Governed by AWO)
+## 3. Out-of-Scope (By Design)
 
-AWO explicitly does **not** govern:
+AWO does **not**:
 
-- Execution engines or runtime systems  
-- Automation tooling, CI/CD pipelines, or workflow runners  
-- Enforcement mechanisms or compliance validation  
-- Attestation generation, verification, or identity binding  
-- Cryptographic operations, signing, or key management  
-- File formats, storage layouts, or databases  
-- AI model selection, orchestration strategies, or prompting logic  
-- Organizational policy, institutional law, or epistemic doctrine  
+- Execute workflows or perform enforcement  
+- Define runtime or CI/CD logic  
+- Specify cryptographic or attestation engines  
+- Govern policy, doctrine, or institutional authority  
+- Replace ARI, NTD, or NTS  
+- Judge correctness of research conclusions  
 
-Any document, code, or system performing these functions is **outside the scope of AWO**, regardless of historical association or naming.
+These responsibilities remain with **CRI‑CORE**, **ARI**, and case‑study repos.
 
 ---
 
-## 4. Governance and Authority Boundaries
+## 4. Boundary Relationships
 
-AWO operates under upstream governance and epistemic authority and introduces **no independent law**.
-
-- **Metadata validity** is governed exclusively by the ARI Metadata Policy.
-- **Role authority and separation** are governed exclusively by the Role Separation Charter.
-- **Epistemic constraints** are governed by Neurotransparency doctrine and standards.
-- **Enforcement and execution** are delegated to downstream systems (e.g., CRI-CORE).
-
-AWO MUST NOT:
-- enforce governance,
-- implement enforcement logic,
-- adjudicate scientific truth,
-- or override upstream policy.
+| Layer | Position | AWO Relationship |
+|------|----------|------------------|
+| ARI | Governance | AWO inherits policy + metadata law |
+| NTD/NTS | Epistemic | AWO operationalizes transparency requirements |
+| AWO | Method | Defines workflows + artifacts |
+| CRI‑CORE | Enforcement | Implements AWO compliance |
+| Case‑Studies | Downstream | Must follow AWO to claim reproducibility |
 
 ---
 
-## 5. Normative Authority
+## 5. Compliance Statement
 
-Only documents explicitly listed as authoritative in `awo.manifest.json` and `DOCUMENT_REGISTRY.md` may define or extend AWO methodology.
-
-Archived materials, historical implementations, and legacy documents are **non-normative** and MUST NOT be used to infer scope or authority.
-
----
-
-## 6. Scope Stability
-
-Changes to this document constitute a **breaking methodological change** and require:
-
-- a major version increment,
-- explicit documentation of scope impact,
-- and preservation of backward traceability.
-
-Minor and patch versions MUST NOT expand scope.
+This document is valid only if its metadata complies with  
+**ARI Metadata Policy v2.0.0**.
 
 ---
-
-## 7. Compliance Requirement
-
-This document is institutionally valid only if its metadata block complies with **ARI Metadata Policy v2.0.0**.
-
-Any modification that renders the metadata non-compliant invalidates this document as an authoritative AWO artifact.
-
----  
 
 <div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+  <sub>© 2025 Waveframe Labs — Independent Open‑Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>
