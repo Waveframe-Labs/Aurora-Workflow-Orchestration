@@ -1,101 +1,73 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/schemas/awo.evaluation.schema.json",
-  "title": "AWO Evaluation Criteria Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Evaluation Criteria",
   "type": "object",
-  "description": "Schema for the AWO Evaluation Criteria artifact (A-3). Defines machine-readable requirements for acceptance, rejection, and quality thresholds.",
-  "required": [
-    "metadata",
-    "acceptance_criteria",
-    "rejection_criteria",
-    "quality_thresholds",
-    "producing_role"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string"
-        },
-        "ai_assistance_details": {
-          "type": "string"
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "criteria": {
+      "type": "array",
+      "description": "List of evaluation criteria that will be used to judge outcomes.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "description"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "metric": {
+            "type": "string",
+            "description": "Optional metric or indicator."
+          },
+          "threshold": {
+            "type": "string",
+            "description": "Qualitative or quantitative threshold."
+          }
         }
-      },
-      "additionalProperties": false
-    },
-    "acceptance_criteria": {
-      "type": "array",
-      "description": "Explicit conditions that must be satisfied for acceptance.",
-      "items": {
-        "type": "string"
-      },
-      "minItems": 1
-    },
-    "rejection_criteria": {
-      "type": "array",
-      "description": "Explicit conditions that mandate rejection.",
-      "items": {
-        "type": "string"
       }
     },
-    "quality_thresholds": {
-      "type": "object",
-      "description": "Quantitative or qualitative thresholds used to judge sufficiency.",
-      "additionalProperties": {
-        "type": [
-          "string",
-          "number",
-          "boolean"
-        ]
-      }
-    },
-    "producing_role": {
+    "success_conditions": {
       "type": "string",
-      "description": "Declared role responsible for producing the evaluation criteria artifact."
+      "description": "Narrative description of what counts as success."
     },
-    "applicability_notes": {
+    "failure_conditions": {
       "type": "string",
-      "description": "Optional notes clarifying how criteria should be applied."
+      "description": "Narrative description of what counts as failure."
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "criteria"
+  ]
 }
