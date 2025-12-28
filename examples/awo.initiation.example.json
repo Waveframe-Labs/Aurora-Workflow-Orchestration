@@ -1,0 +1,46 @@
+{
+  "$schema": "../schemas/awo.initiation.schema.json",
+  "artifact_id": "A1-INIT-2025-001",
+  "type": "initiation_record",
+  "version": "1.0.0",
+  "created": "2025-12-28",
+  "actor": {
+    "name": "Shawn C. Wright",
+    "role": "initiator",
+    "affiliation": "Waveframe Labs"
+  },
+  "workflow_intent": {
+    "title": "Stochastic Entropic Cosmology Exploration",
+    "objective": "Investigate whether entropy-driven expansion models remain stable when perturbed under stochastic initial conditions.",
+    "rationale": "Waveframe v4.0 suggests horizon-entropy coupling may govern expansion. This workflow will evaluate robustness of the model under noise."
+  },
+  "declared_scope": {
+    "in_scope": [
+      "entropy-Hubble coupling dynamics",
+      "perturbation stability analysis",
+      "ODE simulation and parameter variation",
+      "traceable computation + reproducible notebooks"
+    ],
+    "out_of_scope": [
+      "dark matter modeling",
+      "quantum gravity extensions",
+      "observational data fitting beyond Type-Ia supernovae baseline"
+    ]
+  },
+  "constraints": {
+    "initial_assumptions": [
+      "no geometry fundamental — expansion emergent",
+      "entropy defined S = π / H(t)^2",
+      "perturbations modeled as Gaussian noise ε(t) ~ N(0,σ²)"
+    ],
+    "resources": ["Python 3.11", "NumPy", "SciPy ODE solver", "Matplotlib"]
+  },
+  "links": {
+    "upstream": [],
+    "references": [
+      "Waveframe v4.0 manuscript (internal)",
+      "NTD v1.0.0 — epistemic rationale for transparency",
+      "AWO v2.0.0 normative documents"
+    ]
+  }
+}
