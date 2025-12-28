@@ -1,101 +1,78 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/schemas/awo.reasoning.schema.json",
-  "title": "AWO Reasoning Record Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Reasoning Record",
   "type": "object",
-  "description": "Schema for the AWO Reasoning Record artifact (A-5). Defines machine-readable requirements for structured reasoning, transformations, and uncertainty disclosure.",
-  "required": [
-    "metadata",
-    "reasoning_steps",
-    "transformations",
-    "assumptions",
-    "uncertainties",
-    "producing_role"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string"
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "reasoning_steps": {
-      "type": "array",
-      "description": "Ordered steps describing the reasoning process.",
-      "items": {
-        "type": "string"
-      },
-      "minItems": 1
-    },
-    "transformations": {
-      "type": "array",
-      "description": "Descriptions of transformations applied to inputs during reasoning.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "assumptions": {
-      "type": "array",
-      "description": "Explicit assumptions made during reasoning.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "uncertainties": {
-      "type": "array",
-      "description": "Known uncertainties, gaps, or unresolved questions.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "producing_role": {
+    "artifact_type": {
       "type": "string",
-      "description": "Declared role responsible for producing the reasoning record."
+      "description": "AWO artifact type identifier for this schema."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "context": {
+      "type": "string",
+      "description": "Context in which this reasoning event took place."
+    },
+    "inferences": {
+      "type": "array",
+      "description": "List of explicit reasoning steps, each auditable.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "statement"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string",
+            "description": "The claim or inference made."
+          },
+          "supports": {
+            "type": "array",
+            "description": "IDs or references of prior inferences or evidence used.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_type": {
+            "type": "string",
+            "description": "Human, AI, hybrid, or other origin descriptor."
+          },
+          "pointer": {
+            "type": "string",
+            "description": "Optional external pointer (e.g., log reference, prompt ID)."
+          }
+        }
+      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "context",
+    "inferences"
+  ]
 }
