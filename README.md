@@ -15,6 +15,10 @@ anchors:
   - "AWO-README-v2.0.0"
 ---
 
+<p align="center">
+  <img src="figures/AWO-v2-banner.png" alt="AWO Banner" width="100%">
+</p>
+
 # Aurora Workflow Orchestration (AWO)
 
 > Method layer of the Waveframe Labs governance stack.  
