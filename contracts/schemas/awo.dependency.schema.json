@@ -1,131 +1,67 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/contracts/schemas/awo.dependency.schema.json",
-  "title": "AWO Dependency Declaration Schema",
-  "description": "Optional schema for declaring explicit dependencies between AWO-governed artifacts, contracts, schemas, and specifications. Enables machine-readable dependency graphs and validation.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Dependency Declaration",
   "type": "object",
-  "required": [
-    "metadata",
-    "dependency_declaration"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Draft",
-            "Active",
-            "Archived",
-            "Superseded"
-          ]
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string",
-          "enum": [
-            "true",
-            "false",
-            "partial"
-          ]
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
     },
-    "dependency_declaration": {
-      "type": "object",
-      "required": [
-        "subject",
-        "dependencies"
-      ],
-      "properties": {
-        "subject": {
-          "type": "string",
-          "description": "The artifact, contract, or specification declaring dependencies."
-        },
-        "dependencies": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "dependency_id",
-              "dependency_type",
-              "reference"
-            ],
-            "properties": {
-              "dependency_id": {
-                "type": "string",
-                "description": "Unique identifier for the dependency."
-              },
-              "dependency_type": {
-                "type": "string",
-                "enum": [
-                  "Governance",
-                  "Contract",
-                  "Schema",
-                  "Artifact",
-                  "External"
-                ],
-                "description": "Type classification of the dependency."
-              },
-              "reference": {
-                "type": "string",
-                "description": "Canonical reference (path, URL, DOI, or identifier) to the dependency."
-              },
-              "required": {
-                "type": "boolean",
-                "description": "Whether the dependency is mandatory for validity.",
-                "default": true
-              },
-              "notes": {
-                "type": "string",
-                "description": "Optional explanatory notes about the dependency."
-              }
-            },
-            "additionalProperties": false
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "List of dependencies relevant to this workflow or artifact.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier for the dependency."
+          },
+          "type": {
+            "type": "string",
+            "description": "Type (repo, dataset, model, doctrine, spec, etc.)."
+          },
+          "version": {
+            "type": "string",
+            "description": "Version or tag if applicable."
+          },
+          "relation": {
+            "type": "string",
+            "description": "How this dependency is used (input, reference, contract, etc.)."
           }
         }
-      },
-      "additionalProperties": false
+      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "dependencies"
+  ]
 }
