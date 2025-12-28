@@ -1,178 +1,92 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/contracts/schemas/awo.audit.schema.json",
-  "title": "AWO Audit Record Schema",
-  "description": "Schema for formal audit records within Aurora Workflow Orchestration (AWO). Captures audit scope, findings, determinations, and independence declarations.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Audit Report",
   "type": "object",
-  "required": [
-    "metadata",
-    "audit"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Draft",
-            "Active",
-            "Archived",
-            "Superseded"
-          ]
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string",
-          "enum": [
-            "true",
-            "false",
-            "partial"
-          ]
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
     },
-    "audit": {
-      "type": "object",
-      "required": [
-        "audit_id",
-        "audit_type",
-        "auditing_role",
-        "audited_scope",
-        "independence_declared",
-        "findings",
-        "audit_date",
-        "determination"
-      ],
-      "properties": {
-        "audit_id": {
-          "type": "string",
-          "description": "Unique identifier for the audit event."
-        },
-        "audit_type": {
-          "type": "string",
-          "enum": [
-            "Process",
-            "Artifact",
-            "Compliance",
-            "Governance"
-          ],
-          "description": "Type of audit conducted."
-        },
-        "auditing_role": {
-          "type": "string",
-          "description": "Role exercising audit authority."
-        },
-        "audited_scope": {
-          "type": "string",
-          "description": "Reference to the workflow, artifact set, or approval being audited."
-        },
-        "independence_declared": {
-          "type": "boolean",
-          "description": "Affirms auditor independence from the audited work."
-        },
-        "independence_details": {
-          "type": "string",
-          "description": "Optional details describing independence guarantees or constraints."
-        },
-        "findings": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "object",
-            "required": [
-              "finding_id",
-              "description",
-              "severity"
-            ],
-            "properties": {
-              "finding_id": {
-                "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "severity": {
-                "type": "string",
-                "enum": [
-                  "low",
-                  "medium",
-                  "high",
-                  "critical"
-                ]
-              },
-              "evidence_reference": {
-                "type": "string",
-                "description": "Reference to evidence supporting the finding."
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "determination": {
-          "type": "string",
-          "enum": [
-            "Pass",
-            "Conditional Pass",
-            "Fail"
-          ],
-          "description": "Overall audit determination."
-        },
-        "required_remediation": {
-          "type": "array",
-          "items": {
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "auditor_role": {
+      "type": "string",
+      "description": "Declared role of the auditor."
+    },
+    "audit_scope": {
+      "type": "string",
+      "description": "Description of workflow elements included in this audit."
+    },
+    "invariant_check_results": {
+      "type": "array",
+      "description": "Structured results of invariant checks.",
+      "items": {
+        "type": "object",
+        "required": [
+          "invariant_id",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "invariant_id": {
             "type": "string"
           },
-          "description": "Required remediation actions if audit did not pass cleanly."
-        },
-        "audit_date": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional contextual notes from the auditor."
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "not_applicable"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
         }
-      },
-      "additionalProperties": false
+      }
+    },
+    "overall_status": {
+      "type": "string",
+      "description": "Aggregate audit status.",
+      "enum": [
+        "pass",
+        "fail",
+        "conditional"
+      ]
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Follow-up recommendations or required remediations.",
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "auditor_role",
+    "audit_scope",
+    "invariant_check_results",
+    "overall_status"
+  ]
 }
