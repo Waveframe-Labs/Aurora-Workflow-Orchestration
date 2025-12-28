@@ -1,86 +1,64 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/schemas/awo.initiation.schema.json",
-  "title": "AWO Initiation Record Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Initiation Record",
   "type": "object",
-  "description": "Schema for the AWO Initiation Record artifact (A-1). Defines the minimum machine-readable requirements for initiating a compliant AWO workflow.",
-  "required": [
-    "metadata",
-    "objective",
-    "scope_intent",
-    "constraints",
-    "producing_role"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string"
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "title": {
+      "type": "string",
+      "description": "Short title for the workflow run or research initiative."
     },
     "objective": {
       "type": "string",
-      "description": "Declared research objective for the workflow."
+      "description": "Primary research objective stated in natural language."
     },
-    "scope_intent": {
+    "motivating_context": {
       "type": "string",
-      "description": "High-level description of the intended scope prior to formal scoping."
+      "description": "Background context or problem statement motivating the workflow."
     },
-    "constraints": {
+    "assumptions": {
       "type": "array",
-      "description": "Declared assumptions, constraints, or limitations at initiation time.",
+      "description": "Explicit assumptions declared at initiation.",
       "items": {
         "type": "string"
       }
     },
-    "producing_role": {
-      "type": "string",
-      "description": "Declared role responsible for producing the initiation record."
+    "constraints": {
+      "type": "array",
+      "description": "Declared hard constraints (time, resources, scope, etc.).",
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "title",
+    "objective"
+  ]
 }
