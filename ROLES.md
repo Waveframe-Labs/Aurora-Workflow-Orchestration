@@ -5,15 +5,17 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-20"
-updated: "2025-12-20"
+updated: "2025-12-27"
 author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+maintainer: "Shawn C. Wright"
 license: "Apache-2.0"
 ai_assisted: "partial"
 ai_assistance_details: "AI-assisted drafting with full human oversight, aligned to the Role Separation Charter v1.1.1 and ARI Metadata Policy v2.0.0."
 dependencies:
-  - "AWO Scope Definition v2.0.0"
-  - "AWO Methodological Invariants v2.0.0"
+  - "SCOPE.md"
+  - "INVARIANTS.md"
+  - "WORKFLOW_SPEC.md"
+  - "ARI Metadata Policy v2.0.0"
   - "Role Separation Charter v1.1.1"
 anchors:
   - "AWO-ROLES-v2.0.0"
@@ -22,13 +24,12 @@ anchors:
 # AWO Workflow Roles
 
 ## 1. Purpose
+This document defines **workflow-level functional roles** within
+**Aurora Workflow Orchestration (AWO) v2.0.0** and establishes **constraints
+governing who may perform which methodological actions**.
 
-This document defines the **workflow-level roles** used within
-**Aurora Workflow Orchestration (AWO) v2.0.0**.
-
-These roles describe **functional responsibilities within a research workflow**.
-They do **not** redefine governance authority, institutional power, or enforcement
-capabilities, which are governed upstream by the Role Separation Charter.
+Roles define responsibility, **not authority** — authority remains upstream
+in ARI governance.
 
 This document is **normative**.
 
@@ -36,134 +37,138 @@ This document is **normative**.
 
 ## 2. Role Model Principles
 
-AWO workflow roles adhere to the following principles:
-
-- Roles are **functional**, not organizational.
-- Roles define **responsibilities**, not authority.
-- Authority is exercised only where explicitly permitted by upstream governance.
-- Role assumption MUST be explicit and declared.
-- A single actor MAY occupy multiple workflow roles only if invariants are preserved.
+- Roles are functional, assigned on action — not identity or job title.
+- Role assumption MUST be **declared**, not inferred.
+- A single actor MAY hold multiple roles **only if invariants are preserved**.
+- No role may implicitly inherit permissions of another role.
+- Governance authority and enforcement authority are **out of scope here**.
 
 ---
 
-## 3. Defined Workflow Roles
+## 3. Workflow Roles (Canonical)
 
 ### R-1 — Workflow Initiator
+Responsibilities:
+- Define problem, intent, and starting assumptions.
+- Register workflow as AWO-compliant.
+- Produce initiation record.
 
-**Responsibilities:**
-- Defines the research objective and scope.
-- Initiates the workflow.
-- Declares initial assumptions and constraints.
-
-**Constraints:**
-- MUST NOT approve outcomes.
-- MUST NOT attest to final validity.
+Constraints:
+- MUST NOT review, approve, or audit workflow results.
+- MUST NOT perform final decision actions.
 
 ---
 
 ### R-2 — Contributor
+Responsibilities:
+- Generate research artifacts and reasoning.
+- Perform derivations, synthesis, modeling, or experimentation.
+- Submit outputs for review.
 
-**Responsibilities:**
-- Produces intermediate artifacts.
-- Performs analysis, synthesis, or generation tasks.
-- Documents reasoning and outputs.
-
-**Constraints:**
-- MUST NOT approve or attest to artifacts they produce.
-- MUST operate within declared scope.
+Constraints:
+- MUST NOT approve or audit artifacts they created.
+- MAY revise artifacts only through documented change logs.
+- MUST reference inputs and justify transformations.
 
 ---
 
 ### R-3 — Reviewer
+Responsibilities:
+- Evaluate artifacts against scope + evaluation criteria.
+- Produce review reports and issue registers.
 
-**Responsibilities:**
-- Evaluates artifacts against methodological requirements.
-- Verifies completeness and consistency.
-- Flags violations or ambiguities.
-
-**Constraints:**
-- MUST be independent of artifact production.
-- MUST declare reviewer role explicitly.
+Constraints:
+- MUST be independent of contribution context.
+- MUST NOT approve artifacts they reviewed **if also contributor**.
+- Review confirms sufficiency — **not scientific correctness**.
 
 ---
 
 ### R-4 — Approver
+Responsibilities:
+- Decide if the workflow satisfies required criteria.
+- Issue approval or rejection decision records.
 
-**Responsibilities:**
-- Determines whether workflow outputs satisfy defined criteria.
-- Issues approval or rejection decisions.
-
-**Constraints:**
-- MUST NOT be the same actor as Contributor for approved artifacts.
-- Approval does not imply scientific truth, only methodological sufficiency.
+Constraints:
+- MUST NOT be the contributor of approved artifacts.
+- MUST base decisions on artifacts — not narrative claims.
 
 ---
 
 ### R-5 — Auditor
+Responsibilities:
+- Assess invariant compliance and traceability.
+- Verify reconstructibility and metadata integrity.
+- Produce audit report.
 
-**Responsibilities:**
-- Evaluates workflow adherence to AWO invariants.
-- Assesses traceability and auditability.
-- Documents audit findings.
-
-**Constraints:**
-- MUST remain independent of Initiation and Contribution roles.
-- MUST NOT modify workflow artifacts.
-
----
-
-## 4. Role Interaction Constraints
-
-The following interactions are prohibited:
-
-- Self-review or self-approval.
-- Silent role switching.
-- Undeclared role assumption.
-- Reviewer or Auditor producing artifacts they evaluate.
-- Approver validating artifacts they contributed to.
-
-Violations invalidate the workflow.
+Constraints:
+- MUST be role-independent from Initiator + Contributor.
+- MUST NOT modify artifacts, only observe + report.
 
 ---
 
-## 5. Role Declaration Requirement
+## 4. Role Interaction Constraints (Hard Law)
 
-All workflow actions that exercise role-specific responsibility MUST explicitly
-declare the role being exercised.
+- ❌ Self-review is prohibited.
+- ❌ Self-approval is prohibited.
+- ❌ A single actor MAY NOT approve artifacts they contributed.
+- ❌ Audit may not be performed by contributor or approver.
+- ❌ Undeclared role assumption invalidates resulting artifacts.
 
-Implicit role inference is prohibited.
-
----
-
-## 6. Relationship to Upstream Governance
-
-This document:
-- Defines workflow roles only.
-- Defers authority boundaries to the Role Separation Charter.
-- Introduces no governance power or enforcement capability.
-
-In case of conflict, upstream governance documents prevail.
+Any violation renders workflow **methodologically invalid**.
 
 ---
 
-## 7. Stability and Change Control
+## 5. Phase-Role Matrix (Normative Table)
 
-Changes to workflow roles constitute **breaking methodological changes** and REQUIRE:
-- a major version increment,
-- explicit documentation of role impact,
-- preservation of backward traceability.
+| Phase | Allowed Roles | Forbidden Roles |
+|---|---|---|
+| Initiation | Initiator | Reviewer/Approver/Auditor |
+| Scoping | Initiator, Contributor | Approver/Auditor |
+| Contribution | Contributor | Approver/Auditor |
+| Review | Reviewer | Contributor for same artifact |
+| Approval | Approver | Contributor/Reviewer for same artifact |
+| Audit | Auditor | Contributor/Approver |
 
 ---
 
-## 8. Compliance Requirement
+## 6. Role Escalation & Multi-Role Rules
 
-This document is institutionally valid only if its metadata block complies
-with **ARI Metadata Policy v2.0.0**.
+Escalation requires **explicit declaration** and MUST follow:
+```  
+Initiator → Contributor → Reviewer → Approver → Auditor
+```  
+(One direction only, no backward collapse)  
 
-Any modification that renders the metadata non-compliant invalidates this
-document as an authoritative AWO artifact.
+A single person **may occupy multiple roles sequentially**, **but never concurrently
+within the same artifact lineage**.
 
----  
+If roles conflict, **inactive role must be explicitly set aside**.
+
+---
+
+## 7. Neurotransparency Alignment
+
+All roles MUST include attribution sufficient for NTS compliance:
+
+- who acted,
+- under what role,
+- based on what reasoning,
+- using which cognitive agents (AI/Human/Both),
+- traceable to commit or artifact.
+
+---
+
+## 8. Compliance & Invalidity
+
+Non-compliance with this specification invalidates workflow status.
+Remediation requires:
+
+1. new artifact superseding invalid one,
+2. updated provenance chain,
+3. audit documenting correction.
+
+---
 
 <div align="center">
   <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
