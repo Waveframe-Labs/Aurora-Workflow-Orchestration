@@ -1,84 +1,58 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/schemas/awo.issue_register.schema.json",
-  "title": "AWO Issue Register Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Issue Register",
   "type": "object",
-  "description": "Schema for the AWO Issue Register artifact (A-7). Defines machine-readable requirements for enumerating issues identified during review or audit.",
-  "required": [
-    "metadata",
-    "issues",
-    "producing_role"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string"
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
     },
     "issues": {
       "type": "array",
-      "description": "Enumerated issues identified, each with severity and required action.",
-      "minItems": 1,
+      "description": "List of open or resolved issues tracked for the workflow.",
       "items": {
         "type": "object",
         "required": [
           "id",
           "description",
-          "severity"
+          "status",
+          "severity",
+          "created_at"
         ],
+        "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string",
-            "description": "Unique identifier for the issue."
+            "type": "string"
           },
           "description": {
+            "type": "string"
+          },
+          "status": {
             "type": "string",
-            "description": "Description of the issue."
+            "enum": [
+              "open",
+              "in_progress",
+              "resolved",
+              "closed"
+            ]
           },
           "severity": {
             "type": "string",
@@ -87,21 +61,36 @@
               "medium",
               "high",
               "critical"
-            ],
-            "description": "Severity classification of the issue."
+            ]
           },
-          "required_action": {
+          "created_at": {
             "type": "string",
-            "description": "Required remediation action."
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Actor responsible for this issue."
+          },
+          "related_artifacts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
-        },
-        "additionalProperties": false
+        }
       }
-    },
-    "producing_role": {
-      "type": "string",
-      "description": "Declared role responsible for producing the issue register."
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "issues"
+  ]
 }
