@@ -1,94 +1,62 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://waveframelabs.org/schemas/awo.scope.schema.json",
-  "title": "AWO Scope Definition Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AWO Scope Definition",
   "type": "object",
-  "description": "Schema for the AWO Scope Definition artifact (A-2). Defines the minimum machine-readable requirements for formal scope specification.",
-  "required": [
-    "metadata",
-    "in_scope",
-    "out_of_scope",
-    "boundary_rationale",
-    "producing_role"
-  ],
+  "additionalProperties": false,
   "properties": {
-    "metadata": {
-      "type": "object",
-      "description": "YAML-equivalent metadata extracted from the governing Markdown artifact.",
-      "required": [
-        "title",
-        "version",
-        "status",
-        "created",
-        "updated",
-        "author",
-        "maintainer",
-        "license",
-        "ai_assisted"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "created": {
-          "type": "string",
-          "format": "date"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date"
-        },
-        "author": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "ai_assisted": {
-          "type": "string"
-        },
-        "ai_assistance_details": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+    "artifact_type": {
+      "type": "string",
+      "description": "AWO artifact type identifier for this schema."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Stable identifier for the governed workflow run."
+    },
+    "awo_version": {
+      "type": "string",
+      "description": "Declared AWO method version used for this run (e.g. '2.0.0')."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when this artifact was created."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Identifier for the actor (human or agent) that created this artifact."
+    },
+    "scope_statement": {
+      "type": "string",
+      "description": "Concise definition of workflow scope."
     },
     "in_scope": {
       "type": "array",
-      "description": "Explicitly enumerated items included within the scope boundary.",
-      "items": {
-        "type": "string"
-      },
-      "minItems": 1
-    },
-    "out_of_scope": {
-      "type": "array",
-      "description": "Explicitly enumerated items excluded from the scope boundary.",
+      "description": "Explicitly in-scope questions, tasks, or subsystems.",
       "items": {
         "type": "string"
       }
     },
-    "boundary_rationale": {
-      "type": "string",
-      "description": "Justification for the chosen scope boundaries."
+    "out_of_scope": {
+      "type": "array",
+      "description": "Explicitly out-of-scope questions, tasks, or subsystems.",
+      "items": {
+        "type": "string"
+      }
     },
-    "producing_role": {
-      "type": "string",
-      "description": "Declared role responsible for producing the scope definition artifact."
-    },
-    "revision_of": {
-      "type": "string",
-      "description": "Identifier of a prior scope artifact if this artifact is a revision."
+    "dependencies": {
+      "type": "array",
+      "description": "Known external dependencies or upstream artifacts.",
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": false
+  "required": [
+    "artifact_type",
+    "run_id",
+    "awo_version",
+    "created_at",
+    "created_by",
+    "scope_statement"
+  ]
 }
