@@ -1,3 +1,60 @@
+---
+title: "AWO v2 — Phase Definitions (Initiation → Release)"
+short_title: "AWO Phase Definitions"
+filetype: "documentation"
+type: "method"
+version: "2.0.0"
+status: "Draft"
+created: "2026-01-02"
+updated: "2026-01-02"
+author: "Waveframe Labs"
+maintainer: "Waveframe Labs"
+license: "CC-BY-4.0"
+ai_assisted: "partial"
+ai_assistance_details: "Draft refined with AI assistance; final structure, scope, and acceptance determined by maintainer."
+policy_version: "ARI-Metadata-2.0.0"
+dependencies:
+  - "AWO v2 — Design Envelope"
+  - "AWO v2 — Minimal Phase Topology"
+---
+
+# AWO v2 — Minimal Phase Topology
+Status: Draft — Method Layer (L1)  
+Scope: Structural workflow ordering only (non-normative, non-semantic)
+
+---
+
+## Purpose
+
+This document defines the **minimal phase topology** for Aurora Workflow Orchestration (AWO).
+
+The topology specifies **when** work progresses and **what structural artifacts must exist at each transition**.  
+It does **not** evaluate content, legitimacy, correctness, or authority.
+
+Phase transitions enforce **structural completeness**, not semantic validity.
+
+---
+
+## Core Principle
+
+**Order without judgment.**
+
+AWO phases:
+- impose sequence,
+- require artifacts,
+- constrain roles per phase,
+
+while deferring all validation, approval, and enforcement to downstream layers.
+
+---
+
+## Phase Set (Minimal)
+
+AWO defines **five phases**. No phase is optional.
+
+```  
+Initiation → Specification → Execution → Review → Release  
+```  
 
 ---
 
