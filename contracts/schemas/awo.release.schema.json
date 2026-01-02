@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://waveframelabs.org/schemas/awo.release.schema.json",
+  "title": "AWO Release Artifact",
+  "description": "The terminal artifact of an AWO workflow cycle. Acts as a frozen manifest that bundles upstream artifacts for distribution or archival without asserting approval, legitimacy, or authority.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "awo_version",
+    "artifact_id",
+    "phase",
+    "created_at",
+    "actors",
+    "release_meta",
+    "manifest",
+    "integrity_attestation",
+    "terminal_attestation"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "awo.release"
+    },
+
+    "awo_version": {
+      "type": "string"
+    },
+
+    "artifact_id": {
+      "type": "string"
+    },
+
+    "phase": {
+      "const": "release"
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "actors": {
+      "type": "array",
+      "description": "Actors responsible for curating the release bundle.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor_id", "role", "ai_assisted"],
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "role": {
+            "const": "curator",
+            "description": "Curator role responsible for assembling and freezing the release bundle."
+          },
+          "ai_assisted": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "release_meta": {
+      "type": "object",
+      "description": "Descriptive metadata regarding the release context. Declarative only.",
+      "required": ["version_tag", "release_intent", "target_audience"],
+      "properties": {
+        "version_tag": {
+          "type": "string",
+          "description": "Semantic version identifier for this release bundle.",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?$"
+        },
+        "release_intent": {
+          "type": "string",
+          "enum": ["draft_preview", "peer_context", "production_context", "archival", "deprecation"],
+          "description": "Declared context for downstream consumers. Does not imply approval or validation."
+        },
+        "target_audience": {
+          "type": "string",
+          "enum": ["internal", "ecosystem", "public"]
+        },
+        "license_declaration": {
+          "type": "string",
+          "description": "Optional license declaration applying to this bundle (e.g., SPDX identifier)."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "manifest": {
+      "type": "array",
+      "description": "Exhaustive list of artifacts included in this release bundle.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ref_type", "identifier", "artifact_type"],
+        "properties": {
+          "ref_type": {
+            "type": "string",
+            "enum": ["internal_id", "uri", "doi"]
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "artifact_type": {
+            "type": "string",
+            "enum": ["awo.initiation", "awo.specification", "awo.execution", "awo.review"]
+          },
+          "inclusion_reason": {
+            "type": "string",
+            "enum": ["core_component", "supporting_evidence", "lineage_trace"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "integrity_attestation": {
+      "type": "object",
+      "description": "Structural guarantee that the release bundle is complete and unmodified.",
+      "required": ["bundle_complete", "upstream_modified"],
+      "properties": {
+        "bundle_complete": {
+          "type": "boolean",
+          "description": "Attestation that all referenced artifacts are accessible and included."
+        },
+        "upstream_modified": {
+          "const": false,
+          "description": "Attestation that no upstream artifacts were altered during bundling."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "terminal_attestation": {
+      "type": "object",
+      "description": "Declaration that this artifact concludes the current workflow iteration.",
+      "required": ["workflow_concluded"],
+      "properties": {
+        "workflow_concluded": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+
+  "additionalProperties": false
+}
