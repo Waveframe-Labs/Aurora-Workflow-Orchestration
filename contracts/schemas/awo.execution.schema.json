@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://waveframelabs.org/schemas/awo.execution.schema.json",
+  "title": "AWO Execution Artifact",
+  "description": "Records execution activity performed under a declared AWO Specification. Enforces structural traceability only; makes no semantic or normative judgments.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "awo_version",
+    "artifact_id",
+    "phase",
+    "created_at",
+    "specification_ref",
+    "actors",
+    "execution_log",
+    "deviations"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "awo.execution"
+    },
+
+    "awo_version": {
+      "type": "string",
+      "description": "AWO version this execution artifact conforms to."
+    },
+
+    "artifact_id": {
+      "type": "string",
+      "description": "Globally unique identifier for this execution artifact."
+    },
+
+    "phase": {
+      "const": "execution"
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "specification_ref": {
+      "type": "object",
+      "description": "Reference to the governing Specification Artifact.",
+      "required": ["ref_type", "identifier"],
+      "properties": {
+        "ref_type": {
+          "type": "string",
+          "enum": ["internal_id", "uri", "doi"]
+        },
+        "identifier": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "actors": {
+      "type": "array",
+      "description": "Actors participating in execution.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor_id", "role", "ai_assisted"],
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["executor", "originator"]
+          },
+          "ai_assisted": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "execution_log": {
+      "type": "array",
+      "description": "Chronological record of execution steps performed.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["step_id", "description"],
+        "properties": {
+          "step_id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tool_used": {
+            "type": "string",
+            "description": "Optional tool or system used in this step."
+          },
+          "output_ref": {
+            "type": "object",
+            "description": "Optional reference to generated output.",
+            "required": ["ref_type", "identifier"],
+            "properties": {
+              "ref_type": {
+                "type": "string",
+                "enum": ["internal_id", "uri", "doi"]
+              },
+              "identifier": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "deviations": {
+      "type": "object",
+      "description": "Explicit declaration of whether execution deviated from the governing specification.",
+      "required": ["deviations_occurred"],
+      "properties": {
+        "deviations_occurred": {
+          "type": "boolean",
+          "description": "TRUE indicates execution deviated from specification; FALSE is an explicit attestation of fidelity."
+        },
+        "deviation_details": {
+          "type": "array",
+          "description": "Required if deviations_occurred is TRUE.",
+          "items": {
+            "type": "object",
+            "required": ["description"],
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "related_spec_section": {
+                "type": "string",
+                "description": "Optional reference to affected specification section."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "deviations_occurred": { "const": true }
+            }
+          },
+          "then": {
+            "required": ["deviation_details"],
+            "properties": {
+              "deviation_details": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+
+  "additionalProperties": false
+}
