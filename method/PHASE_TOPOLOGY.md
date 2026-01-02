@@ -1,5 +1,5 @@
 ---
-title: "AWO v2 — Phase Definitions (Initiation → Release)"
+title: "AWO v2 — Minimal Phase Topology"
 short_title: "AWO Phase Definitions"
 filetype: "documentation"
 type: "method"
