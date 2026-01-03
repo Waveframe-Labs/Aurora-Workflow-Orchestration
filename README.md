@@ -48,33 +48,6 @@ AWO does **not** run workflows, validate artifacts, or adjudicate truth.
 
 ---
 
-## Repository Structure
-
-```
-/
-├─ /contracts/                 → schemas + machine‑readable contracts
-│   ├─ CONTRACT_INDEX.md
-│   ├─ ARTIFACT_SCHEMA_MAP.md
-│   └─ /schemas/*.schema.json
-│
-├─ /v1-archived/               → legacy AWO layer (read‑only, not normative)
-│
-├─ SCOPE.md                    → What AWO governs & boundaries
-├─ INVARIANTS.md               → Non‑negotiable methodological laws
-├─ ROLES.md                    → Workflow role definitions
-├─ WORKFLOW_SPEC.md            → Phase & transition structure
-├─ ARTIFACT_CLASSES.md         → Required artifact classes
-├─ ARTIFACT_REQUIREMENTS.md    → Mandatory semantic fields per artifact
-├─ AWO_OVERVIEW.md             → High‑level conceptual orientation
-├─ GLOSSARY.md                 → Normative definitions
-├─ PROVENANCE_MODEL.md         → Traceability & reconstruction patterns
-├─ DESIGN_LAWS.md              → Design‑time constraints
-├─ AWO_NEUROTRANSPARENCY.md    → NTS interface & cognitive disclosure rules
-└─ awo.manifest.json           → Machine manifest (metadata index root)
-```
-
----
-
 ## Where to Start
 
 New readers should follow documents in this order:
