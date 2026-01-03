@@ -4,7 +4,7 @@ short_title: "AWO Design Envelope"
 filetype: "documentation"
 type: "architecture"
 version: "2.0.0"
-status: "Draft"
+status: "Active"
 created: "2026-01-02"
 updated: "2026-01-02"
 author: "Waveframe Labs"
@@ -15,8 +15,9 @@ ai_assistance_details: "Draft refined with multi-model AI assistance (ChatGPT, G
 policy_version: "ARI-Metadata-2.0.0"
 dependencies:
   - "Aurora Research Initiative (ARI)"
+  - "Neurotransparency Doctrine (NTD)"
   - "Neurotransparency Specification (NTS)"
-  - "Aurora Workflow Orchestration (AWO)"
+
 ---
 
 # AWO v2 — Design Envelope (Minimal)
@@ -73,7 +74,7 @@ All such functions belong to other layers and may only interface with AWO throug
 
 ## 4. What AWO Produces
 
-AWO produces **method artifacts**, including:
+AWO produces **method artifacts (structural records)**, including:
 
 - workflow phase definitions
 - artifact classes and structural schemas
