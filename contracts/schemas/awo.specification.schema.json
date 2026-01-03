@@ -1,0 +1,196 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://waveframelabs.org/schemas/awo.specification.schema.json",
+  "title": "AWO Specification Artifact",
+  "description": "Declares intended reasoning, scope, assumptions, and planned methods prior to execution. Enforces structural traceability without asserting correctness, validity, or authority.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "awo_version",
+    "artifact_id",
+    "phase",
+    "created_at",
+    "actors",
+    "cognitive_origin",
+    "scope",
+    "objectives",
+    "assumptions",
+    "governing_references",
+    "method_plan"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "awo.specification"
+    },
+
+    "awo_version": {
+      "type": "string",
+      "description": "AWO version this specification conforms to."
+    },
+
+    "artifact_id": {
+      "type": "string",
+      "description": "Globally unique identifier for this specification artifact."
+    },
+
+    "phase": {
+      "const": "specification"
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "actors": {
+      "type": "array",
+      "description": "Actors responsible for producing the specification.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor_id", "role", "ai_assisted"],
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["originator", "synthesizer"]
+          },
+          "ai_assisted": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "cognitive_origin": {
+      "type": "object",
+      "description": "Explicit disclosure of how this specification was generated.",
+      "required": ["generated_by", "human_engagement"],
+      "properties": {
+        "generated_by": {
+          "type": "string",
+          "enum": ["human", "ai", "hybrid"]
+        },
+        "human_engagement": {
+          "type": "string",
+          "enum": ["scan", "deep_read", "rewrite"],
+          "description": "Declared level of human engagement with AI-generated content."
+        },
+        "ai_models_used": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional list of AI models used in generating this specification."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "scope": {
+      "type": "object",
+      "description": "Explicit boundary of intended work.",
+      "required": ["in_scope", "out_of_scope"],
+      "properties": {
+        "in_scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "objectives": {
+      "type": "array",
+      "description": "Explicit goals or questions this work intends to address.",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "assumptions": {
+      "type": "array",
+      "description": "Assumptions relied upon in the planned work.",
+      "items": {
+        "type": "object",
+        "required": ["assumption_id", "statement", "justification_ref"],
+        "properties": {
+          "assumption_id": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "justification_ref": {
+            "type": "object",
+            "required": ["ref_type", "identifier"],
+            "properties": {
+              "ref_type": {
+                "type": "string",
+                "enum": ["internal_id", "uri", "doi"]
+              },
+              "identifier": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "governing_references": {
+      "type": "array",
+      "description": "References to governing doctrine or specifications (by link only).",
+      "items": {
+        "type": "object",
+        "required": ["reference_type", "reference_id"],
+        "properties": {
+          "reference_type": {
+            "type": "string",
+            "enum": ["doctrine", "specification", "policy"]
+          },
+          "reference_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "method_plan": {
+      "type": "object",
+      "description": "Declared plan for how work will be carried out.",
+      "required": ["planned_steps", "success_criteria"],
+      "properties": {
+        "planned_steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "success_criteria": {
+          "type": "array",
+          "description": "Explicit criteria for evaluating outcomes. Empty array implies exploratory work.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+
+  "additionalProperties": false
+}
