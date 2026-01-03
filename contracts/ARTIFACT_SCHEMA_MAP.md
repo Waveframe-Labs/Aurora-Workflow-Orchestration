@@ -1,24 +1,21 @@
 ---
 title: "AWO Artifact Schema Map"
+short_title: "AWO Schema Map"
 filetype: "documentation"
 type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-20"
-updated: "2025-12-27"
+updated: "2026-01-02"
 author: "Waveframe Labs"
 maintainer: "Waveframe Labs"
-license: "Apache-2.0"
+license: "CC-BY-4.0"
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting under human oversight; schema mappings derived from ARTIFACT_CLASSES.md & ARTIFACT_REQUIREMENTS.md; aligned to CONTRACT_INDEX.md and ARI Metadata Policy v2.0.0."
+ai_assistance_details: "Map revised with AI assistance; schema set and scope determined and approved by maintainer."
+policy_version: "ARI-Metadata-2.0.0"
 dependencies:
-  - "SCOPE.md"
-  - "INVARIANTS.md"
-  - "ROLES.md"
-  - "WORKFLOW_SPEC.md"
-  - "ARTIFACT_CLASSES.md"
-  - "ARTIFACT_REQUIREMENTS.md"
-  - "CONTRACT_INDEX.md"
+  - "DESIGN_ENVELOPE.md"
+  - "PHASE_TOPOLOGY.md"
   - "ARI Metadata Policy v2.0.0"
 anchors:
   - "AWO-ARTIFACT-SCHEMA-MAP-v2.0.0"
@@ -28,79 +25,85 @@ anchors:
 
 ## 1. Purpose
 
-This document defines the **authoritative mapping** between AWO artifact classes
-and the **schema identifiers used for machine validation & enforcement**.
+This document defines the **authoritative mapping** between AWO artifact classes and
+their corresponding **JSON Schemas** for structural validation.
 
-It formalizes *which artifact maps to which contract schema*, ensuring that:
+It exists to ensure that:
 
-- AWO remains methodology-first
-- enforcement contracts are traceable to normative definitions
-- downstream engines (CRI-CORE, validators, Forge workflows) have a single lookup source
+- AWO remains strictly **methodological (L1)**
+- Artifact expectations are **explicit and finite**
+- Downstream tooling (e.g., CRI-CORE, validators, Forge) has a **single source of truth**
 
-This document is **normative with respect to schema association**, not schema structure.
-
----
-
-## 2. Mapping Rules
-
-1. Each required AWO artifact class MUST have a schema.
-2. Optional artifacts MAY have schemas — if a schema exists, it is enforceable.
-3. Schema identifiers are stable, versioned separately from this mapping.
-4. Enforcement tools MUST reference this document as the **single source of truth**.
+This document is **normative with respect to artifact–schema association only**.  
+It does **not** define schema structure, validation logic, or enforcement behavior.
 
 ---
 
-## 3. Artifact Class → Schema Identifier Map
+## 2. Canonical Artifact Set (v2.0.0)
 
-| Artifact Class | Contract Key | Schema Filename | Requirement |
-|---|---|---|---|
-| A-1 Initiation Record | AWO-CONTRACT-A1 | `awo.initiation.schema.json` | Required |
-| A-2 Scope Definition | AWO-CONTRACT-A2 | `awo.scope.schema.json` | Required |
-| A-3 Evaluation Criteria | AWO-CONTRACT-A3 | `awo.evaluation.schema.json` | Required |
-| A-4 Contribution Artifact | AWO-CONTRACT-A4 | `awo.contribution.schema.json` | Required |
-| A-5 Reasoning Record | AWO-CONTRACT-A5 | `awo.reasoning.schema.json` | Required |
-| A-6 Review Report | AWO-CONTRACT-A6 | `awo.review.schema.json` | Required |
-| A-7 Issue Register | AWO-CONTRACT-A7 | `awo.issue_register.schema.json` | Required |
-| A-8 Approval Decision | AWO-CONTRACT-A8 | `awo.approval.schema.json` | Required |
-| A-9 Audit Report | AWO-CONTRACT-A9 | `awo.audit.schema.json` | Required |
-| A-10 Change Log Entry | AWO-CONTRACT-A10 | `awo.change_log.schema.json` | Optional |
-| A-11 Dependency Declaration | AWO-CONTRACT-A11 | `awo.dependency.schema.json` | Optional |
+AWO v2.0.0 defines **exactly five** canonical artifact classes.
+
+| Phase | Artifact Class | Schema Filename | Required |
+|-----|---------------|-----------------|----------|
+| Initiation | AWO Initiation Artifact | `awo.initiation.schema.json` | Yes |
+| Specification | AWO Specification Artifact | `awo.specification.schema.json` | Yes |
+| Execution | AWO Execution Artifact | `awo.execution.schema.json` | Yes |
+| Review | AWO Review Artifact | `awo.review.schema.json` | Yes |
+| Release | AWO Release Artifact | `awo.release.schema.json` | Yes |
 
 ---
 
-## 4. Enforcement Boundary
+## 3. Mapping Rules
 
-- AWO defines **what must exist**
-- CONTRACT_INDEX defines **which contracts exist**
-- Schema files define **validation structure**
-- CRI-CORE enforces them
-
-No contract may redefine methodology.
-No enforcement engine may infer missing schemas.
+1. Every AWO phase **must** have exactly one schema.
+2. Schemas are **structural only** and must remain non-normative.
+3. Artifact–schema mappings are **version-locked** to AWO releases.
+4. Enforcement engines **must not infer** artifacts not listed here.
+5. Tooling **must reference this file** as the canonical lookup source.
 
 ---
 
-## 5. Change Control
+## 4. Removal of Legacy Artifacts
 
-Changes require:
+The following artifact classes and schemas **do not exist** in AWO v2.0.0 and are intentionally removed:
 
-- update to this mapping document
-- update to CONTRACT_INDEX.md
-- major version bump if mappings change meaningfully
+- Scope Definition
+- Evaluation Criteria
+- Reasoning Record
+- Contribution Artifact
+- Approval Decision
+- Audit Report
+- Issue Register
+- Change Log Artifact
+- Dependency Declaration
 
-Schema version bumps alone **do not** require updates here.
+Any prior schemas associated with these classes are **non-canonical** and must not be used for validation or enforcement in v2.0.0.
 
 ---
 
-## 6. Compliance Statement
+## 5. Enforcement Boundary
 
-This document is valid only if its metadata complies with
-**ARI Metadata Policy v2.0.0**.
+- AWO defines **what artifacts must exist**
+- Schemas define **how those artifacts are structured**
+- CRI-CORE (L4) may validate presence, linkage, and completeness
+- No enforcement logic is defined or implied here
 
-Non-compliant metadata voids enforcement authority.
+AWO does not approve, reject, or legitimize artifacts.
+
+---
+
+## 6. Change Control
+
+Changes to this document require:
+
+- explicit revision
+- version bump (MINOR or MAJOR)
+- corresponding schema changes
+
+Schema-only updates **do not** require changes here unless the artifact set itself changes.
 
 ---
 
 <div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+  <sub>© 2026 Waveframe Labs — Governed under the Aurora Research Initiative (ARI)</sub>
 </div>
