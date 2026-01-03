@@ -10,11 +10,11 @@
     "artifact_id",
     "phase",
     "created_at",
+    "release_state",
     "actors",
     "release_meta",
     "manifest",
-    "integrity_attestation",
-    "terminal_attestation"
+    "integrity_attestation"
   ],
   "properties": {
     "artifact_type": {
@@ -38,6 +38,12 @@
       "format": "date-time"
     },
 
+    "release_state": {
+      "type": "string",
+      "enum": ["prepared", "frozen", "withdrawn"],
+      "description": "Declared lifecycle state of the release artifact."
+    },
+
     "actors": {
       "type": "array",
       "description": "Actors responsible for curating the release bundle.",
@@ -50,8 +56,8 @@
             "type": "string"
           },
           "role": {
-            "const": "curator",
-            "description": "Curator role responsible for assembling and freezing the release bundle."
+            "type": "string",
+            "enum": ["curator", "automated_curator"]
           },
           "ai_assisted": {
             "type": "boolean"
@@ -68,21 +74,18 @@
       "properties": {
         "version_tag": {
           "type": "string",
-          "description": "Semantic version identifier for this release bundle.",
           "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?$"
         },
         "release_intent": {
           "type": "string",
-          "enum": ["draft_preview", "peer_context", "production_context", "archival", "deprecation"],
-          "description": "Declared context for downstream consumers. Does not imply approval or validation."
+          "enum": ["draft_preview", "peer_context", "production_context", "archival", "deprecation"]
         },
         "target_audience": {
           "type": "string",
           "enum": ["internal", "ecosystem", "public"]
         },
         "license_declaration": {
-          "type": "string",
-          "description": "Optional license declaration applying to this bundle (e.g., SPDX identifier)."
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -90,7 +93,6 @@
 
     "manifest": {
       "type": "array",
-      "description": "Exhaustive list of artifacts included in this release bundle.",
       "minItems": 1,
       "items": {
         "type": "object",
@@ -118,16 +120,13 @@
 
     "integrity_attestation": {
       "type": "object",
-      "description": "Structural guarantee that the release bundle is complete and unmodified.",
       "required": ["bundle_complete", "upstream_modified"],
       "properties": {
         "bundle_complete": {
-          "type": "boolean",
-          "description": "Attestation that all referenced artifacts are accessible and included."
+          "type": "boolean"
         },
         "upstream_modified": {
-          "const": false,
-          "description": "Attestation that no upstream artifacts were altered during bundling."
+          "const": false
         }
       },
       "additionalProperties": false
@@ -135,7 +134,6 @@
 
     "terminal_attestation": {
       "type": "object",
-      "description": "Declaration that this artifact concludes the current workflow iteration.",
       "required": ["workflow_concluded"],
       "properties": {
         "workflow_concluded": {
@@ -145,6 +143,19 @@
       "additionalProperties": false
     }
   },
+
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "release_state": { "const": "frozen" }
+        }
+      },
+      "then": {
+        "required": ["terminal_attestation"]
+      }
+    }
+  ],
 
   "additionalProperties": false
 }
