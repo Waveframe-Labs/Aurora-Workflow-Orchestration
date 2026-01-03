@@ -23,14 +23,15 @@ anchors:
 
 ## 1. Purpose
 
-This document defines the **formal scope boundary** of
+This document defines the **formal scope boundary** of  
 **Aurora Workflow Orchestration (AWO) v2.0.0**.
 
-It establishes what AWO **defines**, what it **explicitly does not define**,
-and how it **interfaces** with upstream (doctrine / governance) and downstream
+It specifies what AWO **defines**, what it **explicitly does not define**,  
+and how it **interfaces** with upstream (doctrine / governance) and downstream  
 (enforcement / tooling) layers.
 
-This document is **normative** with respect to AWO’s methodological authority.
+This document is **normative with respect to AWO’s methodological domain only**.  
+It does not confer epistemic, institutional, or enforcement authority.
 
 ---
 
@@ -38,29 +39,30 @@ This document is **normative** with respect to AWO’s methodological authority.
 
 AWO defines and controls:
 
-- the **structural ordering** of research workflows,
-- required **workflow phases and transitions**,
-- required **artifact classes** per phase,
+- the **structural ordering** of governed workflows,
+- required **workflow phases and permitted transitions**,
+- required **artifact classes per phase**,
 - **structural completeness requirements** for artifacts,
 - **role participation constraints** per phase,
 - **linkage and reference requirements** enabling traceability.
 
-AWO does **not** define or adjudicate:
+AWO does **not** define, judge, or adjudicate:
 
 - epistemic legitimacy or truth,
 - semantic correctness of claims,
-- enforcement or verification outcomes,
+- enforcement or validation outcomes,
 - runtime execution behavior,
 - publication or dissemination decisions,
-- scientific validity of results.
+- scientific validity or merit of results.
 
-AWO defines **how work is recorded**, not **what conclusions are correct**.
+AWO defines **how work is recorded and structured**,  
+not **what conclusions are correct or accepted**.
 
 ---
 
 ## 3. Positive Scope (What AWO Controls)
 
-When a workflow is declared AWO-governed, AWO has authority over:
+When a workflow is declared AWO-governed, AWO has authority over **method structure only**, including:
 
 | Domain | AWO Authority |
 |------|---------------|
@@ -70,10 +72,10 @@ When a workflow is declared AWO-governed, AWO has authority over:
 | Role Participation | Which roles may act in which phases |
 | Traceability Enablement | Structural links enabling reconstruction |
 
-If AWO requires an artifact or declaration and it is missing,
+If AWO requires an artifact or declaration and it is missing,  
 the workflow is **structurally non-compliant**.
 
-AWO does **not** evaluate the content of those artifacts.
+AWO does **not** evaluate artifact content, conclusions, or correctness.
 
 ---
 
@@ -82,7 +84,7 @@ AWO does **not** evaluate the content of those artifacts.
 AWO MUST NOT:
 
 - perform enforcement or verification,
-- adjudicate scientific correctness,
+- adjudicate scientific correctness or legitimacy,
 - define epistemic doctrine or disclosure policy,
 - select tools, models, or implementation methods,
 - dictate repository layout or storage mechanisms,
@@ -90,7 +92,7 @@ AWO MUST NOT:
 
 These responsibilities belong to **ARI, NTD, NTS, CRI-CORE, and tooling layers**.
 
-AWO is **method only**, never execution or judgment.
+AWO is **method only**, never execution, judgment, or authority.
 
 ---
 
@@ -105,7 +107,7 @@ A workflow exits AWO scope when:
 
 - A **Release Artifact** is produced that freezes the workflow iteration.
 
-Any approval, attestation, audit, or enforcement activity occurs
+Any approval, attestation, audit, or enforcement activity occurs  
 **outside AWO scope**, even if it references AWO artifacts.
 
 ---
@@ -123,7 +125,7 @@ AWO defines:
 - the artifacts required at each phase,
 - the roles permitted to act in each phase.
 
-AWO does not define outcomes beyond Release.
+AWO defines **no outcomes beyond Release**.
 
 ---
 
@@ -163,8 +165,8 @@ AWO compliance does **not** imply:
 
 AWO ensures only that:
 
-> **a workflow can be reconstructed, inspected, and challenged
-without trust in the author.**
+> **a workflow can be reconstructed, inspected, and challenged  
+> without trust in the author.**
 
 ---
 
@@ -185,7 +187,7 @@ Clarifications that do not change meaning may be patch-level updates.
 
 ## 10. Compliance Requirement
 
-This document is valid only if its metadata complies with
+This document is valid only if its metadata complies with  
 **ARI Metadata Policy v2.0.0**.
 
 Non-compliance voids AWO scope authority.
