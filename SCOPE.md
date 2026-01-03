@@ -3,21 +3,18 @@ title: "AWO Scope Definition"
 filetype: "documentation"
 type: "specification"
 version: "2.0.0"
-status: "Active"
+status: "Draft"
 created: "2025-12-27"
-updated: "2025-12-27"
+updated: "2026-01-02"
 author: "Waveframe Labs"
 maintainer: "Waveframe Labs"
 license: "Apache-2.0"
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human governance; expanded from minimal version based on architectural alignment with ARI, NTD, NTS, and AWO methodology structure."
+ai_assistance_details: "AI-assisted drafting with full human governance; revised to align with AWO v2 Design Envelope and Minimal Phase Topology."
+policy_version: "ARI-Metadata-2.0.0"
 dependencies:
-  - "AWO_OVERVIEW.md"
-  - "WORKFLOW_SPEC.md"
-  - "ARTIFACT_CLASSES.md"
-  - "ARTIFACT_REQUIREMENTS.md"
-  - "INVARIANTS.md"
-  - "AR I Metadata Policy v2.0.0"
+  - "DESIGN_ENVELOPE.md"
+  - "PHASE_TOPOLOGY.md"
 anchors:
   - "AWO-SCOPE-v2.0.0"
 ---
@@ -29,54 +26,54 @@ anchors:
 This document defines the **formal scope boundary** of
 **Aurora Workflow Orchestration (AWO) v2.0.0**.
 
-It establishes what AWO **governs**, what it **does not govern**, and
-how it **interfaces** with upstream (doctrine/governance) and downstream
-(enforcement/tooling) layers.
+It establishes what AWO **defines**, what it **explicitly does not define**,
+and how it **interfaces** with upstream (doctrine / governance) and downstream
+(enforcement / tooling) layers.
 
-This document is **normative**.
+This document is **normative** with respect to AWO’s methodological authority.
 
 ---
 
 ## 2. Scope Summary
 
-AWO governs:
+AWO defines and controls:
 
-- structure of research workflows,
-- required workflow phases,
-- required artifact classes,
-- semantic requirements for artifacts,
-- role separation within workflows,
-- traceability and falsifiability logic.
+- the **structural ordering** of research workflows,
+- required **workflow phases and transitions**,
+- required **artifact classes** per phase,
+- **structural completeness requirements** for artifacts,
+- **role participation constraints** per phase,
+- **linkage and reference requirements** enabling traceability.
 
-AWO does **not** govern:
+AWO does **not** define or adjudicate:
 
-- organizational policy or institutional law (ARI),
-- disclosure rules for AI cognition (NTS),
-- execution, runtime behavior, or enforcement logic (CRI-CORE),
-- publication/formatting outputs (Forge),
-- case study scientific content (Waveframe, SHS, etc.).
+- epistemic legitimacy or truth,
+- semantic correctness of claims,
+- enforcement or verification outcomes,
+- runtime execution behavior,
+- publication or dissemination decisions,
+- scientific validity of results.
 
-AWO defines **how work is performed**, not **what results must be true**.
+AWO defines **how work is recorded**, not **what conclusions are correct**.
 
 ---
 
-## 3. Positive Scope (Things AWO Controls)
+## 3. Positive Scope (What AWO Controls)
 
-### AWO governs methodology when a workflow is declared compliant.
-
-Within an AWO-controlled workflow, the following are binding:
+When a workflow is declared AWO-governed, AWO has authority over:
 
 | Domain | AWO Authority |
-|-------|---------------|
-| Workflow Structure | Required phases + permitted transitions |
-| Artifact Taxonomy | Classes, purpose, relation structure |
-| Artifact Semantics | Minimum required content & metadata |
-| Traceability Model | Inputs, outputs, lineage requirements |
-| Falsifiability Conditions | Criteria must be pre-declared |
-| Role Participation | Who is allowed to act in each phase |
-| Independence | Separation of contribution/review/approval/audit |
+|------|---------------|
+| Workflow Structure | Required phases and allowed transitions |
+| Artifact Taxonomy | Required artifact types and relationships |
+| Structural Requirements | Mandatory fields, references, and declarations |
+| Role Participation | Which roles may act in which phases |
+| Traceability Enablement | Structural links enabling reconstruction |
 
-If AWO says something **must exist**, then a workflow is invalid without it.
+If AWO requires an artifact or declaration and it is missing,
+the workflow is **structurally non-compliant**.
+
+AWO does **not** evaluate the content of those artifacts.
 
 ---
 
@@ -86,81 +83,88 @@ AWO MUST NOT:
 
 - perform enforcement or verification,
 - adjudicate scientific correctness,
-- select tools, models, languages, or workflows,
-- dictate storage layout or repo structures,
-- alter or override ARI, NTD, or NTS requirements,
-- govern post-publication activity or dissemination.
+- define epistemic doctrine or disclosure policy,
+- select tools, models, or implementation methods,
+- dictate repository layout or storage mechanisms,
+- govern post-release activity or dissemination.
 
-These are handled by **CRI-CORE, ARI, NTS, and infrastructure layers.**
+These responsibilities belong to **ARI, NTD, NTS, CRI-CORE, and tooling layers**.
 
-AWO is **method only**, never execution.
+AWO is **method only**, never execution or judgment.
 
 ---
 
 ## 5. Workflow Boundary Model
 
-A workflow becomes AWO-governed when:
+A workflow enters AWO scope when:
 
-1. A research intention is declared, **and**
-2. An **Initiation Record (A-1)** is created with compliant metadata.
+1. An intentional unit of work is declared, **and**
+2. A compliant **Initiation Artifact** is created.
 
-A workflow exits AWO when:
+A workflow exits AWO scope when:
 
-- Approval (A-8) or Abandonment is recorded, **and**
-- An **Audit Report (A-9)** verifies artifact completeness.
+- A **Release Artifact** is produced that freezes the workflow iteration.
 
-Anything outside this start-to-exit window is **not AWO’s domain**.
-
----
-
-## 6. Lifecycle Scope Diagram
-```  
-[Outside Scope] → Initiation Record → SCOPE + CRITERIA → Contribution →
-Review → Approval → Audit → [Outside Scope]
-```  
-AWO governs where the arrows are fixed, traceable, and role-separated.  
+Any approval, attestation, audit, or enforcement activity occurs
+**outside AWO scope**, even if it references AWO artifacts.
 
 ---
 
-## 7. Upstream/Downstream Interaction
+## 6. Phase Boundary Alignment
+
+AWO governs exactly the following phases:
+
+```
+Initiation → Specification → Execution → Review → Release
+```
+
+AWO defines:
+- the order of these phases,
+- the artifacts required at each phase,
+- the roles permitted to act in each phase.
+
+AWO does not define outcomes beyond Release.
+
+---
+
+## 7. Upstream / Downstream Interaction
 
 ### Upstream (AWO must obey)
 
-| Layer | What It Controls |
+| Layer | Authority |
 |---|---|
-| **ARI Governance** | Institutional authority & metadata law |
-| **NTS** | Cognitive provenance & AI disclosure requirements |
-| **NTD Doctrine** | Epistemic rationale for transparency |
-| **Role Separation Charter** | Who may do what under conflict rules |
+| **ARI** | Institutional authority and governance |
+| **NTS** | AI disclosure and cognitive provenance |
+| **NTD** | Epistemic rationale |
+| **Role Separation Charter** | Conflict and independence rules |
 
-### Downstream (AWO enables but does not control)
+### Downstream (AWO enables)
 
-| Layer | AWO Provides Inputs To |
+| Layer | Uses AWO Artifacts For |
 |---|---|
-| **CRI-CORE** | Enforcement, attestation, runtime validation |
-| **Waveframe PDF Forge** | Converts artifacts to publications |
-| **Case Studies** | Research workflows executed using AWO |
-| **External Tools** | Validators, metadata linters, etc. |
+| **CRI-CORE** | Enforcement and validation |
+| **Forge / Stamp** | Publication and freezing |
+| **Case Studies** | Executed research workflows |
+| **External Tools** | Validation, linting, inspection |
 
-AWO is a **hinge layer** — upstream doctrine constrains it,
-downstream tooling operationalizes it.
+AWO is a **hinge layer**: constrained upstream, operationalized downstream.
 
 ---
 
 ## 8. Misinterpretation Safeguards
 
-AWO **does not imply**:
+AWO compliance does **not** imply:
 
 - research quality,
 - scientific correctness,
 - publication worthiness,
-- validity of conclusions,
-- credibility of researchers.
+- legitimacy of conclusions,
+- credibility of contributors.
 
 AWO ensures only that:
 
-> **a result can be independently reconstructed, audited,
-and falsified without trust in the author.**
+> **a workflow can be reconstructed, inspected, and challenged
+without trust in the author.**
 
 ---
 
@@ -168,27 +172,26 @@ and falsified without trust in the author.**
 
 Any change that modifies:
 
+- required phases,
 - required artifacts,
-- workflow phases,
 - role permissions,
-- invariants,
+- structural requirements,
 
-constitutes a **breaking methodological change** and requires a major
-version increment + public log.
+is a **breaking methodological change** requiring a major version increment.
 
-Clarifications that do not alter meaning may be patch-level updates.
+Clarifications that do not change meaning may be patch-level updates.
 
 ---
 
 ## 10. Compliance Requirement
 
-This document is valid only if its metadata complies
-with **ARI Metadata Policy v2.0.0**.
+This document is valid only if its metadata complies with
+**ARI Metadata Policy v2.0.0**.
 
-Any violation invalidates AWO-scope authority.
+Non-compliance voids AWO scope authority.
 
 ---
 
 <div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+  <sub>© 2026 Waveframe Labs — Governed under the Aurora Research Initiative (ARI)</sub>
 </div>
