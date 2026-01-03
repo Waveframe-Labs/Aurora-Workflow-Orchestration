@@ -10,6 +10,7 @@
     "artifact_id",
     "phase",
     "created_at",
+    "review_state",
     "target_refs",
     "actors",
     "review_context",
@@ -37,6 +38,12 @@
     "created_at": {
       "type": "string",
       "format": "date-time"
+    },
+
+    "review_state": {
+      "type": "string",
+      "enum": ["in_progress", "completed", "halted"],
+      "description": "Declared state of the review at time of artifact creation."
     },
 
     "target_refs": {
@@ -76,7 +83,7 @@
           },
           "role": {
             "type": "string",
-            "enum": ["validator", "curator"]
+            "enum": ["validator", "curator", "automated_validator"]
           },
           "ai_assisted": {
             "type": "boolean",
@@ -170,6 +177,29 @@
       "additionalProperties": false
     }
   },
+
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "review_outcome": {
+            "properties": {
+              "assessment": {
+                "enum": ["issues_identified", "significant_concerns"]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
 
   "additionalProperties": false
 }
