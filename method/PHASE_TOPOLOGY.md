@@ -4,7 +4,7 @@ short_title: "AWO Phase Definitions"
 filetype: "documentation"
 type: "method"
 version: "2.0.0"
-status: "Draft"
+status: "Active"
 created: "2026-01-02"
 updated: "2026-01-02"
 author: "Waveframe Labs"
@@ -14,8 +14,8 @@ ai_assisted: "partial"
 ai_assistance_details: "Draft refined with AI assistance; final structure, scope, and acceptance determined by maintainer."
 policy_version: "ARI-Metadata-2.0.0"
 dependencies:
-  - "AWO v2 — Design Envelope"
-  - "AWO v2 — Minimal Phase Topology"
+  - "AWO v2 — Design Envelope (Minimal)"
+
 ---
 
 # AWO v2 — Minimal Phase Topology
@@ -78,7 +78,7 @@ Capture the existence of an intentional unit of work.
 - Synthesizer
 
 ### Structural Constraints
-- Artifact must be complete and schema-conformant.
+- Artifact must be complete and conformant with declared structural schema.
 - No claims of correctness or legitimacy allowed.
 
 ### Forbidden in This Phase
