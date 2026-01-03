@@ -10,6 +10,7 @@
     "artifact_id",
     "phase",
     "created_at",
+    "execution_state",
     "specification_ref",
     "actors",
     "execution_log",
@@ -37,6 +38,12 @@
     "created_at": {
       "type": "string",
       "format": "date-time"
+    },
+
+    "execution_state": {
+      "type": "string",
+      "enum": ["in_progress", "completed", "halted"],
+      "description": "Declared state of execution at time of artifact creation."
     },
 
     "specification_ref": {
@@ -68,7 +75,7 @@
           },
           "role": {
             "type": "string",
-            "enum": ["executor", "originator"]
+            "enum": ["executor", "originator", "automated_executor"]
           },
           "ai_assisted": {
             "type": "boolean"
@@ -119,11 +126,18 @@
     "deviations": {
       "type": "object",
       "description": "Explicit declaration of whether execution deviated from the governing specification.",
-      "required": ["deviations_occurred"],
+      "required": [
+        "deviations_occurred",
+        "scope_conformance_declared"
+      ],
       "properties": {
         "deviations_occurred": {
           "type": "boolean",
           "description": "TRUE indicates execution deviated from specification; FALSE is an explicit attestation of fidelity."
+        },
+        "scope_conformance_declared": {
+          "type": "boolean",
+          "description": "Explicit declaration that execution did not expand beyond declared specification scope."
         },
         "deviation_details": {
           "type": "array",
