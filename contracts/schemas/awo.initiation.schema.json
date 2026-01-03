@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://waveframelabs.org/schemas/awo.initiation.schema.json",
+  "title": "AWO Initiation Artifact",
+  "description": "Declares the existence of an intentional unit of work. Captures intent, high-level scope boundary, initiating actors, and AI assistance disclosure without asserting legitimacy, correctness, or authority.",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "awo_version",
+    "artifact_id",
+    "phase",
+    "created_at",
+    "actors",
+    "intent",
+    "scope_boundary"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "awo.initiation"
+    },
+
+    "awo_version": {
+      "type": "string",
+      "description": "AWO version this initiation artifact conforms to."
+    },
+
+    "artifact_id": {
+      "type": "string",
+      "description": "Globally unique identifier for this initiation artifact."
+    },
+
+    "phase": {
+      "const": "initiation"
+    },
+
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "actors": {
+      "type": "array",
+      "description": "Actors initiating the unit of work.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor_id", "role", "ai_assisted"],
+        "properties": {
+          "actor_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["originator", "synthesizer"]
+          },
+          "ai_assisted": {
+            "type": "boolean",
+            "description": "TRUE indicates AI assistance was used in forming intent."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "intent": {
+      "type": "string",
+      "description": "Free-text declaration of the intended work or inquiry."
+    },
+
+    "scope_boundary": {
+      "type": "object",
+      "description": "High-level declaration of what this work is and is not intended to cover.",
+      "required": ["in_scope", "out_of_scope"],
+      "properties": {
+        "in_scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "notes": {
+      "type": "string",
+      "description": "Optional contextual notes or constraints declared at initiation time."
+    }
+  },
+
+  "additionalProperties": false
+}
