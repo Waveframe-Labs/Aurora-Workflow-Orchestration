@@ -5,96 +5,158 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-24"
-updated: "2025-12-24"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+updated: "2026-01-04"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with human oversight; terminology consolidated from AWO whitepaper v1.2.1, method spec lineage, NTS/NTD foundational docs, ARI governance structures, and artifact methodology."
+ai_assistance_details: "AI-assisted drafting with human oversight; terminology consolidated from AWO v2 specifications, contracts, schemas, and upstream ARI / NTS doctrine. Definitions constrained to language stabilization only."
+
 dependencies:
-  - "AWO_OVERVIEW.md"
+  - "OVERVIEW.md"
   - "INVARIANTS.md"
   - "WORKFLOW_SPEC.md"
-  - "ARTIFACT_CLASSES.md"
-  - "ARTIFACT_REQUIREMENTS.md"
+  - "ARTIFACT_SCHEMA_MAP.md"
   - "ROLES.md"
   - "PROVENANCE_MODEL.md"
+
 anchors:
   - "AWO-GLOSSARY-v2.0.0"
 ---
 
 # AWO Glossary
 
-Authoritative term definitions for **Aurora Workflow Orchestration (AWO)**.  
-If terminology conflicts with other AWO docs, **this glossary governs meaning**.
+This document stabilizes terminology used throughout **Aurora Workflow Orchestration (AWO) v2.0.0**.
+
+If language usage varies across documents, this glossary clarifies **intended meaning**,  
+but **does not override normative method specifications**.
+
+Method-defining authority remains with:
+- `INVARIANTS.md`
+- `WORKFLOW_SPEC.md`
+- `ROLES.md`
+- contract and schema definitions
 
 ---
 
 ## Core Concepts
 
-**Aurora Workflow Orchestration (AWO)** — methodology governing reproducible, artifact‑first research under role separation and verifiable traceability.
+**Aurora Workflow Orchestration (AWO)**  
+A methodological framework governing reproducible, artifact-first research through explicit phases, role separation, and traceable provenance.
 
-**Method vs. Enforcement** — AWO defines workflow rules; CRI‑CORE and tooling enforce them.
+**Method vs. Enforcement**  
+AWO defines *what must exist and when*.  
+Enforcement (validation, blocking, attestation) is delegated to downstream systems (e.g., CRI-CORE).
 
-**Governance Layer (ARI)** — upstream authority defining metadata law, role boundaries, and change control.
+**Governance Layer (ARI)**  
+Upstream authority governing metadata structure, role legitimacy, and change control.  
+AWO operates under ARI but does not redefine it.
 
-**Neurotransparency (NTD/NTS)** — epistemic requirement for traceable cognition. AWO integrates it at workflow level.
+**Neurotransparency (NTD / NTS)**  
+Upstream epistemic doctrine requiring disclosure of cognitive influence.  
+AWO integrates these requirements into workflow artifacts without redefining them.
 
-**Reproducibility (AWO Definition)** — ability to reconstruct **reasoning + decisions** using artifacts. Not merely rerunning experiments.
+**Reproducibility (AWO Definition)**  
+The ability to reconstruct **decisions, reasoning, and transformations** using artifacts — not merely to re-execute code or experiments.
 
 ---
 
 ## Artifacts
 
-**Artifact** — a persistent, role‑attributed file capturing epistemic state. If no artifact exists, the action is methodologically invisible.
+**Artifact**  
+A persistent, role-attributed record capturing epistemically relevant state.  
+Actions without artifacts are methodologically invisible.
 
-**Artifact Class** — category of artifact with defined purpose (A‑1 to A‑11).
+**Artifact Type**  
+One of the canonical AWO artifact categories defined by schema:
+- Initiation
+- Specification
+- Execution
+- Review
+- Release
 
-**Artifact Requirements** — semantic minima an artifact must contain to be valid.
+**Schema Compliance**  
+Conformance of an artifact to its structural JSON schema.  
+Schema compliance is necessary but not sufficient for methodological validity.
 
-**Supersession** — replacement with version retention. Originals are never discarded.
+**Supersession**  
+Replacement of an artifact by a later version while preserving lineage.  
+Artifacts are never silently modified.
 
-**Invalid Artifact** — missing required metadata, provenance, or role legality. Must not enter provenance chains.
+**Invalid Artifact**  
+An artifact that fails schema, provenance, or role constraints.  
+Invalid artifacts MUST NOT participate in workflow progression.
 
 ---
 
 ## Workflow Structure
 
-**Workflow Phase** — one of six required stages: Initiation → Scoping → Contribution → Review → Approval → Audit.
+**Workflow Phase**  
+One of the required AWO stages:
+Initiation → Specification → Execution → Review → Release
 
-**Entry Condition** — prerequisites required before entering a phase.
+**Entry Condition**  
+The minimum required artifacts or declarations to enter a phase.
 
-**Exit Condition** — required artifacts/decisions needed to transition forward.
+**Exit Condition**  
+The artifacts or attestations required to progress forward.
 
-**Transition** — movement between phases. Must be explicit and traceable.
+**Transition**  
+An explicit, traceable movement between phases.  
+Implicit transitions are invalid.
 
 ---
 
 ## Roles
 
-**Role** — procedural authority assignment. Defined in `ROLES.md`.
+**Role**  
+A formally defined locus of authority within a workflow.
 
-**Orchestrator** — initiates and scopes workflow; cannot approve or audit outputs.
+**Originator**  
+Declares intent and scope; may not approve or audit outcomes.
 
-**Contributor** — produces work artifacts and reasoning.
+**Contributor / Executor**  
+Produces substantive work artifacts under a governing specification.
 
-**Reviewer** — evaluates contributions using evaluation criteria.
+**Reviewer**  
+Evaluates artifacts against declared criteria without modifying them.
 
-**Approver** — grants acceptance or rejection; independent of contributor/reviewer.
+**Approver**  
+Declares acceptance or rejection outcomes; must be independent of contribution.
 
-**Auditor** — verifies invariants, provenance, and artifact lineage.
+**Auditor**  
+Verifies invariant compliance, provenance completeness, and role separation.
 
 ---
 
 ## Provenance & Verification
 
-**Provenance Chain** — complete linked lineage of artifacts proving how knowledge was formed. Defined in `PROVENANCE_MODEL.md`.
+**Provenance**  
+The complete, linked lineage describing where an artifact came from, how it was formed, and who acted.
 
-**Attestation** — formal approval event. Self‑attestation prohibited.
+**Provenance Chain**  
+A reconstructible graph of artifacts and references proving methodological history.
 
-**Checksum (SHA‑256)** — immutable identity fingerprint for artifact integrity.
+**Attestation**  
+A formal declaration that a workflow state meets required conditions.  
+Self-attestation is prohibited.
 
-**Evidence** — artifacts/logs that substantiate claims. No evidence → no claim.
+**Evidence**  
+Artifacts or records that substantiate claims.  
+Claims without evidence are methodologically void.
 
 ---
 
@@ -104,18 +166,20 @@ If terminology conflicts with other AWO docs, **this glossary governs meaning**.
 |---|---|
 | MUST | Mandatory without exception |
 | MUST NOT | Prohibited; violation invalidates workflow |
-| SHOULD | Strong recommendation; deviations must be justified |
-| MAY | Optional, discretionary |
+| SHOULD | Strong recommendation; deviations require justification |
+| MAY | Optional |
 | INVALID | Not eligible for workflow progression |
-| COMPLIANT | Meets structural, role, and provenance criteria |
+| COMPLIANT | Meets structural, role, and provenance requirements |
 
 ---
 
 ## Change Control
 
-Changes to term meaning require **major version increments**.  
-Clarifications may be minor revisions if meaning is unchanged.
+Changes that alter term meaning require a **major version increment**.  
+Clarifications that preserve meaning may be minor revisions.
 
 ---
 
-<div align="center"><sub>© 2025 Waveframe Labs — Governed by ARI</sub></div>
+<div align="center">
+  <sub>© 2026 Waveframe Labs — Independent Open-Science Research Entity</sub>
+</div>
