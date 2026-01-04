@@ -5,19 +5,33 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-25"
-updated: "2025-12-25"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+updated: "2026-01-04"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with human review; formalized for AWO v2 governance surface."
+ai_assistance_details: "AI-assisted drafting with full human governance; revised to align strictly with AWO v2 artifact set and enforcement boundaries."
+
 dependencies:
-  - "ARTIFACT_CLASSES.md"
-  - "ARTIFACT_REQUIREMENTS.md"
+  - "SCOPE.md"
   - "INVARIANTS.md"
   - "ROLES.md"
-  - "GLOSSARY.md"
-  - "ARI Metadata Policy v2.0.0"
+  - "WORKFLOW_SPEC.md"
+  - "ARTIFACT_SCHEMA_MAP.md"
+
 anchors:
   - "AWO-PROVENANCE-MODEL-v2.0.0"
 ---
@@ -26,142 +40,187 @@ anchors:
 
 ## 1. Purpose
 
-This document defines the provenance model for **Aurora Workflow Orchestration (AWO) v2.0.0** — how knowledge, artifacts, and decisions become **traceable, auditable, and reconstructible over time**.
+This document defines the **provenance model** for  
+**Aurora Workflow Orchestration (AWO) v2.0.0**.
 
-It answers the question:
+It specifies how AWO workflows ensure that every governed artifact is:
 
-> How do we prove where every research artifact came from, how it changed, and who acted when?
+- traceable to its origins,
+- attributable to responsible roles,
+- reconstructible by third parties,
+- and auditable without reliance on trust or narrative explanation.
 
-This document is **normative**.
-
----
-
-## 2. Provenance as Identity
-
-Under AWO, provenance is not metadata — it is **the identity of an artifact.**  
-Two files with different provenance are **not the same artifact**, even if byte-identical.
-
-Provenance MUST:
-
-- attribute authorship + acting role,
-- record inputs, dependencies, and upstream artifacts,
-- preserve historical continuity,
-- enable third-party replay without tacit knowledge.
-
-If provenance is lost, the artifact **ceases to be valid under AWO.**
+This document is **normative** with respect to provenance structure and requirements.
 
 ---
 
-## 3. Provenance Dimensions
+## 2. Provenance as Methodological Identity
 
-Every governed artifact MUST be traceable along five axes:
+Under AWO, provenance is not auxiliary metadata —  
+it is the **methodological identity** of an artifact.
 
-| Dimension | Must Capture |
-|----------|--------------|
-| **Origin** | Where did this artifact come from? (inputs, upstream artifacts) |
-| **Authority** | Which role produced it? Under what permissions? |
-| **Method** | What transformations or reasoning steps were applied? |
-| **Dependencies** | Which artifacts or external knowledge does it rely on? |
-| **Evolution** | How has it changed over time? What revision lineage exists? |
+Two artifacts with identical content but different provenance
+are **not equivalent** under AWO.
 
-No dimension may be omitted without explicit exemption.
+Loss of provenance renders an artifact **methodologically invalid**,
+regardless of correctness or utility.
 
 ---
 
-## 4. Provenance Requirements (Normative)
+## 3. Provenance Dimensions (Normative)
 
-### P-1 — All artifacts MUST include provenance references
+Every AWO-governed artifact MUST be traceable across the following dimensions:
 
-Referencing MUST be explicit, not implied.
+| Dimension | Requirement |
+|---------|-------------|
+| **Origin** | References to upstream artifacts or inputs |
+| **Role Authority** | Declared role under which the artifact was produced |
+| **Method Context** | Linkage to governing specification or execution context |
+| **Dependencies** | Explicit references to relied-upon artifacts or sources |
+| **Evolution** | Declared relationship to prior or superseded artifacts |
 
-Provenance fields appear in metadata OR in body sections clearly labeled.  
-
-### P-2 — Provenance must enable reconstruction
-
-A third party must be able to:
-
-- obtain all referenced artifacts,
-- replay transformations,
-- understand reasoning and assumptions,
-- reproduce or falsify outputs.
-
-### P-3 — No silent modification
-
-Artifacts MAY be superseded, never rewritten without record.
-
-### P-4 — Provenance binds role accountability
-
-Role = locus of authority.  
-Authority without attribution is invalid.
+No dimension may be implicitly inferred.
 
 ---
 
-## 5. Provenance Chain Model
+## 4. Provenance Scope in AWO v2
 
-Research under AWO forms a **provenance graph**, not a linear log.
+AWO v2 governs provenance **only for canonical workflow artifacts**:
+
+- `awo.initiation`
+- `awo.specification`
+- `awo.execution`
+- `awo.review`
+- `awo.release`
+
+Provenance for auxiliary materials (notes, drafts, external datasets)
+is **out of scope** unless explicitly incorporated into an AWO artifact.
+
+---
+
+## 5. Provenance Requirements (Binding)
+
+### P-1 — Explicit Referencing
+
+All provenance relationships MUST be explicit.
+
+Artifacts MUST reference upstream artifacts via:
+- internal identifiers,
+- URIs,
+- or DOIs.
+
+Implicit lineage is prohibited.
+
+---
+
+### P-2 — Reconstructibility
+
+Provenance MUST be sufficient for a third party to:
+
+- locate referenced artifacts,
+- understand declared transformations,
+- identify role participation,
+- and challenge or reproduce outcomes.
+
+AWO does not require reproducibility in practice —
+only that it is **methodologically possible**.
+
+---
+
+### P-3 — No Silent Mutation
+
+Artifacts MAY be superseded or deprecated,  
+but MUST NOT be altered without explicit lineage declaration.
+
+Historical provenance MUST remain accessible.
+
+---
+
+### P-4 — Role-Bound Accountability
+
+Every provenance assertion MUST be attributable to a declared role.
+
+Authority without attribution invalidates the artifact.
+
+---
+
+## 6. Provenance Graph Model
+
+AWO workflows form a **directed provenance graph**.
+
+- **Nodes**: AWO artifacts
+- **Edges**: reference, dependency, or supersession relationships
 
 ```
-Initiation → Scope → Contribution → Review → Approval → Audit
-          ↘ reasoning ↗ change logs ↘ dependency refs
+
+Initiation
+↓
+Specification
+↓
+Execution
+↓
+Review
+↓
+Release
 ```
 
-Edges represent **reference, evolution, or justification**.
+Branching and iteration are permitted **only when explicitly recorded**.
 
-Nodes are **artifacts**.
-
-Cycles are permitted only when documented as iterative updates.
-
----
-
-## 6. Provenance in Metadata
-
-Required metadata fields that contribute to provenance:
-
-- `title`
-- `version`
-- `author/maintainer`
-- `created` / `updated`
-- `ai_assisted` disclosure
-- `dependencies` list
-- `anchors` for stable citation
-
-Schemas may extend provenance, but never override.
+Cycles require documented justification.
 
 ---
 
 ## 7. Provenance and Neurotransparency
 
-NTS governs **cognitive provenance**.  
-AWO governs **workflow provenance**.
+AWO governs **workflow provenance**.  
+Neurotransparency (NTS) governs **cognitive influence**.
 
-Together they ensure:
+AWO artifacts MUST be structurally compatible with NTS disclosures,
+but AWO itself does not enforce or define NTS schemas.
 
-- *what* was done,
-- *how* it was done,
-- *who or what cognition influenced it*,
-- *how we know.*
-
-No AWO artifact is complete without NTS‑compliant disclosure once CRI‑CORE enforces attribution.
+Cognitive attribution supplements provenance — it does not replace it.
 
 ---
 
-## 8. Change Control
+## 8. Provenance in Schemas
 
-Updates to this model require:
+Machine-readable schemas may:
 
-- major version bump for semantic changes,
-- minor for clarifications.  
+- encode provenance fields,
+- validate reference structure,
+- enforce presence of declared links.
 
-Backward traceability MUST be preserved.
+Schemas MUST NOT:
+- redefine provenance meaning,
+- introduce new provenance requirements,
+- assert epistemic authority.
+
+The method layer remains authoritative.
 
 ---
 
-## 9. Compliance Statement
+## 9. Change Control
 
-Valid only if metadata complies with **ARI Metadata Policy v2.0.0**.
+Changes to provenance requirements constitute **methodological changes** and require:
+
+- a documented revision,
+- semantic versioning discipline,
+- preservation of backward traceability.
+
+Clarifications that do not alter meaning may be patch-level updates.
+
+---
+
+## 10. Compliance Statement
+
+This document is valid only when used in conjunction with
+the canonical AWO v2 specifications.
+
+Any artifact claiming AWO compliance while violating this model
+is methodologically invalid.
 
 ---
 
 <div align="center">
-<sub>© 2025 Waveframe Labs — Independent Open‑Science Research Entity</sub>
+  <sub>© 2026 Waveframe Labs — Governed under the Aurora Research Initiative (ARI)</sub>
 </div>
