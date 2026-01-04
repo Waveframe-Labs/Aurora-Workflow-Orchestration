@@ -10,6 +10,7 @@ updated: "2026-01-04"
 author:
   name: "Shawn C. Wright"
   email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
 
 maintainer:
   name: "Waveframe Labs"
