@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://waveframelabs.org/schemas/awo.initiation.schema.json",
   "title": "AWO Initiation Artifact",
-  "description": "Declares the existence of an intentional unit of work. Captures intent, high-level scope boundary, initiating actors, and AI assistance disclosure without asserting legitimacy, correctness, or authority.",
+  "description": "Declares the existence of an intentional unit of work. Captures intent, high-level scope boundary, initiating actor, and AI assistance disclosure without asserting legitimacy, correctness, or authority.",
   "type": "object",
   "required": [
     "artifact_type",
@@ -10,6 +10,8 @@
     "artifact_id",
     "phase",
     "created_at",
+    "is_root",
+    "mutable",
     "actors",
     "intent",
     "scope_boundary"
@@ -21,7 +23,8 @@
 
     "awo_version": {
       "type": "string",
-      "description": "AWO version this initiation artifact conforms to."
+      "description": "AWO version this initiation artifact conforms to.",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
     },
 
     "artifact_id": {
@@ -38,10 +41,21 @@
       "format": "date-time"
     },
 
+    "is_root": {
+      "const": true,
+      "description": "Indicates this artifact is the root of an AWO workflow."
+    },
+
+    "mutable": {
+      "const": false,
+      "description": "Initiation artifacts are immutable once created."
+    },
+
     "actors": {
       "type": "array",
       "description": "Actors initiating the unit of work.",
       "minItems": 1,
+      "maxItems": 1,
       "items": {
         "type": "object",
         "required": ["actor_id", "role", "ai_assisted"],
@@ -51,7 +65,7 @@
           },
           "role": {
             "type": "string",
-            "enum": ["originator", "synthesizer"]
+            "enum": ["workflow_initiator"]
           },
           "ai_assisted": {
             "type": "boolean",
@@ -75,15 +89,11 @@
         "in_scope": {
           "type": "array",
           "minItems": 1,
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         },
         "out_of_scope": {
           "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
         }
       },
       "additionalProperties": false
