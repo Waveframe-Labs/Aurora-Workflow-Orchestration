@@ -10,6 +10,9 @@
     "artifact_id",
     "phase",
     "created_at",
+    "initiation_ref",
+    "specification_ref",
+    "mutable",
     "release_state",
     "actors",
     "release_meta",
@@ -22,7 +25,8 @@
     },
 
     "awo_version": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
     },
 
     "artifact_id": {
@@ -38,26 +42,57 @@
       "format": "date-time"
     },
 
+    "initiation_ref": {
+      "type": "object",
+      "required": ["ref_type", "identifier"],
+      "properties": {
+        "ref_type": {
+          "type": "string",
+          "enum": ["internal_id", "uri", "doi"]
+        },
+        "identifier": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "specification_ref": {
+      "type": "object",
+      "required": ["ref_type", "identifier"],
+      "properties": {
+        "ref_type": {
+          "type": "string",
+          "enum": ["internal_id", "uri", "doi"]
+        },
+        "identifier": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "mutable": {
+      "const": false,
+      "description": "Release artifacts are immutable once created."
+    },
+
     "release_state": {
       "type": "string",
-      "enum": ["prepared", "frozen", "withdrawn"],
-      "description": "Declared lifecycle state of the release artifact."
+      "enum": ["prepared", "frozen", "withdrawn"]
     },
 
     "actors": {
       "type": "array",
-      "description": "Actors responsible for curating the release bundle.",
       "minItems": 1,
       "items": {
         "type": "object",
         "required": ["actor_id", "role", "ai_assisted"],
         "properties": {
-          "actor_id": {
-            "type": "string"
-          },
+          "actor_id": { "type": "string" },
           "role": {
             "type": "string",
-            "enum": ["curator", "automated_curator"]
+            "enum": ["auditor"]
           },
           "ai_assisted": {
             "type": "boolean"
@@ -69,12 +104,11 @@
 
     "release_meta": {
       "type": "object",
-      "description": "Descriptive metadata regarding the release context. Declarative only.",
       "required": ["version_tag", "release_intent", "target_audience"],
       "properties": {
         "version_tag": {
           "type": "string",
-          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?$"
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
         },
         "release_intent": {
           "type": "string",
@@ -107,7 +141,12 @@
           },
           "artifact_type": {
             "type": "string",
-            "enum": ["awo.initiation", "awo.specification", "awo.execution", "awo.review"]
+            "enum": [
+              "awo.initiation",
+              "awo.specification",
+              "awo.execution",
+              "awo.review"
+            ]
           },
           "inclusion_reason": {
             "type": "string",
