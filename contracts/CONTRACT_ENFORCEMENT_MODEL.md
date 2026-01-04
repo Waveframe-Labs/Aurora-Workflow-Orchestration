@@ -5,19 +5,33 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-27"
-updated: "2025-12-27"
-author: "Waveframe Labs"
-maintainer: "Shawn C. Wright"
+updated: "2026-01-04"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
 ai_assistance_details: "Structure and normative rules drafted with AI assistance under human governance direction."
+
 dependencies:
-  - "AWO_OVERVIEW.md"
-  - "WORKFLOW_SPEC.md"
-  - "INVARIANTS.md"
   - "ROLES.md"
+  - "INVARIANTS.md"
   - "ARTIFACT_CLASSES.md"
+  - "ARTIFACT_REQUIREMENTS.md"
   - "ARTIFACT_SCHEMA_MAP.md"
+
 anchors:
   - "AWO-CONTRACT-ENFORCEMENT-v2.0.0"
 ---
@@ -26,172 +40,193 @@ anchors:
 
 ## 1. Purpose
 
-This document defines **how AWO workflow contracts are enforced**,
-and which conditions **trigger validation**, **block progression**, or
-**invalidate workflow outcomes**.
+This document defines **the conditions under which AWO workflow contracts
+are considered structurally satisfied** under **Aurora Workflow Orchestration (AWO) v2.0.0**.
 
-This is the binding mechanism that will later be executed by **CRI-CORE**
-as the enforcement engine, but is **tool-agnostic and method-native**.
+It specifies:
 
-**This document is normative.**
+- what constitutes a contract in the AWO method layer,
+- what properties must hold for a contract to be satisfied,
+- and how downstream systems may interpret those conditions for enforcement.
+
+This document is **normative with respect to contractual conditions only**.
+It does **not** define execution behavior, runtime validation, or enforcement logic.
 
 ---
 
-## 2. Definition — Contract
+## 2. Definition — Contract (Method Layer)
 
-A **contract** in AWO is a *structural promise* that:
+A **contract** in AWO is a *methodological commitment* that asserts:
 
 1. A required artifact **exists**,  
-2. It is **complete** within its schema,  
-3. It is **traceable** to upstream context,  
-4. It is **role-compliant** under AWO roles,  
-5. It is **provably reconstructible** from records.
+2. The artifact is **structurally complete** according to its schema,  
+3. The artifact is **traceable** to upstream context,  
+4. Role participation is **declared and compliant**,  
+5. The workflow state is **reconstructible from records**.
 
-If any condition fails, the contract is **unfulfilled**.
+Failure to satisfy any condition renders the contract
+**methodologically unsatisfied**.
 
----
-
-## 3. Enforcement Surfaces
-
-Contracts apply to four surfaces:
-
-| Surface | Enforced Through | Failure Effect |
-|---|---|---|
-| Roles | ROLES.md | Blocks approval & audit |
-| Artifact Class | ARTIFACT_CLASSES.md | Missing artifact = invalid workflow |
-| Metadata | ARI Metadata Policy v2.0.0 | Artifact invalid until corrected |
-| Invariants | INVARIANTS.md | Workflow integrity compromised |
-
-No downstream artifact may proceed if previous surface contracts are unmet.
+No judgment of correctness, quality, or legitimacy is implied.
 
 ---
 
-## 4. Contract States
+## 3. Contractual Surfaces (Authoritative Sources)
 
-```
-UNVERIFIED → VERIFIED → APPROVED → ATTESTED
-⤺───────────┴───────────────⤼
-REVISION REQUIRED
-```
+AWO contracts derive authority from the following **method-layer sources**:
 
-State meanings:
+| Surface | Authoritative Source | Methodological Consequence |
+|------|---------------------|----------------------------|
+| Roles | `ROLES.md` | Role violations invalidate method compliance |
+| Artifact Classes | `ARTIFACT_CLASSES.md` | Missing required artifacts invalidate workflow |
+| Artifact Requirements | `ARTIFACT_REQUIREMENTS.md` | Incomplete artifacts are non-compliant |
+| Invariants | `INVARIANTS.md` | Invariant violations invalidate workflow structure |
+| Schema Mapping | `ARTIFACT_SCHEMA_MAP.md` | Schema mismatch breaks structural traceability |
 
-* **UNVERIFIED** — exists but not checked.
-* **VERIFIED** — schema and metadata valid.
-* **APPROVED** — passed review under correct role separation.
-* **ATTESTED** — auditor confirms invariant compliance.
-
-Attestation is **final state** for workflow validity.
+These sources **define conditions**, not enforcement behavior.
 
 ---
 
-## 5. Contract Validation Rules
+## 4. Contract Satisfaction (Non-Sequential)
 
-A contract is considered **valid** only if:
+AWO does **not** define contract lifecycle states or progression.
+
+Instead, a contract is evaluated as either:
+
+- **Structurally satisfied**, or
+- **Structurally unsatisfied**
+
+based solely on whether required conditions hold at the time of inspection.
+
+Any notion of sequencing, gating, or state transition
+is delegated to downstream enforcement systems.
+
+---
+
+## 5. Structural Satisfaction Conditions
+
+A contract associated with artifact `X` is **structurally satisfied** iff:
 
 ```
-HAS(metadata) AND
-HAS(schema-compliant-content) AND
-HAS(provenance-chain) AND
-ROLE_ASSIGNMENTS_VALID AND
-INVARIANTS_SATISFIED
+HAS(metadata)
+AND HAS(schema-compliant content)
+AND HAS traceable references
+AND role assignments comply with ROLES.md
+AND invariants in INVARIANTS.md are satisfied
 ```
 
 Formally:
 
 ```
-Contract(X) = valid
-↔
-∀ required_fields(X): exists(field) ∧ correct_type(field)
-∧ provenance(X) ≠ null
+Satisfied(X) ↔
+∀ required_fields(X): exists ∧ correct_type
+∧ provenance(X) is reconstructible
 ∧ roles(X) comply_with ROLES.md
-∧ invariants satisfy INVARIANTS.md
+∧ invariants_satisfied(X)
 ```
 
-If any condition is false → `Contract(X) = invalid`.
+Structural satisfaction does **not** imply approval, acceptance,
+or scientific validity.
 
 ---
 
-## 6. Enforcement Triggers
+## 6. Evaluation Contexts (Informative, Non-Normative)
 
-Validation MUST occur at:
+Structural contract evaluation commonly occurs when:
 
-| Event | Trigger Contract Checks |
-|---|---|
-| Workflow initiation | Metadata + initiation artifact |
-| Contribution commit | Artifact class + schema compliance |
-| Review event | Invariant + role separation |
-| Approval request | Provenance chain completeness |
-| Attestation request | Full contract suite |
+- an artifact is submitted for review,
+- a workflow snapshot is inspected,
+- a downstream system performs validation,
+- or an audit is requested.
 
-No workflow may reach approval without successful review.
-No workflow may reach attestation without successful approval **and audit**.
+AWO does **not** mandate when evaluation occurs,
+only what must be true when it does.
 
 ---
 
-## 7. Failure Modes
+## 7. Structural Failure Conditions
 
-| Failure | Result |
-|---|---|
-| Missing artifact | Workflow pauses until produced |
-| Role violation | Block + require reassignment |
-| Schema incomplete | Artifact invalid until fixed |
-| Provenance broken | Require reconstruction |
-| Invariant breach | Workflow invalidated; must restart from prior safe state |
+If a contract is structurally unsatisfied, one or more of the following apply:
 
-Critical rule:
+| Condition | Methodological Meaning |
+|---------|------------------------|
+| Missing artifact | Workflow is incomplete |
+| Role violation | Methodological invalidity |
+| Schema non-conformance | Structural insufficiency |
+| Broken traceability | Reconstruction failure |
+| Invariant breach | Workflow structure invalid |
 
-```
-Approval cannot supersede audit, and audit cannot repair missing provenance.
-```
-
----
-
-## 8. Contract Evidence
-
-Every contract MUST have reconstructible evidence:
-
-```
-
-contract_evidence/
-├── metadata.yaml
-├── schema.json
-├── artifact_reference
-├── role_assignments.log
-├── checksum
-└── audit_record (post-attestation)
-```
-
-CRI-CORE will later generate this structure automatically as proof.
+Remediation procedures, recovery steps, and enforcement responses
+are **explicitly out of scope** for AWO.
 
 ---
 
-## 9. Machine-Readable Contract Spec (for CRI-CORE)
+## 8. Contract Evidence (Conceptual)
 
-A workflow is **methodologically valid** if:
+For a contract to be evaluated, sufficient evidence must exist to reconstruct:
+
+- the artifact itself,
+- its metadata,
+- its schema expectations,
+- its role context,
+- and its traceability links.
+
+The representation, storage, and automation of this evidence
+are delegated to downstream tooling (e.g., CRI-CORE).
+
+No file structure, directory layout, or storage mechanism is defined here.
+
+---
+
+## 9. Machine-Readable Projection (Illustrative)
+
+Downstream systems may represent contract satisfaction using structures such as:
 
 ```json
 {
-  "metadata": "valid",
-  "schema": "complete",
-  "provenance": "intact",
+  "metadata": "present",
+  "schema": "conformant",
+  "traceability": "intact",
   "roles": "compliant",
-  "invariants": "satisfied",
-  "attestation": "completed"
+  "invariants": "satisfied"
 }
 ```
-Tooling MAY reject any commit not meeting minimal compliance.  
 
----  
+This example is **illustrative only** and does not constitute
+a normative machine contract.
 
-## 10. Future Enforcement Integration Path  
-| Stage                      | Actor                 | Mechanism       |
-| -------------------------- | --------------------- | --------------- |
-| Manual validation (v2)     | Human + workflow logs | Required now    |
-| Assisted validation (v3)   | Doc Guard + Stamp     | Early detection |
-| Automated enforcement (v4) | CRI-CORE              | Hard gate       |
+---
 
-This document is not execution logic, but the law that execution must enforce.  
+## 10. Enforcement Boundary
 
----  
-<div align="center"> <sub>© 2025 Waveframe Labs — Contract Enforcement Surface for AWO v2.0.0</sub> </div>
+AWO defines:
+
+- what contracts exist,
+- what conditions must hold for satisfaction,
+- and which documents authorize those conditions.
+
+AWO does **not**:
+
+- execute validation,
+- block workflow progression,
+- define recovery behavior,
+- or perform enforcement.
+
+All execution and enforcement responsibilities belong to downstream systems,
+including but not limited to **CRI-CORE**.
+
+---
+
+## 11. Future Integration Path (Non-Binding)
+
+| Stage | Actor | Interpretation |
+|-----|------|---------------|
+| Manual inspection | Humans | Current v2 usage |
+| Assisted validation | Doc Guard / Stamp | Early detection |
+| Automated enforcement | CRI-CORE | Hard gating |
+
+This roadmap is descriptive, not prescriptive.
+
+<div align="center">
+  <sub>© 2026 Waveframe Labs — Governed under the Aurora Research Initiative (ARI)</sub>
+</div>
