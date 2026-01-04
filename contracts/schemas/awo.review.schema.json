@@ -10,11 +10,13 @@
     "artifact_id",
     "phase",
     "created_at",
+    "initiation_ref",
+    "specification_ref",
+    "mutable",
     "review_state",
     "target_refs",
     "actors",
     "review_context",
-    "findings",
     "review_outcome",
     "mutation_attestation"
   ],
@@ -24,7 +26,8 @@
     },
 
     "awo_version": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
     },
 
     "artifact_id": {
@@ -40,15 +43,48 @@
       "format": "date-time"
     },
 
+    "initiation_ref": {
+      "type": "object",
+      "required": ["ref_type", "identifier"],
+      "properties": {
+        "ref_type": {
+          "type": "string",
+          "enum": ["internal_id", "uri", "doi"]
+        },
+        "identifier": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "specification_ref": {
+      "type": "object",
+      "required": ["ref_type", "identifier"],
+      "properties": {
+        "ref_type": {
+          "type": "string",
+          "enum": ["internal_id", "uri", "doi"]
+        },
+        "identifier": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "mutable": {
+      "const": false,
+      "description": "Review artifacts are observational and immutable."
+    },
+
     "review_state": {
       "type": "string",
-      "enum": ["in_progress", "completed", "halted"],
-      "description": "Declared state of the review at time of artifact creation."
+      "enum": ["in_progress", "completed", "halted"]
     },
 
     "target_refs": {
       "type": "array",
-      "description": "Artifacts being reviewed.",
       "minItems": 1,
       "items": {
         "type": "object",
@@ -72,22 +108,18 @@
 
     "actors": {
       "type": "array",
-      "description": "Actors performing the review.",
       "minItems": 1,
       "items": {
         "type": "object",
         "required": ["actor_id", "role", "ai_assisted"],
         "properties": {
-          "actor_id": {
-            "type": "string"
-          },
+          "actor_id": { "type": "string" },
           "role": {
             "type": "string",
-            "enum": ["validator", "curator", "automated_validator"]
+            "enum": ["reviewer"]
           },
           "ai_assisted": {
-            "type": "boolean",
-            "description": "TRUE indicates AI-assisted or automated analysis was used."
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -96,7 +128,6 @@
 
     "review_context": {
       "type": "object",
-      "description": "Declares how the review was conducted.",
       "required": ["method", "depth", "criteria_ref"],
       "properties": {
         "method": {
@@ -109,7 +140,6 @@
         },
         "criteria_ref": {
           "type": "object",
-          "description": "Reference to the criteria or standard used for evaluation.",
           "required": ["ref_type", "identifier"],
           "properties": {
             "ref_type": {
@@ -128,7 +158,6 @@
 
     "findings": {
       "type": "array",
-      "description": "Observations recorded during review.",
       "items": {
         "type": "object",
         "required": ["severity", "description"],
@@ -137,13 +166,8 @@
             "type": "string",
             "enum": ["info", "minor", "blocking", "critical"]
           },
-          "description": {
-            "type": "string"
-          },
-          "location_ref": {
-            "type": "string",
-            "description": "Optional reference to affected location in the target artifact."
-          }
+          "description": { "type": "string" },
+          "location_ref": { "type": "string" }
         },
         "additionalProperties": false
       }
@@ -151,23 +175,19 @@
 
     "review_outcome": {
       "type": "object",
-      "description": "Declared assessment outcome without asserting authority.",
       "required": ["assessment"],
       "properties": {
         "assessment": {
           "type": "string",
           "enum": ["no_issues_noted", "issues_identified", "significant_concerns"]
         },
-        "notes": {
-          "type": "string"
-        }
+        "notes": { "type": "string" }
       },
       "additionalProperties": false
     },
 
     "mutation_attestation": {
       "type": "object",
-      "description": "Structural attestation that no upstream artifacts were modified during review.",
       "required": ["mutation_performed"],
       "properties": {
         "mutation_performed": {
@@ -192,6 +212,7 @@
         }
       },
       "then": {
+        "required": ["findings"],
         "properties": {
           "findings": {
             "minItems": 1
