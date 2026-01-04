@@ -5,22 +5,35 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-20"
-updated: "2026-01-03"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+updated: "2026-01-04"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human oversight; revised to align with AWO v2 Design Envelope, Minimal Phase Topology, and Role Separation Charter v1.1.1."
-policy_version: "ARI-Metadata-2.0.0"
+ai_assistance_details: "AI-assisted drafting with full human oversight; revised to align with AWO v2 Design Envelope, Minimal Phase Topology, and Role Separation Charter v1.1.1."  
+
 dependencies:
   - "SCOPE.md"
   - "INVARIANTS.md"
   - "PHASE_TOPOLOGY.md"
-  - "METADATA_POLICY.md"
-  - "ROLE_SEPARATION_CHARTER.md"
+  - "Role Separation Charter v1.1.1 (ARI concept DOI)"
+
 anchors:
   - "AWO-ROLES-v2.0.0"
 ---
+
 
 # AWO Workflow Roles
 
