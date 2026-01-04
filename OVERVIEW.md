@@ -5,20 +5,33 @@ type: "specification"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-22"
-updated: "2025-12-22"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+updated: "2026-01-04"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human oversight; overview synthesized from AWO v2 normative specifications and aligned with ARI Metadata Policy v2.0.0."
+ai_assistance_details: "AI-assisted drafting with full human oversight; overview rewritten for clarity and boundary discipline following AWO v2 method lock."
+
+
 dependencies:
   - "SCOPE.md"
   - "INVARIANTS.md"
   - "WORKFLOW_SPEC.md"
-  - "ARTIFACT_CLASSES.md"
-  - "ARTIFACT_REQUIREMENTS.md"
   - "ROLES.md"
-  - "ARI Metadata Policy v2.0.0"
+
 anchors:
   - "AWO-OVERVIEW-v2.0.0"
 ---
@@ -27,187 +40,151 @@ anchors:
 
 ## 1. Purpose
 
-This document defines the **constitutional role** of
+This document provides a **high-level orientation** to  
 **Aurora Workflow Orchestration (AWO) v2.0.0**.
 
-It answers the question:
+It exists to answer a simple question:
 
-> “What *is* AWO, what authority does it claim, and what does it explicitly not do?”
+> *What is AWO, why does it exist, and how should it be understood within the Waveframe Labs ecosystem?*
 
-This document is **authoritative with respect to AWO’s scope, intent, and methodological boundaries,** but does not supersede detailed normative specifications.
+This document is **descriptive**, not normative.  
+All binding definitions, constraints, and requirements are specified in the
+dedicated AWO specifications referenced throughout.
 
 ---
 
 ## 2. What AWO Is
 
-AWO is a **methodological governance framework** for reproducible,
-AI-assisted research.
+AWO is a **methodological framework** for structuring reproducible,
+AI-assisted research workflows.
 
-It defines:
-- required workflow phases,
-- required artifact classes,
-- role separation constraints,
-- traceability and falsifiability invariants,
+It defines a shared method for:
 
-such that a research outcome can be **independently reconstructed,
-audited, and evaluated** without reliance on institutional trust,
-author reputation, or narrative explanation.
+- organizing research activity into explicit stages,
+- requiring persistent artifacts for epistemically relevant actions,
+- separating roles to preserve independence,
+- enabling traceability across decisions, inputs, and transformations.
 
-AWO governs **how knowledge is produced**, not what conclusions are reached.
+AWO governs **how work is recorded and structured**, not what conclusions are reached.
 
 ---
 
 ## 3. What AWO Is Not
 
-AWO explicitly **does not**:
+AWO explicitly does **not**:
 
 - execute workflows,
+- evaluate scientific correctness,
 - validate artifacts at runtime,
-- define file formats or directory structures,
-- prescribe tooling or CI/CD behavior,
+- define tooling, CI/CD, or infrastructure,
 - enforce compliance.
 
-These responsibilities are delegated to downstream systems
-(e.g. CRI-CORE).
+Execution, validation, and enforcement are handled by downstream systems
+(e.g., CRI-CORE and related tooling).
 
-AWO defines **methodology only**.
-
----
-
-## 4. Normative Authority
-
-AWO v2.0.0 is authoritative for:
-
-- workflow phase structure,
-- artifact class existence and meaning,
-- minimum semantic requirements of artifacts,
-- role eligibility and separation,
-- methodological invalidity conditions.
-
-All machine-enforceable contracts MUST derive from AWO specifications.
-No contract may introduce new methodological rules.
+AWO is **method only**.
 
 ---
 
-## 5. Reproducibility as Governance
+## 4. AWO’s Role in the Stack
 
-AWO treats reproducibility not as a reporting norm, but as a **governed process**.
+Within the Waveframe Labs ecosystem, AWO occupies a **hinge position**.
 
-A result is considered reproducible if—and only if—
-the artifacts defined by AWO are sufficient to:
+- **Upstream**, it is constrained by governance, doctrine, and disclosure frameworks.
+- **Downstream**, it provides structured inputs to enforcement engines,
+  validators, publication tooling, and case-study research.
 
-- reconstruct the decision process,
-- identify all inputs and transformations,
-- verify role independence,
-- assess falsifiability conditions,
-- audit invariant compliance.
-
-Trust is replaced by **procedure**.
+AWO does not replace governance or tooling.  
+It connects them by making research workflows **legible and reconstructible**.
 
 ---
 
-## 6. Workflow Model (Abstract)
+## 5. Reproducibility as a Structured Process
 
-An AWO workflow is a **finite, phase-structured process** composed of:
+AWO treats reproducibility as a **procedural property**, not a reporting norm.
 
-1. Initiation
-2. Scoping
-3. Contribution
-4. Review
-5. Approval
-6. Audit
+Rather than relying on post-hoc explanations, AWO requires that:
 
-Each phase:
-- has defined entry conditions,
-- produces required artifact classes,
-- restricts which roles may act.
+- epistemically relevant actions leave persistent artifacts,
+- those artifacts are role-bound and traceable,
+- downstream evaluation can occur without trust in the author.
 
-Details are specified in `WORKFLOW_SPEC.md`.
+Reproducibility emerges from **methodical structure**, not narrative authority.
 
 ---
 
-## 7. Artifact-Centered Methodology
+## 6. Artifact-Centered Methodology
 
 AWO is **artifact-first**.
 
-Every epistemically relevant action MUST result in a persistent artifact.
-If an action leaves no artifact, it is methodologically invisible.
+Every meaningful action in a workflow is expected to result in
+a persistent artifact that can be:
 
-Artifacts:
-- are role-bound,
-- are traceable to inputs,
-- may be reviewed, approved, or audited,
-- may be superseded but never silently altered.
+- referenced,
+- inspected,
+- reviewed,
+- superseded without being silently altered.
 
-Artifact classes and requirements are defined in:
-- `ARTIFACT_CLASSES.md`
-- `ARTIFACT_REQUIREMENTS.md`
+If an action leaves no artifact, it is methodologically opaque.
 
 ---
 
-## 8. Role Separation and Independence
+## 7. Roles and Independence
 
-AWO enforces epistemic independence through **role separation**.
+AWO relies on **explicit role separation** to preserve epistemic independence.
 
-No single role may:
-- define evaluation criteria,
-- produce substantive work,
-- approve its own outputs,
-- audit its own compliance.
+Roles are:
 
-Role definitions and constraints are normative and binding.
-Violations invalidate the workflow.
+- functional rather than institutional,
+- declared per action rather than inferred,
+- constrained to prevent self-review, self-approval, or self-attestation.
 
-See `ROLES.md`.
+Role definitions and constraints are specified in the dedicated roles specification.
+This document explains their purpose, not their rules.
 
 ---
 
-## 9. Falsifiability and Traceability
+## 8. Traceability and Falsifiability
 
-All AWO workflows MUST be falsifiable in principle.
+AWO workflows are designed to support **challenge and reconstruction**.
 
-This requires:
-- declared evaluation criteria,
-- explicit acceptance and rejection conditions,
-- traceable linkage between artifacts.
+A properly structured workflow should allow a third party to:
 
-AWO does not judge correctness.
-It governs **whether correctness can be evaluated**.
+- identify inputs and assumptions,
+- follow transformations and decisions,
+- understand how outcomes were produced,
+- determine how claims could be falsified or revised.
 
----
-
-## 10. Enforcement Boundary
-
-AWO defines:
-- *what must exist*,
-- *what must be true*,
-- *what invalidates a workflow*.
-
-AWO does **not** enforce.
-
-Automated validation, schema checking, and execution control
-are delegated to downstream enforcement layers.
+AWO does not judge correctness.  
+It structures workflows so correctness *can be evaluated*.
 
 ---
 
-## 11. Change Control
+## 9. Enforcement Boundary
 
-Changes to AWO specifications constitute methodological changes and MUST:
-- follow semantic versioning,
-- preserve backward traceability,
-- be explicitly documented.
+AWO defines **methodological expectations**, not enforcement behavior.
+
+Downstream systems may validate, block, attest, or automate,
+but those mechanisms operate *on* AWO artifacts —
+they are not defined *by* this document.
 
 ---
 
-## 12. Compliance Statement
+## 10. How to Use This Repository
 
-This document is institutionally valid only if its metadata complies
-with **ARI Metadata Policy v2.0.0**.
+This overview should be read as a **map**, not a rulebook.
 
-Any metadata violation invalidates this document.
+To understand AWO in detail:
+- consult scope and invariants for boundaries,
+- review the workflow specification for structure,
+- examine artifact classes and schemas for concrete expectations,
+- refer to contract documentation for machine-readable projections.
+
+This document exists to provide context and orientation,
+not to restate normative specifications.
 
 ---
 
 <div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+  <sub>© 2026 Waveframe Labs — Aurora Workflow Orchestration (AWO)</sub>
 </div>
