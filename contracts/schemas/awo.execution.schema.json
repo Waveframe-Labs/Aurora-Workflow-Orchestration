@@ -10,8 +10,10 @@
     "artifact_id",
     "phase",
     "created_at",
-    "execution_state",
+    "initiation_ref",
     "specification_ref",
+    "mutable",
+    "execution_state",
     "actors",
     "execution_log",
     "deviations"
@@ -23,7 +25,8 @@
 
     "awo_version": {
       "type": "string",
-      "description": "AWO version this execution artifact conforms to."
+      "description": "AWO version this execution artifact conforms to.",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
     },
 
     "artifact_id": {
@@ -40,10 +43,20 @@
       "format": "date-time"
     },
 
-    "execution_state": {
-      "type": "string",
-      "enum": ["in_progress", "completed", "halted"],
-      "description": "Declared state of execution at time of artifact creation."
+    "initiation_ref": {
+      "type": "object",
+      "description": "Reference to the initiating artifact for this workflow.",
+      "required": ["ref_type", "identifier"],
+      "properties": {
+        "ref_type": {
+          "type": "string",
+          "enum": ["internal_id", "uri", "doi"]
+        },
+        "identifier": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
 
     "specification_ref": {
@@ -62,6 +75,17 @@
       "additionalProperties": false
     },
 
+    "mutable": {
+      "const": false,
+      "description": "Execution artifacts are immutable once created."
+    },
+
+    "execution_state": {
+      "type": "string",
+      "enum": ["in_progress", "completed", "halted"],
+      "description": "Declared state of execution at time of artifact creation."
+    },
+
     "actors": {
       "type": "array",
       "description": "Actors participating in execution.",
@@ -75,7 +99,7 @@
           },
           "role": {
             "type": "string",
-            "enum": ["executor", "originator", "automated_executor"]
+            "enum": ["contributor"]
           },
           "ai_assisted": {
             "type": "boolean"
@@ -87,34 +111,23 @@
 
     "execution_log": {
       "type": "array",
-      "description": "Chronological record of execution steps performed.",
       "minItems": 1,
       "items": {
         "type": "object",
         "required": ["step_id", "description"],
         "properties": {
-          "step_id": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "tool_used": {
-            "type": "string",
-            "description": "Optional tool or system used in this step."
-          },
+          "step_id": { "type": "string" },
+          "description": { "type": "string" },
+          "tool_used": { "type": "string" },
           "output_ref": {
             "type": "object",
-            "description": "Optional reference to generated output.",
             "required": ["ref_type", "identifier"],
             "properties": {
               "ref_type": {
                 "type": "string",
                 "enum": ["internal_id", "uri", "doi"]
               },
-              "identifier": {
-                "type": "string"
-              }
+              "identifier": { "type": "string" }
             },
             "additionalProperties": false
           }
@@ -125,34 +138,23 @@
 
     "deviations": {
       "type": "object",
-      "description": "Explicit declaration of whether execution deviated from the governing specification.",
-      "required": [
-        "deviations_occurred",
-        "scope_conformance_declared"
-      ],
+      "required": ["deviations_occurred", "scope_conformance_declared"],
       "properties": {
         "deviations_occurred": {
-          "type": "boolean",
-          "description": "TRUE indicates execution deviated from specification; FALSE is an explicit attestation of fidelity."
+          "type": "boolean"
         },
         "scope_conformance_declared": {
           "type": "boolean",
-          "description": "Explicit declaration that execution did not expand beyond declared specification scope."
+          "description": "Declarative statement regarding whether execution exceeded the declared specification scope."
         },
         "deviation_details": {
           "type": "array",
-          "description": "Required if deviations_occurred is TRUE.",
           "items": {
             "type": "object",
             "required": ["description"],
             "properties": {
-              "description": {
-                "type": "string"
-              },
-              "related_spec_section": {
-                "type": "string",
-                "description": "Optional reference to affected specification section."
-              }
+              "description": { "type": "string" },
+              "related_spec_section": { "type": "string" }
             },
             "additionalProperties": false
           }
