@@ -1,46 +1,31 @@
 {
-  "$schema": "../schemas/awo.initiation.schema.json",
-  "artifact_id": "A1-INIT-2025-001",
-  "type": "initiation_record",
-  "version": "1.0.0",
-  "created": "2025-12-28",
-  "actor": {
-    "name": "Shawn C. Wright",
-    "role": "initiator",
-    "affiliation": "Waveframe Labs"
-  },
-  "workflow_intent": {
-    "title": "Stochastic Entropic Cosmology Exploration",
-    "objective": "Investigate whether entropy-driven expansion models remain stable when perturbed under stochastic initial conditions.",
-    "rationale": "Waveframe v4.0 suggests horizon-entropy coupling may govern expansion. This workflow will evaluate robustness of the model under noise."
-  },
-  "declared_scope": {
+  "artifact_type": "awo.initiation",
+  "awo_version": "2.0.0",
+  "artifact_id": "AWO-INIT-2025-001",
+  "phase": "initiation",
+  "created_at": "2025-12-28T00:00:00Z",
+  "is_root": true,
+  "mutable": false,
+  "actors": [
+    {
+      "actor_id": "shawn-c-wright",
+      "role": "workflow_initiator",
+      "ai_assisted": true
+    }
+  ],
+  "intent": "Investigate whether entropy-driven cosmological expansion models remain dynamically stable when subjected to stochastic perturbations in initial conditions, with the goal of assessing robustness claims made in prior Waveframe entropy–Hubble coupling work.",
+  "scope_boundary": {
     "in_scope": [
-      "entropy-Hubble coupling dynamics",
-      "perturbation stability analysis",
-      "ODE simulation and parameter variation",
-      "traceable computation + reproducible notebooks"
+      "entropy–Hubble coupling dynamics",
+      "stochastic perturbation analysis",
+      "stability behavior under Gaussian noise",
+      "reproducible numerical experimentation"
     ],
     "out_of_scope": [
       "dark matter modeling",
       "quantum gravity extensions",
-      "observational data fitting beyond Type-Ia supernovae baseline"
+      "precision observational fitting beyond baseline cosmology"
     ]
   },
-  "constraints": {
-    "initial_assumptions": [
-      "no geometry fundamental — expansion emergent",
-      "entropy defined S = π / H(t)^2",
-      "perturbations modeled as Gaussian noise ε(t) ~ N(0,σ²)"
-    ],
-    "resources": ["Python 3.11", "NumPy", "SciPy ODE solver", "Matplotlib"]
-  },
-  "links": {
-    "upstream": [],
-    "references": [
-      "Waveframe v4.0 manuscript (internal)",
-      "NTD v2.0.0 — epistemic rationale for transparency",
-      "AWO v2.0.0 normative documents"
-    ]
-  }
+  "notes": "This initiation declares exploratory intent only. No methodological claims, evaluation criteria, or execution commitments are asserted at this stage."
 }
