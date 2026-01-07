@@ -294,24 +294,29 @@ Tooling & enforcement sit below.
 
 ---
 
-## Current Status
+## Citation
 
-AWO v2.0.0 is:
+Please cite this specification when using AWO workflows in research.
 
-- **document‑complete**
-- **methodologically stable**
-- ready for **CRI‑CORE enforcement integration**
-- pending **example workflow runs + test workflows**
+### Preferred Citation  
 
-Case study integration will begin with **Waveframe v4.0 cosmology**.
+```
+Wright, Shawn C. (2026). Aurora Workflow Orchestration (AWO): Methodological Specification for AI-Assisted Research. Waveframe Labs. Version 2.0.0. https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration
+```
 
----
+## Bibtex  
 
-## Licensing & Attribution
-
-- Documents licensed under **Apache‑2.0**
-- AI assistance is transparently disclosed per **NTS & Metadata Policy**
-- Derived artifacts (e.g., PDF builds via Forge) must preserve metadata equivalence
+```  
+@misc{wright_awo_2026,
+  author       = {Wright, Shawn C. and Waveframe Labs},
+  title        = {Aurora Workflow Orchestration (AWO): Methodological Specification for AI-Assisted Research},
+  year         = {2026},
+  version      = {2.0.0},
+  publisher    = {Waveframe Labs},
+  url          = {[https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration)},
+  note         = {Governance Layer: Method Specification}
+}
+```
 
 ---
 
