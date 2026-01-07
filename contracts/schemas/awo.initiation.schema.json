@@ -5,11 +5,12 @@
   "description": "Declares the existence of an intentional unit of work. Captures intent, high-level scope boundary, initiating actor, and AI assistance disclosure without asserting legitimacy, correctness, or authority.",
   "type": "object",
   "required": [
-    "artifact_type",
-    "awo_version",
+    "type",
+    "version",
+    "status",
     "artifact_id",
     "phase",
-    "created_at",
+    "created",
     "is_root",
     "mutable",
     "actors",
@@ -17,28 +18,38 @@
     "scope_boundary"
   ],
   "properties": {
-    "artifact_type": {
-      "const": "awo.initiation"
+    "type": {
+      "const": "awo.initiation",
+      "description": "Replaces 'artifact_type' to align with ARI Metadata Policy."
     },
 
-    "awo_version": {
+    "version": {
       "type": "string",
-      "description": "AWO version this initiation artifact conforms to.",
+      "description": "Replaces 'awo_version' to align with ARI Metadata Policy (SemVer).",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"],
+      "default": "draft",
+      "description": "REQUIRED by Invariant I-2. Defines if the initiation is live or merely proposed."
     },
 
     "artifact_id": {
       "type": "string",
-      "description": "Globally unique identifier for this initiation artifact."
+      "format": "uuid",
+      "description": "Globally unique identifier (UUID)."
     },
 
     "phase": {
       "const": "initiation"
     },
 
-    "created_at": {
+    "created": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Replaces 'created_at' to align with standard YAML metadata keys."
     },
 
     "is_root": {
