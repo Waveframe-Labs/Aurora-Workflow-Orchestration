@@ -6,6 +6,7 @@ version: "2.0.0"
 status: "Active"
 created: "2025-12-25"
 updated: "2026-01-07"
+doi: "10.5281/zenodo.17013612"  
 
 author:
   name: "Shawn C. Wright"
