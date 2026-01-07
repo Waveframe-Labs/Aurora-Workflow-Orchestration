@@ -1,9 +1,9 @@
 {
-  "artifact_type": "awo.initiation",
-  "awo_version": "2.0.0",
+  "type": "awo.initiation",
+  "version": "2.0.0",
   "artifact_id": "AWO-INIT-2025-001",
   "phase": "initiation",
-  "created_at": "2025-12-28T00:00:00Z",
+  "created": "2025-12-28T00:00:00Z",
   "is_root": true,
   "mutable": false,
   "actors": [
