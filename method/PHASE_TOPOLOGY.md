@@ -1,21 +1,35 @@
 ---
 title: "AWO v2 — Minimal Phase Topology"
-short_title: "AWO Phase Definitions"
 filetype: "documentation"
-type: "method"
+type: "guidance"
 version: "2.0.0"
 status: "Active"
-created: "2026-01-02"
-updated: "2026-01-02"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
-license: "CC-BY-4.0"
-ai_assisted: "partial"
-ai_assistance_details: "Draft refined with AI assistance; final structure, scope, and acceptance determined by maintainer."
-policy_version: "ARI-Metadata-2.0.0"
-dependencies:
-  - "AWO v2 — Design Envelope (Minimal)"
+created: "2026-01-07"
+updated: "2026-01-07"
 
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
+license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
+ai_assisted: "partial"
+ai_assistance_details: "AI-assisted drafting under human supervision; human-controlled structure, terminology, and acceptance."
+
+dependencies:
+  - "../DESIGN_ENVELOPE_MINIMAL.md"
+
+anchors:
+  - "AWO-PHASE-TOPOLOGY-v2.0.0"
 ---
 
 # AWO v2 — Minimal Phase Topology
