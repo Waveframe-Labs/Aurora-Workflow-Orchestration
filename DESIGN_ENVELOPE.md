@@ -1,27 +1,38 @@
 ---
 title: "AWO v2 — Design Envelope (Minimal)"
-short_title: "AWO Design Envelope"
 filetype: "documentation"
-type: "architecture"
+type: "guidance"
 version: "2.0.0"
 status: "Active"
-created: "2026-01-02"
-updated: "2026-01-02"
+created: "2026-01-07"
+updated: "2026-01-07"
+
 author:
   name: "Shawn C. Wright"
   email: "swright@waveframelabs.org"
   orcid: "https://orcid.org/0009-0006-6043-9295"
-maintainer: "Waveframe Labs"
-license: "CC-BY-4.0"
-ai_assisted: "partial"
-ai_assistance_details: "Draft refined with multi-model AI assistance (ChatGPT, Gemini); final structure and acceptance determined by maintainer."
-policy_version: "ARI-Metadata-2.0.0"
-dependencies:
-  - "Aurora Research Initiative (ARI)"
-  - "Neurotransparency Doctrine (NTD)"
-  - "Neurotransparency Specification (NTS)"
 
----
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
+license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
+ai_assisted: "partial"
+ai_assistance_details: "AI-assisted drafting; human-reviewed structure, terminology, and acceptance."
+
+dependencies:
+  - "../ARI.md"
+  - "../NTD.md"
+  - "../NTS.md"
+
+anchors:
+  - "AWO-DESIGN-ENVELOPE-MINIMAL-v2.0.0"
+---  
 
 # AWO v2 — Design Envelope (Minimal)
 Scope: Aurora Workflow Orchestration (L1 — Method Layer)
