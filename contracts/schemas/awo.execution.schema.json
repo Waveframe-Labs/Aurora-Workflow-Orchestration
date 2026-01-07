@@ -5,11 +5,12 @@
   "description": "Records execution activity performed under a declared AWO Specification. Enforces structural traceability only; makes no semantic or normative judgments.",
   "type": "object",
   "required": [
-    "artifact_type",
-    "awo_version",
+    "type",
+    "version",
+    "status",
     "artifact_id",
     "phase",
-    "created_at",
+    "created",
     "initiation_ref",
     "specification_ref",
     "mutable",
@@ -19,18 +20,27 @@
     "deviations"
   ],
   "properties": {
-    "artifact_type": {
-      "const": "awo.execution"
+    "type": {
+      "const": "awo.execution",
+      "description": "Replaces 'artifact_type' to align with ARI Metadata Policy."
     },
 
-    "awo_version": {
+    "version": {
       "type": "string",
-      "description": "AWO version this execution artifact conforms to.",
+      "description": "Replaces 'awo_version' to align with ARI Metadata Policy (SemVer).",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"],
+      "default": "draft",
+      "description": "REQUIRED by Invariant I-2. Defines the lifecycle state of this record."
     },
 
     "artifact_id": {
       "type": "string",
+      "format": "uuid",
       "description": "Globally unique identifier for this execution artifact."
     },
 
@@ -38,9 +48,10 @@
       "const": "execution"
     },
 
-    "created_at": {
+    "created": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Replaces 'created_at' to align with standard YAML metadata keys."
     },
 
     "initiation_ref": {
@@ -83,7 +94,7 @@
     "execution_state": {
       "type": "string",
       "enum": ["in_progress", "completed", "halted"],
-      "description": "Declared state of execution at time of artifact creation."
+      "description": "Declared state of the WORK at time of artifact creation."
     },
 
     "actors": {
@@ -99,7 +110,8 @@
           },
           "role": {
             "type": "string",
-            "enum": ["contributor"]
+            "enum": ["contributor"],
+            "description": "Execution actors are contributors only; they cannot self-approve."
           },
           "ai_assisted": {
             "type": "boolean"
@@ -111,6 +123,7 @@
 
     "execution_log": {
       "type": "array",
+      "description": "High-level trace of execution steps. Do NOT include raw logs or code (Invariant I-1).",
       "minItems": 1,
       "items": {
         "type": "object",
