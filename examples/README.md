@@ -64,5 +64,5 @@ These examples intentionally avoid optional metadata for clarity.
 This directory supports understanding but does not impose obligations. The authoritative definitions and normative constraints are found in the specification documents located in the root of this repository.
 
 <div align="center">
-  <sub>© 2025 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
+  <sub>© 2026 Waveframe Labs — Independent Open-Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
 </div>
