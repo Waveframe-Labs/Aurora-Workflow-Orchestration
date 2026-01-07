@@ -5,11 +5,12 @@
   "description": "Records declared evaluation activity over upstream AWO artifacts. Enforces explicit disclosure of review method, depth, criteria, and observations without asserting authority or enforcement outcomes.",
   "type": "object",
   "required": [
-    "artifact_type",
-    "awo_version",
+    "type",
+    "version",
+    "status",
     "artifact_id",
     "phase",
-    "created_at",
+    "created",
     "initiation_ref",
     "specification_ref",
     "mutable",
@@ -21,26 +22,38 @@
     "mutation_attestation"
   ],
   "properties": {
-    "artifact_type": {
-      "const": "awo.review"
+    "type": {
+      "const": "awo.review",
+      "description": "Replaces 'artifact_type' to align with ARI Metadata Policy."
     },
 
-    "awo_version": {
+    "version": {
       "type": "string",
+      "description": "Replaces 'awo_version' to align with ARI Metadata Policy (SemVer).",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
     },
 
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"],
+      "default": "draft",
+      "description": "REQUIRED by Invariant I-2. Defines the lifecycle state of the artifact."
+    },
+
     "artifact_id": {
-      "type": "string"
+      "type": "string",
+      "format": "uuid",
+      "description": "Globally unique identifier for this review artifact."
     },
 
     "phase": {
       "const": "review"
     },
 
-    "created_at": {
+    "created": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Replaces 'created_at' to align with standard YAML metadata keys."
     },
 
     "initiation_ref": {
@@ -80,7 +93,8 @@
 
     "review_state": {
       "type": "string",
-      "enum": ["in_progress", "completed", "halted"]
+      "enum": ["in_progress", "completed", "halted"],
+      "description": "State of the review activity itself."
     },
 
     "target_refs": {
@@ -116,7 +130,8 @@
           "actor_id": { "type": "string" },
           "role": {
             "type": "string",
-            "enum": ["reviewer"]
+            "enum": ["reviewer"],
+            "description": "Strictly limited to 'reviewer' to separate from 'contributor' (Invariant I-4)."
           },
           "ai_assisted": {
             "type": "boolean"
@@ -191,7 +206,8 @@
       "required": ["mutation_performed"],
       "properties": {
         "mutation_performed": {
-          "const": false
+          "const": false,
+          "description": "Explicit attestation that the reviewer did not alter the target artifacts (Invariant I-3)."
         }
       },
       "additionalProperties": false
