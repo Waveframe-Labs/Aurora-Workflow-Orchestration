@@ -5,11 +5,12 @@
   "description": "Declares intended reasoning, scope, assumptions, and planned methods prior to execution. Enforces structural traceability without asserting correctness, validity, or authority.",
   "type": "object",
   "required": [
-    "artifact_type",
-    "awo_version",
+    "type",
+    "version",
+    "status",
     "artifact_id",
     "phase",
-    "created_at",
+    "created",
     "initiation_ref",
     "mutable",
     "actors",
@@ -21,33 +22,43 @@
     "method_plan"
   ],
   "properties": {
-    "artifact_type": {
-      "const": "awo.specification"
+    "type": {
+      "const": "awo.specification",
+      "description": "Replaces 'artifact_type' to align with ARI Metadata Policy."
     },
 
-    "awo_version": {
+    "version": {
       "type": "string",
-      "description": "AWO version this specification conforms to.",
-      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Replaces 'awo_version' to align with ARI Metadata Policy (SemVer)."
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"],
+      "default": "draft",
+      "description": "REQUIRED by Invariant I-2 (Deterministic Structure). Defines the lifecycle state."
     },
 
     "artifact_id": {
       "type": "string",
-      "description": "Globally unique identifier for this specification artifact."
+      "format": "uuid",
+      "description": "Stricter validation (UUID) to prevent collisions."
     },
 
     "phase": {
       "const": "specification"
     },
 
-    "created_at": {
+    "created": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Replaces 'created_at' to align with standard YAML metadata keys."
     },
 
     "initiation_ref": {
       "type": "object",
-      "description": "Reference to the initiating artifact for this workflow.",
+      "description": "Reference to the initiating artifact (Invariant I-8 Traceability).",
       "required": ["ref_type", "identifier"],
       "properties": {
         "ref_type": {
@@ -79,7 +90,8 @@
           },
           "role": {
             "type": "string",
-            "enum": ["workflow_initiator", "contributor"]
+            "enum": ["workflow_initiator", "contributor"],
+            "description": "Strictly limits roles to prevent self-approval (Invariant I-4)."
           },
           "ai_assisted": {
             "type": "boolean"
@@ -184,7 +196,10 @@
         "planned_steps": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string" }
+          "items": { 
+              "type": "string",
+              "description": "Descriptive steps only. Must NOT contain executable code or scripts (per Invariant I-1)."
+          }
         },
         "success_criteria": {
           "type": "array",
