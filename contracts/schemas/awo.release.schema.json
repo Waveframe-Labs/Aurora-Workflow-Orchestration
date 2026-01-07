@@ -5,11 +5,12 @@
   "description": "The terminal artifact of an AWO workflow cycle. Acts as a frozen manifest that bundles upstream artifacts for distribution or archival without asserting approval, legitimacy, or authority.",
   "type": "object",
   "required": [
-    "artifact_type",
-    "awo_version",
+    "type",
+    "version",
+    "status",
     "artifact_id",
     "phase",
-    "created_at",
+    "created",
     "initiation_ref",
     "specification_ref",
     "mutable",
@@ -20,26 +21,38 @@
     "integrity_attestation"
   ],
   "properties": {
-    "artifact_type": {
-      "const": "awo.release"
+    "type": {
+      "const": "awo.release",
+      "description": "Replaces 'artifact_type' to align with ARI Metadata Policy."
     },
 
-    "awo_version": {
+    "version": {
       "type": "string",
+      "description": "Replaces 'awo_version' to align with ARI Metadata Policy (SemVer).",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
     },
 
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"],
+      "default": "draft",
+      "description": "REQUIRED by Invariant I-2. Defines the lifecycle state of the artifact file."
+    },
+
     "artifact_id": {
-      "type": "string"
+      "type": "string",
+      "format": "uuid",
+      "description": "Globally unique identifier for this release artifact."
     },
 
     "phase": {
       "const": "release"
     },
 
-    "created_at": {
+    "created": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Replaces 'created_at' to align with standard YAML metadata keys."
     },
 
     "initiation_ref": {
@@ -79,7 +92,8 @@
 
     "release_state": {
       "type": "string",
-      "enum": ["prepared", "frozen", "withdrawn"]
+      "enum": ["prepared", "frozen", "withdrawn"],
+      "description": "State of the release process (prepared=draft, frozen=final)."
     },
 
     "actors": {
@@ -92,7 +106,8 @@
           "actor_id": { "type": "string" },
           "role": {
             "type": "string",
-            "enum": ["auditor"]
+            "enum": ["auditor"],
+            "description": "Release must be signed by an 'auditor', not a 'contributor' (Invariant I-4)."
           },
           "ai_assisted": {
             "type": "boolean"
@@ -130,7 +145,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["ref_type", "identifier", "artifact_type"],
+        "required": ["ref_type", "identifier", "type"],
         "properties": {
           "ref_type": {
             "type": "string",
@@ -139,14 +154,15 @@
           "identifier": {
             "type": "string"
           },
-          "artifact_type": {
+          "type": {
             "type": "string",
             "enum": [
               "awo.initiation",
               "awo.specification",
               "awo.execution",
               "awo.review"
-            ]
+            ],
+            "description": "Renamed from 'artifact_type' to match the property key in referenced files."
           },
           "inclusion_reason": {
             "type": "string",
@@ -165,7 +181,8 @@
           "type": "boolean"
         },
         "upstream_modified": {
-          "const": false
+          "const": false,
+          "description": "Must be false. Verifies no upstream artifacts were altered."
         }
       },
       "additionalProperties": false
