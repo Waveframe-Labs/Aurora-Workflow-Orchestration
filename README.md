@@ -2,335 +2,214 @@
 title: "Aurora Workflow Orchestration (AWO) — Repository Overview"
 filetype: "documentation"
 type: "readme"
-version: "2.0.0"  
-title: "Aurora Workflow Orchestration (AWO) — Repository Overview"
-filetype: "documentation"
-type: "readme"
 version: "2.0.0"
 status: "Active"
 created: "2025-12-25"
 updated: "2026-01-07"
+
 author:
   name: "Shawn C. Wright"
   email: "swright@waveframelabs.org"
   orcid: "https://orcid.org/0009-0006-6043-9295"
+
 maintainer:
   name: "Waveframe Labs"
   url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting under full human oversight; revised to align with AWO v2.0.0 method surface."
+ai_assistance_details: "AI-assisted drafting under full human oversight; aligned with AWO v2.0.0 method layer and ARI governance."
+
 anchors:
   - "AWO-README-v2.0.0"
 ---
 
-
 <p align="center">
-
   <img src="figures/AWO-v2-banner.png" alt="AWO Banner" width="100%">
-
 </p>
-
 
 # Aurora Workflow Orchestration (AWO)
 
-
 [![Waveframe Labs](https://img.shields.io/badge/WAVEFRAME%20LABS-Institutional%20Repository-FF6A00?style=flat)](https://waveframelabs.org)
-
-[![Governance: ARI Compliant](https://img.shields.io/badge/Governance-ARI%20Compliant-8A2BE2?style=flat)](https://github.com/Waveframe-Labs/Aurora-Research-Initiative)
-
-[![AWO Version](https://img.shields.io/badge/AWO%20Version-2.0.0-informational?style=flat)](#)
-
-[![Repository Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat)](#)
-
-[![ORCID](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-A6CE39?logo=orcid&logoColor=white)](https://orcid.org/0009-0006-6043-9295)
-
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-
+[![Governed Repository](https://img.shields.io/badge/Governance-ARI%20Compliant-8A2BE2?style=flat)](https://github.com/Waveframe-Labs/Aurora-Research-Initiative)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612)
+[![ORCID](https://img.shields.io/badge/ORCID-0009--0006--6043--9295-A6CE39?logo=orcid&logoColor=white)](https://orcid.org/0009-0006-6043-9295)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
+> Method layer of the Waveframe Labs governance stack.  
+> Defines **how research is conducted**, not what conclusions are reached.
 
-AWO defines **how research is conducted** within Waveframe Labs’ governance stack.  
+AWO provides the **normative methodological framework** for running reproducible, auditable, AI‑assisted research workflows.
 
-It establishes the methodological structure required for research to remain:
+It formalizes:
 
+- workflow phases  
+- artifact classes  
+- invariants  
+- contracts  
+- schema interfaces  
 
-- reproducible  
+AWO does **not** enforce execution — enforcement belongs to **CRI‑CORE**.
 
-- auditable  
-
-- role-separated  
-
-- artifact-first  
-
-- falsifiable  
-
-
-AWO does **not** enforce workflows or validate outputs; that authority belongs to **CRI-CORE**.
-
-
-All AWO v1.x materials are preserved under `/v1-archived/`.
-
+This repository contains the complete **AWO v2.0.0 methodology layer**, replacing all v1.x material now archived under `/v1-archived/`.
 
 ---
 
+## Purpose of AWO
 
-## Purpose
+AWO answers a single foundational question:
 
+**How must research be structured so that results remain independently reconstructible, auditable, and epistemically valid?**
 
-AWO answers a single governing question:
-
-
-> **What structure must a research workflow follow so its results can be independently reconstructed and evaluated long after creation?**
-
-
-To achieve that, AWO governs:
-
+AWO governs:
 
 - workflow phase ordering  
+- artifact production requirements  
+- role separation boundaries  
+- reproducibility + falsifiability invariants  
+- machine‑readable contract surface for CRI‑CORE  
 
-- required artifacts at each phase  
-
-- role separation and authority boundaries  
-
-- traceability and provenance expectations  
-
-- the machine-readable contract surface used by CRI-CORE  
-
-
-It does **not** determine correctness, enforce execution, or prescribe scientific conclusions.
-
+AWO does **not** run workflows or judge correctness.
 
 ---
-
 
 ## Where to Start
 
+Recommended reading path:
 
-Readers new to AWO should review documents in this order:
-
-
-1. **AWO_OVERVIEW.md** — purpose and positioning
-
-2. **SCOPE.md** — what AWO governs and what it does not
-
-3. **WORKFLOW_SPEC.md** — required phases & transitions
-
-4. **ARTIFACT_CLASSES.md** — canonical artifact categories
-
-5. **ARTIFACT_REQUIREMENTS.md** — semantic minima for each artifact
-
-6. **INVARIANTS.md** — governing validity rules  
-
-7. **ROLES.md** — procedural authority and separation rules  
-
-8. **GLOSSARY.md** — controlled vocabulary
-
-9. **PROVENANCE_MODEL.md** — traceability and chain-of-identity model
-
-10. **contracts/** — schemas and contract mappings for machine validation
-
-
-Once these are understood, a workflow can be executed either manually or by CRI-CORE.
-
+1. `AWO_OVERVIEW.md`  
+2. `SCOPE.md`  
+3. `WORKFLOW_SPEC.md`  
+4. `ARTIFACT_CLASSES.md`  
+5. `ARTIFACT_REQUIREMENTS.md`  
+6. `INVARIANTS.md` and `ROLES.md`  
+7. `GLOSSARY.md`, `PROVENANCE_MODEL.md`, `NEUROTRANSPARENCY.md`  
+8. `/contracts/` — schemas & contract surfaces
 
 ---
 
-
-## Workflow Structure
-
-
-The required AWO workflow progression is:
-
+## Method Execution Flow
 
 ```
-
 Initiation → Scoping → Contribution → Review → Approval → Audit
-
 ```
 
+Phase progression requires:
 
-Each phase:
+- required artifacts exist  
+- metadata is complete  
+- provenance is intact  
+- role separation is enforced  
 
-
-- has defined entry/exit conditions  
-
-- produces required artifacts  
-
-- is bound to specific roles  
-
-- must maintain provenance continuity  
-
-
-Missing artifacts or invalid role attribution render the workflow **non-compliant**.
-
+Self‑attestation and silent revision are prohibited.
 
 ---
 
+## Relation to Waveframe Governance Stack
+
+| Layer | System | Responsibility |
+|------|--------|----------------|
+| 0 | NTD / NTS | Epistemic disclosure & cognitive provenance |
+| 1 | ARI | Governance, metadata law, authority boundaries |
+| 2 | **AWO** | **Methodology specification (this repo)** |
+| 3 | CRI‑CORE | Enforcement + attestation engine |
+| 4 | Case Studies | Applications (e.g., Waveframe v4.0) |
+
+---
 
 ## Repository Structure
 
-
 ```
-
-
 /
-
-├── contracts/ # Machine-readable contract layer
-
-│ ├── CONTRACT_INDEX.md
-
-│ ├── ARTIFACT_SCHEMA_MAP.md
-
-│ └── schemas/ # JSON schemas (initiation, review, execution, release, spec)
-
+├── contracts/
+│   ├── CONTRACT_INDEX.md
+│   ├── ARTIFACT_SCHEMA_MAP.md
+│   └── schemas/
+│       ├── awo.initiation.schema.json
+│       ├── awo.execution.schema.json
+│       ├── awo.review.schema.json
+│       ├── awo.specification.schema.json
+│       └── awo.release.schema.json
 │
-
-├── docs/ # User-facing support material
-
-│ ├── ONBOARDING_GUIDE.md
-
-│ ├── FAQ.md
-
-│ └── CHANGE_LOG.md
-
+├── docs/
+│   ├── ONBOARDING_GUIDE.md
+│   ├── FAQ.md
+│   └── CHANGE_LOG.md
 │
-
 ├── examples/
-
-│ └── awo.initiation.example.json
-
+│   └── awo.initiation.example.json
 │
-
 ├── method/
-
-│ └── PHASE_TOPOLOGY.md # Canonical structural model for workflow phases
-
+│   ├── PHASE_TOPOLOGY.md
+│   └── README.md
 │
-
-├── v1-archived/ # Deprecated AWO v1.x documents
-
+├── v1-archived/
+│   (historical materials)
 │
-
-├── ARTIFACT_CLASSES.md
-
-├── ARTIFACT_REQUIREMENTS.md
-
-├── DESIGN_ENVELOPE.md
-
-├── GLOSSARY.md
-
-├── INVARIANTS.md
-
-├── NEUROTRANSPARENCY.md
-
-├── OVERVIEW.md
-
-├── PROVENANCE_MODEL.md
-
-├── ROLES.md
-
-├── SCOPE.md
-
-├── SECURITY.md
-
+├── ADR/
+│   ├── README.md
+│   └── template.md
+│
+├── CITATION.cff
 ├── LICENSE
-
-└── awo.manifest.json
-
+├── SECURITY.md
+└── README.md
 ```
 
-
 ---
 
+## Licensing & Attribution
 
-## Relationship to Other Layers
-
-
-| Layer | Component | Responsibility |
-
-|------|-----------|----------------|
-
-| 0 | NTD / NTS | Epistemic disclosure & attribution law |
-
-| 1 | ARI | Governance, metadata, authority, invariants |
-
-| 2 | **AWO (this repo)** | **Methodology specification** |
-
-| 3 | CRI-CORE | Validation, attestation, enforcement |
-
-| 4 | Case Studies | Application of workflows (e.g., Waveframe v4.0) |
-
-
-- AWO **receives governance** from ARI  
-
-- AWO **exports contracts** to CRI-CORE  
-
-- Tooling does not modify AWO’s meaning  
-
-
----
-
-
-## Status
-
-
-As of **v2.0.0**:
-
-
-- Method layer is **complete**
-
-- Contracts and schemas are **aligned**
-
-- Example artifacts exist
-
-- User-facing documentation is updated
-
-- Metadata normalization pending final pass
-
-- CHANGE_LOG will be generated before tagging the release
-
-
-Integration work resumes in CRI-CORE next.
-
+- All material is licensed under **Apache‑2.0**
+- AI assistance is disclosed per ARI + NTS requirements
+- Derived artifacts must preserve metadata and provenance chains
 
 ---
 
 ## Citation
 
-Please cite this specification when using AWO workflows in research.
+If you use AWO v2.0.0 in academic writing, tooling design, or reproducible-workflow research, please cite:
 
-###  Preferred Citation
-```  
-    Wright, Shawn C. (2026). Aurora Workflow Orchestration (AWO): Methodological Specification for AI-Assisted Research. Waveframe Labs. Version 2.0.0. https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration
-```  
+CFF (preferred)  
+```
+cff-version: "1.2.0"
+message: "If you use this methodology, please cite it."
+title: "Aurora Workflow Orchestration (AWO)"
+version: "2.0.0"
+doi: "10.5281/zenodo.17013612"
+authors:
+  - family-names: "Wright"
+    given-names: "Shawn C."
+    orcid: "https://orcid.org/0009-0006-6043-9295"
+```
 
-## BibTeX
+## Bibtex 
 
 ```
-@misc{wright_awo_2026,
-  author       = {Wright, Shawn C. and Waveframe Labs},
-  title        = {Aurora Workflow Orchestration (AWO): Methodological Specification for AI-Assisted Research},
-  year         = {2026},
-  version      = {2.0.0},
+@software{AWO_v2_0_0,
+  author       = {Wright, Shawn C.},
+  title        = {Aurora Workflow Orchestration (AWO) v2.0.0},
+  month        = jan,
+  year         = 2026,
   publisher    = {Waveframe Labs},
-  url          = {[https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration](https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration)},
-  note         = {Governance Layer: Method Specification}
+  doi          = {10.5281/zenodo.17013612},
+  url          = {https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration}
 }
 ```
-## Licensing & Status
 
-**Status:** Active (v2.0.0) **License:** Apache License 2.0
+---  
 
-This repository is document-complete. Workflows defined here are ready for integration with the CRI-CORE enforcement engine.
+<p align="center">
+  <sub><strong>© 2026 Waveframe Labs</strong> · Independent Open-Science Research Entity · 
+  <a href="https://orcid.org/0009-0006-6043-9295">ORCID: 0009-0006-6043-9295</a> · 
+  <a href="https://doi.org/10.5281/zenodo.17013612">DOI: 10.5281/zenodo.17013612</a></sub>
+</p>
 
-AI assistance is disclosed in accordance with the **ARI Metadata Policy v2.0.0.**
-
----
-
-
-<div align="center">
-
-  <sub>© 2025 Waveframe Labs — Independent Open‑Science Research Entity • Governed under the Aurora Research Initiative (ARI)</sub>
-
-</div> 
+<p align="center">
+  <sub>Governed under the <a href="https://github.com/Waveframe-Labs/Aurora-Research-Initiative">Aurora Research Initiative (ARI)</a></sub>
+</p>
