@@ -1,46 +1,81 @@
 {
-  "manifest_version": "1.0.0",
+  "manifest_version": "1.0.1",
   "awo_version": "2.0.0",
   "status": "active",
-  "updated": "2025-12-22",
-  "author": "Waveframe Labs",
-  "maintainer": "Waveframe Labs",
+  "updated": "2026-01-07",
+
+  "author": {
+    "name": "Shawn C. Wright",
+    "email": "swright@waveframelabs.org",
+    "orcid": "https://orcid.org/0009-0006-6043-9295"
+  },
+
+  "maintainer": {
+    "name": "Waveframe Labs",
+    "url": "https://waveframelabs.org"
+  },
+
   "license": "Apache-2.0",
+
   "governance": {
     "governing_body": "Aurora Research Initiative (ARI)",
     "metadata_policy": "ARI Metadata Policy v2.0.0",
-    "role_charter": "Role Separation Charter v1.1.1"
+    "role_charter": "Role Separation Charter v1.1.1",
+    "ntd_reference": "Neurotransparency Doctrine (concept DOI)",
+    "nts_reference": "Neurotransparency Specification (concept DOI)"
   },
+
   "scope": {
     "definition": "SCOPE.md",
     "invariants": "INVARIANTS.md",
     "roles": "ROLES.md",
-    "workflow": "WORKFLOW_SPEC.md"
+    "workflow": "WORKFLOW_SPEC.md",
+    "provenance": "PROVENANCE_MODEL.md"
   },
+
   "artifacts": {
     "classes": "ARTIFACT_CLASSES.md",
     "requirements": "ARTIFACT_REQUIREMENTS.md"
   },
+
   "contracts": {
     "index": "contracts/CONTRACT_INDEX.md",
     "schema_map": "contracts/ARTIFACT_SCHEMA_MAP.md",
     "schemas_path": "contracts/schemas/",
-    "required_contracts": [
-      "AWO-CONTRACT-A1",
-      "AWO-CONTRACT-A2",
-      "AWO-CONTRACT-A3",
-      "AWO-CONTRACT-A4",
-      "AWO-CONTRACT-A5",
-      "AWO-CONTRACT-A6",
-      "AWO-CONTRACT-A7",
-      "AWO-CONTRACT-A8",
-      "AWO-CONTRACT-A9"
-    ],
-    "optional_contracts": [
-      "AWO-CONTRACT-A10",
-      "AWO-CONTRACT-A11"
+    "active_contracts": [
+      {
+        "id": "AWO-CONTRACT-A1",
+        "artifact": "Initiation",
+        "schema": "awo.initiation.schema.json",
+        "phase": "Initiation"
+      },
+      {
+        "id": "AWO-CONTRACT-A2",
+        "artifact": "Specification",
+        "schema": "awo.specification.schema.json",
+        "phase": "Specification"
+      },
+      {
+        "id": "AWO-CONTRACT-A3",
+        "artifact": "Execution",
+        "schema": "awo.execution.schema.json",
+        "phase": "Execution"
+      },
+      {
+        "id": "AWO-CONTRACT-A4",
+        "artifact": "Review",
+        "schema": "awo.review.schema.json",
+        "phase": "Review"
+      },
+      {
+        "id": "AWO-CONTRACT-A5",
+        "artifact": "Release",
+        "schema": "awo.release.schema.json",
+        "phase": "Release"
+      }
     ]
   },
+
   "enforcement_boundary": {
     "defines": [
       "methodology",
@@ -50,15 +85,18 @@
     "does_not_define": [
       "execution",
       "automation",
-      "enforcement logic"
+      "enforcement logic",
+      "runtime validation engines"
     ],
     "enforced_by": [
       "CRI-CORE"
     ]
   },
+
   "ai_indexing": {
     "machine_readable": true,
     "contract_driven": true,
-    "schema_first": true
+    "schema_first": true,
+    "provenance_aware": true
   }
 }
