@@ -4,17 +4,31 @@ filetype: "documentation"
 type: "specification"
 version: "2.0.0"
 status: "Active"
-created: "2025-12-27"
-updated: "2026-01-02"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+created: "2026-01-07"
+updated: "2026-01-07"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human governance; revised to align with AWO v2 Design Envelope and Minimal Phase Topology."
-policy_version: "ARI-Metadata-2.0.0"
+ai_assistance_details: "AI-assisted drafting under human governance; aligned with AWO v2 Design Envelope and Minimal Phase Topology."
+
 dependencies:
-  - "DESIGN_ENVELOPE.md"
-  - "PHASE_TOPOLOGY.md"
+  - "../DESIGN_ENVELOPE_MINIMAL.md"
+  - "../PHASE_TOPOLOGY.md"
+
 anchors:
   - "AWO-SCOPE-v2.0.0"
 ---
