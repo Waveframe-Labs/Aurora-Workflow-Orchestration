@@ -1,56 +1,27 @@
- ---
-
+---
 title: "Aurora Workflow Orchestration (AWO) — Repository Overview"
-
 filetype: "documentation"
-
 type: "readme"
-
 version: "2.0.0"  
-
 title: "Aurora Workflow Orchestration (AWO) — Repository Overview"
-
 filetype: "documentation"
-
 type: "readme"
-
 version: "2.0.0"
-
 status: "Active"
-
 created: "2025-12-25"
-
 updated: "2026-01-07"
-
-
 author:
-
   name: "Shawn C. Wright"
-
   email: "swright@waveframelabs.org"
-
   orcid: "https://orcid.org/0009-0006-6043-9295"
-
-
 maintainer:
-
   name: "Waveframe Labs"
-
   url: "https://waveframelabs.org"
-
-
 license: "Apache-2.0"
-
-
 ai_assisted: "partial"
-
 ai_assistance_details: "AI-assisted drafting under full human oversight; revised to align with AWO v2.0.0 method surface."
-
-
 anchors:
-
   - "AWO-README-v2.0.0"
-
 ---
 
 
