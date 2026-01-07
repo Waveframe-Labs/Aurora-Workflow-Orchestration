@@ -1,7 +1,8 @@
 {
   "type": "awo.initiation",
   "version": "2.0.0",
-  "artifact_id": "AWO-INIT-2025-001",
+  "status": "active",
+  "artifact_id": "c56a4180-65aa-42ec-a945-5fd21dec0538",
   "phase": "initiation",
   "created": "2025-12-28T00:00:00Z",
   "is_root": true,
@@ -13,7 +14,7 @@
       "ai_assisted": true
     }
   ],
-  "intent": "Investigate whether entropy-driven cosmological expansion models remain dynamically stable when subjected to stochastic perturbations in initial conditions, with the goal of assessing robustness claims made in prior Waveframe entropy–Hubble coupling work.",
+  "intent": "Investigate whether entropy-driven cosmological expansion models remain dynamically stable when subjected to stochastic perturbations...",
   "scope_boundary": {
     "in_scope": [
       "entropy–Hubble coupling dynamics",
@@ -27,5 +28,5 @@
       "precision observational fitting beyond baseline cosmology"
     ]
   },
-  "notes": "This initiation declares exploratory intent only. No methodological claims, evaluation criteria, or execution commitments are asserted at this stage."
+  "notes": "Original ID: AWO-INIT-2025-001. This initiation declares exploratory intent only."
 }
