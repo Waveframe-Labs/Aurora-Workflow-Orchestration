@@ -3,10 +3,10 @@ title: "Aurora Workflow Orchestration (AWO) — Repository Overview"
 filetype: "documentation"
 type: "readme"
 version: "2.0.0"
+doi: "10.5281/zenodo.17013612"  
 status: "Active"
 created: "2025-12-25"
-updated: "2026-01-07"
-doi: "10.5281/zenodo.17013612"  
+updated: "2026-01-07"   
 
 author:
   name: "Shawn C. Wright"
