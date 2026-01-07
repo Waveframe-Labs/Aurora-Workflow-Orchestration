@@ -4,17 +4,31 @@ filetype: "documentation"
 type: "specification"
 version: "2.0.0"
 status: "Active"
-created: "2025-12-20"
-updated: "2026-01-02"
-author: "Waveframe Labs"
-maintainer: "Waveframe Labs"
+created: "2026-01-07"
+updated: "2026-01-07"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
 license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
 ai_assisted: "partial"
-ai_assistance_details: "AI-assisted drafting with full human oversight, cross-checked against ARI Metadata Policy v2.0.0 and the Role Separation Charter v1.1.1, with final acceptance by the maintainer."
-policy_version: "ARI-Metadata-2.0.0"
+ai_assistance_details: "AI-assisted drafting under human oversight; final structure, terminology, and acceptance validated against ARI governance constraints."
+
 dependencies:
-  - "AWO Scope Definition"
-  - "Role Separation Charter v1.1.1 (upstream governance constraint)"
+  - "../SCOPE.md"
+  - "../ROLE_SEPARATION_CHARTER.md"
+
 anchors:
   - "AWO-INVARIANTS-v2.0.0"
 ---
