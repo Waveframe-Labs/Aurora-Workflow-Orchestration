@@ -1,0 +1,34 @@
+cff-version: "1.2.0"
+title: "Aurora Workflow Orchestration (AWO)"
+version: "2.0.0"
+date-released: "2026-01-07"
+
+authors:
+  - family-names: "Wright"
+    given-names: "Shawn C."
+    orcid: "https://orcid.org/0009-0006-6043-9295"
+    affiliation: "Waveframe Labs"
+
+keywords:
+  - reproducibility
+  - workflow orchestration
+  - research methodology
+  - provenance
+  - role separation
+  - auditability
+  - governance
+  - transparency
+
+abstract: >
+  Aurora Workflow Orchestration (AWO) is a reproducible research methodology
+  that formalizes scientific workflows into explicit, auditable phases governed
+  by artifact-first documentation, role separation, and provable provenance.
+  AWO v2.0.0 defines the structural and procedural requirements for initiating,
+  contributing to, reviewing, approving, and auditing research in a way that
+  remains deterministic, replayable, and institution-agnostic. While not an
+  enforcement engine itself, AWO provides the canonical governance layer that
+  downstream tooling (e.g., CRI-CORE) can validate against for compliance.
+
+repository-code: "https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration"
+license: "Apache-2.0"
+message: "If you use AWO in academic, scientific, or technical work, please cite this repository."
