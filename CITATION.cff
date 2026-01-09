@@ -1,6 +1,7 @@
 cff-version: "1.2.0"
 title: "Aurora Workflow Orchestration (AWO)"
 version: "2.0.0"
+doi: "10.5281/zenodo.17013612"
 date-released: "2026-01-07"
 
 authors:
@@ -32,3 +33,13 @@ abstract: >
 repository-code: "https://github.com/Waveframe-Labs/Aurora-Workflow-Orchestration"
 license: "Apache-2.0"
 message: "If you use AWO in academic, scientific, or technical work, please cite this repository."
+
+preferred-citation:
+  type: software
+  title: "Aurora Workflow Orchestration (AWO)"
+  version: "2.0.0"
+  doi: "10.5281/zenodo.17013612"
+  authors:
+    - family-names: "Wright"
+      given-names: "Shawn C."
+      orcid: "https://orcid.org/0009-0006-6043-9295"
