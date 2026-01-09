@@ -1,3 +1,38 @@
+---
+title: "AWO v2.0.0 Changelog"
+filetype: "documentation"
+type: "non-normative"
+version: "2.0.0"
+doi: "TBD-2.0.0"
+status: "Active"
+created: "2026-01-07"
+updated: "2026-01-09"
+
+author:
+  name: "Shawn C. Wright"
+  email: "swright@waveframelabs.org"
+  orcid: "https://orcid.org/0009-0006-6043-9295"
+
+maintainer:
+  name: "Waveframe Labs"
+  url: "https://waveframelabs.org"
+
+license: "Apache-2.0"
+
+copyright:
+  holder: "Waveframe Labs"
+  year: "2026"
+
+ai_assisted: "partial"
+ai_assistance_details: "AI-assisted structuring and validation under human oversight; all change entries reviewed and approved by maintainer."
+
+dependencies:
+  - "./README.md"
+
+anchors:
+  - "AWO-CHANGELOG-v2.0.0"
+---
+
 # CHANGELOG — Aurora Workflow Orchestration (AWO) v2.0.0
 
 ## 2.0.0 — 2026-01-07
