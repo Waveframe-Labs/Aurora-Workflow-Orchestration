@@ -1,8 +1,9 @@
 {
   "manifest_version": "1.0.1",
   "awo_version": "2.0.0",
+  "doi": "10.5281/zenodo.17013612",
   "status": "active",
-  "updated": "2026-01-07",
+  "updated": "2026-01-09",
 
   "author": {
     "name": "Shawn C. Wright",
@@ -19,10 +20,15 @@
 
   "governance": {
     "governing_body": "Aurora Research Initiative (ARI)",
+    "ari_doi": "10.5281/zenodo.17743096",
     "metadata_policy": "ARI Metadata Policy v2.0.0",
     "role_charter": "Role Separation Charter v1.1.1",
-    "ntd_reference": "Neurotransparency Doctrine (concept DOI)",
-    "nts_reference": "Neurotransparency Specification (concept DOI)"
+
+    "ntd_reference": "Neurotransparency Doctrine",
+    "ntd_doi": "10.5281/zenodo.17957384",
+
+    "nts_reference": "Neurotransparency Specification",
+    "nts_doi": "10.5281/zenodo.17809676"
   },
 
   "scope": {
@@ -90,7 +96,8 @@
     ],
     "enforced_by": [
       "CRI-CORE"
-    ]
+    ],
+    "cri_core_concept_doi": "10.5281/zenodo.16872199"
   },
 
   "ai_indexing": {
