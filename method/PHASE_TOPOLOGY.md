@@ -34,7 +34,7 @@ anchors:
 ---
 
 # AWO v2 — Minimal Phase Topology
-Status: Draft — Method Layer (L1)  
+Status: Active: Method Layer (L1)  
 Scope: Structural workflow ordering only (non-normative, non-semantic)
 
 ---
