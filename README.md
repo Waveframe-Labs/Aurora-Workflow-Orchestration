@@ -31,7 +31,7 @@ anchors:
 ---
 
 <p align="center">
-  <img src="figures/AWO-v2-banner.png" alt="AWO Banner" width="100%">
+  <img src="https://raw.githubusercontent.com/Waveframe-Labs/.github/main/assets/branding/canon_wf_logo_extended.png" width="700">
 </p>
 
 # Aurora Workflow Orchestration (AWO)
