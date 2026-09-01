@@ -36,6 +36,8 @@ anchors:
 
 # Aurora Workflow Orchestration (AWO)
 
+> **Current status (2026-09-01): Foundational research methodology — maintenance mode.** AWO is preserved as a published methodology for reproducible AI–human research. It is not a current workflow engine or dependency of the Waveframe product runtime. [Read the current repository boundary](STATUS.md).
+
 [![Waveframe Labs](https://img.shields.io/badge/WAVEFRAME%20LABS-Institutional%20Repository-FF6A00?style=flat)](https://waveframelabs.org)
 [![Governed Repository](https://img.shields.io/badge/Governance-ARI%20Compliant-8A2BE2?style=flat)](https://github.com/Waveframe-Labs/Aurora-Research-Initiative)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17013612.svg)](https://doi.org/10.5281/zenodo.17013612)
